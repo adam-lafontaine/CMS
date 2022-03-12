@@ -1,0 +1,28 @@
+{
+    "videos": [
+        {
+            "youtube_id": "P2lxGnbDkDI",
+            "description": "What should a program look like?"
+        },
+        {
+            "youtube_id": "rX0ItVEVjHc",
+            "description": "Software is not a platform"
+        },
+        {
+            "youtube_id": "rNSVZs66o48",
+            "description": "It depends"
+        },
+        {
+            "youtube_id": "ZSRHeXYDLko",
+            "description": "Preventing the Collapse of Civilization"
+        },
+        {
+            "youtube_id": "kZRE7HIO3vk",
+            "description": "The Thirty Million Line Problem"
+        },
+        {
+            "youtube_id": "hCvHTrUh4os",
+            "description": "Significant whitespace is actually a thing"
+        }
+    ]
+}
