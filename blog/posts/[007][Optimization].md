@@ -3,7 +3,7 @@
 
 Optimizing our code can be a lot of work, but before we get into some examples lets have a look at what we get for free.  Below are the execution times of several operations using different implementations.  The left side shows the times with compiler optimizations turned on, and the right side shows the times with compiler optimizations disabled.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/example_output.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/example_output.png)
 
 In general, the compiler-optimized versions are faster and the performance gains are quite significant.  The only exception being the "8 wide" version of the Fused Muliply-Add example.  In the "SIMD" section, the times decrease with the "width" when unoptimized and the times are much closer together in the optimized versions.  The "8 wide" versions are also the slowest when optimized.  When unoptimized, the "8 wide" versions are just as fast as the optimized versions.
 
@@ -207,7 +207,7 @@ void multiply()
 
 Note: The Stopwatch class is available in this [previous post](https://almostalwaysauto.com/posts/parallelism-for-free)
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/simd_multiply.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/simd_multiply.png)
 
 We would expect the 8 wide version to be fastest because it has the fewest total operations to perform.  This is the case when the compiler does not apply any optimizations of its own.  With compiler optimizations enabled, all three versions are pretty much the same with the 8 wide version being slightly slower than the other two.  Also, the unoptimized 8 wide version is just as fast as the optimized versions.
 
@@ -345,7 +345,7 @@ void fused_multiply_add()
 }
 ```
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/simd_fma.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/simd_fma.png)
 
 All versions are slower than then their multiply counterparts.  The fused multiply-add is technically one operation but it is clearly more work for the processor to perform.  With compiler optimizations, the 1 and 4 wide implementations are faster than the 8 wide implementation.  8 wide is still the same speed with our without compiler optimizations.
 
@@ -499,7 +499,7 @@ void hypotenuse_3d()
 }
 ```
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/simd_hypot3d.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/simd_hypot3d.png)
 
 The calculation takes considerably more time when compiled without optimizations.  With optimizations, the times are the same as those for the fused multiply-add.  The compiler-optimized 8 wide version is also slower than the 1 and 4 wide versions but faster than the 8 wide fused multiply-add.
 
@@ -648,7 +648,7 @@ void madd_struct_of_arrays()
 }
 ```
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/soa_fma.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/soa_fma.png)
 
 The SOA version is significantly faster with and without compiler optimizations.  The speeds match the 1 wide implementations of the SIMD fused multiply-add example.  This is because the implementations are exactly the same.  Data elements are contiguous, which makes it possible to vectorize and cache efficiently.
 
@@ -664,7 +664,7 @@ This is the question that we should always be asking ourselves rather than simpl
 
 Here is an example doing edge detection on grayscale images.  The numbers are relative times per pixel rather than raw milliseconds.  This allows for comparing different sizes of images and different quantities.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B007%5D/image_processing.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B007%5D/image_processing.png)
 
 * seq = Raw loops or std::for_each(...)
 * par = Parallel processing using std::execution::par

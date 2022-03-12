@@ -354,19 +354,19 @@ int main()
 
 The program output gives us what we expect.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B002%5D/output.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B002%5D/output.bmp)
 
 This is what the image first looked like after setting the color based on the x position.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B002%5D/french.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B002%5D/french.bmp)
 
 The image after setting the color based on the y position.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B002%5D/dutch.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B002%5D/dutch.bmp)
 
 The same checkerboard pattern as the previous post using RGB grayscale.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B002%5D/pattern.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B002%5D/pattern.bmp)
 
 
 ### Conclusion

@@ -1,4 +1,4 @@
-# Simple Image Transforms
+s# Simple Image Transforms
 ## Grayscale, Binarization
 
 ### The standard algorithms
@@ -111,11 +111,11 @@ void convert_to_grayscale(RGBAImage& src, GrayImage& dst)
 
 Starting with an image containing two sprites.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B006%5D/sprites.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B006%5D/sprites.png)
 
 We get the following grayscale image
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B006%5D/sprites_gray.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B006%5D/sprites_gray.bmp)
 
 
 ### Binarization
@@ -151,7 +151,7 @@ void binarize_simple(GrayImage& src_dst)
 
 Applying the function with the grayscale image we just generated gives the following.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B006%5D/binary.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B006%5D/binary.bmp)
 
 
 ### Example Program

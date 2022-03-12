@@ -210,11 +210,11 @@ int main()
 
 Output when running in debug mode.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B004%5D/debug.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/debug.png)
 
 Output when running in release mode.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B004%5D/release.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/release.png)
 
 In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but the time adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT. Also, check and see how it affects your computer's CPU usage by openning Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
 
@@ -225,7 +225,7 @@ constexpr unsigned AMOUNT_OF_WORK = 1000;
 constexpr unsigned ELEMENT_COUNT = 1000000;
 ```
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B004%5D/cpu_usage.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/cpu_usage.png)
 
 While running sequencially, the CPU usage is at about 40%.  It then goes up to 100% when it does the parallel processing.  Parallel execution can be a CPU resource hog.  It could slow down other processes running on the computer, especially if they require significant CPU resources as well.  It's also impossible to know how much faster it will be if other processes will be running at the same time.
 

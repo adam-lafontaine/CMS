@@ -60,7 +60,7 @@ Note:  I have no idea how this actually works.  My professor in college gave us 
 
 If the program exits without freeing all of its memory, a report is generated in the debug console.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B005%5D/leak_report.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B005%5D/leak_report.png)
 
 Enabling this in a full application will slow it down considerably.  It's best to use a check like this when testing each feature individually.  Memory leak bugs are very hard to track down.  Catching them early in isolated situations prevents many problems down the road.
 
@@ -82,7 +82,7 @@ void opencv_memory_leak()
 
 Even with the call to release(), the debug report is very clear.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/master/img/%5B005%5D/opencv_leak.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B005%5D/opencv_leak.png)
 
 So OpenCV does not clean up after itself.  Tsk tsk.  Memory leaks do not always cause a program to crash though.  OpenCV is a good example.  The library is over 20 years old and has been widely used without issue.  However that does not mean that there are no issues.  One consequence is that any application using OpenCV cannot be reliably tested for leaks.  The test will always show leaks regardless.
 
