@@ -217,7 +217,7 @@ public:
 
 ### The iterator class
 
-The iterator for the GrayView class needs to be a forward iterator.  That means at minimum it must be able to increment (++), compare equality (==, !=) and dereference(*).  We'll start with the following definitions.
+The iterator for the GrayView class needs to be a forward iterator.  That means at minimum it must be able to increment (++), dereference(*) and compare equality (==, !=).  We'll start with the following definitions.
 
 ```cpp
 class GrayView::iterator
@@ -246,7 +246,7 @@ public:
 };
 ```
 
-When the iterator is created from a view, it will set its location to the beginning of the range.  It will also need to store the location of the image memory and the range of pixel locations represented by the view.
+In order to track the location within the image we need the x and y positions.  The pointer to the image data is needed as well as the range of the view.  The width of the image is needed for locating the start of each row of pixels.
 
 ```cpp
 class GrayView::iterator
@@ -265,44 +265,225 @@ public:
 
     GrayPixel* image_data_ = nullptr;
     Range2Du32 range_ = {};
+    u32 image_width_ = 0;
 
     explicit iterator() {}
 
-    explicit iterator(GrayView const& view)
-    {
-        image_data_ = view.image_data_;
-        range_ = view.range_;
-        
-        x_ = range_.x_begin;
-        y_ = range_.y_begin;
-    }
+    explicit iterator(GrayView const& view); // TODO: implement
 
-    iterator& operator ++ ();
+    iterator& operator ++ (); // TODO: implement
 
-    iterator operator ++ (int);
+    iterator operator ++ (int); // TODO: implement
 
-    bool operator == (iterator other) const;
+    bool operator == (iterator other) const; // TODO: implement
 
-    bool operator != (iterator other) const;
+    bool operator != (iterator other) const; // TODO: implement
 
-    reference operator * () const;
+    reference operator * () const; // TODO: implement
 };
 ```
 
-Increment
+Constructing the iterator from a view object copies the properties from the view and sets position to the beginning of the range.
 
 ```cpp
-
+explicit iterator(GrayView const& view)
+{
+    image_data_ = view.image_data_;
+    range_ = view.range_;
+    image_width_ = view.image_width_;
+    
+    x_ = range_.x_begin;
+    y_ = range_.y_begin;
+}
 ```
 
-Equality
+To compare equality with another iterator, just check if the x and y positons are the same.
 
 ```cpp
+bool operator == (iterator other) const { return x_ == other.x_ && y_ == other.y_; }
 
+bool operator != (iterator other) const { return !(*this == other); }
 ```
 
-Dereference
+To increment, or advance the iterator to the next position, we increment the x position until we reach the width of the range.  When we reach the end of the range of x values, increment y to the next row and set the x position to the beginning of the range.  We'll place this logic in its own method.
 
 ```cpp
-
+void next()
+{
+    ++x_;
+    if (x_ >= range_.x_end)
+    {
+        ++y_;
+        x_ = range_.x_begin;
+    }
+}
 ```
+
+The pre-increment operator increments itself and then returns itself;
+
+```cpp
+iterator& operator ++ () { next(); return *this; }
+```
+
+The post-increment operator increments itself and returns a copy of it's state before being incremented.
+
+```cpp
+bool operator != (iterator other) const { return !(*this == other); }
+```
+
+Dereferencing the iterator returns a reference to the pixel at its position.  To do that we need a pointer to the pixel and its position.  Just like every memory buffer, the pointer to the pixel is at an offset from the beginning of the image buffer.  We calculate the offset using the x and y positions as well as the width of the image.
+
+The number of pixels in each row of the image is the width of the image.  So the offset to the beginning of each row is the y position multiplied by the width.
+
+```cpp
+auto image_row_offset = y_ * image_width_;
+```
+
+The x position is the number of pixels from the beginning of the row.  That means that the total offset of the pixel is the offset of the row plus the x position.
+
+```cpp
+auto offset = (size_t)(image_row_offset + x_);
+```
+
+We'll add a method to the iterator class that returns the pixel pointer.
+
+```cpp
+GrayPixel* xy_ptr() const
+{
+    auto image_row_offset = y_ * image_width_;
+    auto offset = (size_t)(image_row_offset + x_);
+    auto ptr = image_data_ + offset;
+
+    return ptr;
+}
+```
+
+The dereference operator only needs to return the dereferenced pointer of this method.
+
+```cpp
+reference operator * () const { return *xy_ptr(); }
+```
+
+The last thing the iterator needs is a way to return the "end" of the view.  In the C++ world "begin" is the first element of a collection and "end" is one past the last element.  In this case, the last element is the last pixel in the range.  One past the last pixel is simply the next one.
+
+```cpp
+iterator end()
+{
+    x_ = range_.x_end - 1;
+    y = range_.y_end - 1;
+    next();
+
+    return *this;
+}
+```
+
+### Back to the view class
+
+Now that the iterator class is complete we can turn our attention back to the view to implement the begin and end iterator methods.  Including the iterator definition in the view class makes things simpler for this post's purposes.
+
+This is what we have so far.
+
+```cpp
+class GrayView
+{
+public:
+
+    GrayPixel* image_data_ = nullptr;
+    u32 image_width_ = 0;
+    u32 image_height_ = 0;
+
+    Range2Du32 range_ = {};
+
+    GrayView(GrayImage const& image, Range2Du32 const& range)
+    {
+        image_data_ = image.data;
+        image_width_ = image.width;
+        image_height_ = image.height;
+        range_ = range;
+    }
+
+
+    class iterator
+    {
+    public:
+
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = GrayPixel;
+        using difference_type = std::ptrdiff_t;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+        // location within the image
+        u32 x_ = 0;
+        u32 y_ = 0;
+
+        GrayPixel* image_data_ = nullptr;
+        Range2Du32 range_ = {};
+        u32 image_width_ = 0;
+
+        explicit iterator() {}
+
+        explicit iterator(GrayView const& view)
+        {
+            image_data_ = view.image_data_;
+            range_ = view.range_;
+            image_width_ = view.image_width_;
+
+            x_ = range_.x_begin;
+            y_ = range_.y_begin;
+        }
+
+
+        void next()
+        {
+            ++x_;
+            if (x_ >= range_.x_end)
+            {
+                ++y_;
+                x_ = range_.x_begin;
+            }
+        }
+
+
+        GrayPixel* xy_ptr() const
+        {
+            auto image_row_offset = y_ * image_width_;
+            auto offset = (size_t)(image_row_offset + x_);
+            auto ptr = image_data_ + offset;
+
+            return ptr;
+        }
+
+
+        iterator end()
+        {
+            x_ = range_.x_end - 1;
+            y_ = range_.y_end - 1;
+            next();
+
+            return *this;
+        }
+
+
+        iterator& operator ++ () { next(); return *this; }
+
+        iterator operator ++ (int) { iterator result = *this; ++(*this); return result; }
+
+        bool operator == (iterator other) const { return x_ == other.x_ && y_ == other.y_; }
+
+        bool operator != (iterator other) const { return !(*this == other); }
+
+        reference operator * () const { return *xy_ptr(); }
+    };
+
+
+    iterator begin(); // TODO: implement
+
+    iterator end(); // TODO: implement
+
+    iterator begin() const; // TODO: implement
+
+    iterator end() const; // TODO: implement
+};
+```
+
