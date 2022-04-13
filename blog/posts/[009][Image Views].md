@@ -2,6 +2,8 @@
 ## 
 
 
+### The image class
+
 ```cpp
 #include <cstdint>
 
@@ -71,6 +73,8 @@ public:
     }
 };
 ```
+
+### Objective
 
 Suppose we have functions for reading and writing images.  This was covered in a previous post.
 
@@ -147,8 +151,158 @@ int main()
 
 void invert_gray(GrayView const& view)
 {
-    auto const invert = [](GrayPixel& p) { p = 255 - p; }
+    auto const invert = [](GrayPixel& p) { p = 255 - p; };
 
     std::for_each(view.begin(), view.end(), invert);
 }
+```
+
+From this we can see that in addition to implementing the constructor, we need begin and end iterator functions if we want to use the standard algorithms.
+
+### the view class
+
+Given our requirements, the GrayView class needs to have the following structure.
+
+```cpp
+class GrayView
+{
+public:    
+
+    GrayView(GrayImage const& image, Range2Du32 const& range); // TODO: implement
+
+
+    class iterator; // TODO: implement
+
+    iterator begin(); // TODO: implement
+
+    iterator end(); // TODO: implement
+
+    iterator begin() const; // TODO: implement
+
+    iterator end() const; // TODO: implement
+};
+```
+
+Before we handle the iterator, we need to specify what the view object needs to be able to iterate over a range of an image.  i.e. the image's properties as well as the range.  Adding these properties makes implementing the constructor trivial.
+
+```cpp
+class GrayView
+{
+public:
+
+    GrayPixel* image_data_ = nullptr;
+    u32 image_width_ = 0;
+    u32 image_height_ = 0;
+
+    GrayView(GrayImage const& image, Range2Du32 const& range)
+    {
+        image_data_ = image.data;
+        image_width_ = image.width;
+        image_height_ = image.height;
+        range_ = range;
+    }
+
+
+    class iterator; // TODO: implement
+
+    iterator begin(); // TODO: implement
+
+    iterator end(); // TODO: implement
+
+    iterator begin() const; // TODO: implement
+
+    iterator end() const; // TODO: implement
+};
+```
+
+### The iterator class
+
+The iterator for the GrayView class needs to be a forward iterator.  That means at minimum it must be able to increment (++), compare equality (==, !=) and dereference(*).  We'll start with the following definitions.
+
+```cpp
+class GrayView::iterator
+{
+public:
+
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = GrayPixel;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type*;
+    using reference = value_type&;
+
+    explicit iterator() {}
+
+    explicit iterator(GrayView const& view); // TODO: implement
+
+    iterator& operator ++ (); // TODO: implement
+
+    iterator operator ++ (int); // TODO: implement
+
+    bool operator == (iterator other) const; // TODO: implement
+
+    bool operator != (iterator other) const; // TODO: implement
+
+    reference operator * () const; // TODO: implement
+};
+```
+
+When the iterator is created from a view, it will set its location to the beginning of the range.  It will also need to store the location of the image memory and the range of pixel locations represented by the view.
+
+```cpp
+class GrayView::iterator
+{
+public:
+
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = GrayPixel;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type*;
+    using reference = value_type&;
+
+    // location within the image
+    u32 x_ = 0;
+    u32 y_ = 0;
+
+    GrayPixel* image_data_ = nullptr;
+    Range2Du32 range_ = {};
+
+    explicit iterator() {}
+
+    explicit iterator(GrayView const& view)
+    {
+        image_data_ = view.image_data_;
+        range_ = view.range_;
+        
+        x_ = range_.x_begin;
+        y_ = range_.y_begin;
+    }
+
+    iterator& operator ++ ();
+
+    iterator operator ++ (int);
+
+    bool operator == (iterator other) const;
+
+    bool operator != (iterator other) const;
+
+    reference operator * () const;
+};
+```
+
+Increment
+
+```cpp
+
+```
+
+Equality
+
+```cpp
+
+```
+
+Dereference
+
+```cpp
+
 ```
