@@ -86,7 +86,7 @@ void read_image_from_file(const char* img_path_src, GrayImage& image_dst);
 void write_image(GrayImage const& image_src, const char* file_path_dst);
 ```
 
-We want to be able to create a view from an existing image and range of pixel locations.
+We want to be able to create a view from an existing image using a 2 dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.
 
 ```cpp
 class Range2Du32
@@ -103,17 +103,24 @@ class GrayView
 {
 public:
 
-    GrayView(GrayImage const& image, Range2Du32 const& range);
-
-    // TODO: implement
+    GrayView(GrayImage const& image, Range2Du32 const& range); // TODO: implement
+    
 };
 ```
 
-For our example, we'll a function that uses a GrayView to operate its pixels.
+For our example, we'll define a function that uses a GrayView to operate on an image's pixels.  We'll make make the view behave like a standard container so that we can use it with the standard algorithms.  In addition to implementing the constructor, we need begin() and end() iterator functions.
 
 ```cpp
+#include <algorithm>
+
+
 // a function for operating on the selected region
-void invert_gray(GrayView const& view); // TODO: implement
+void invert_gray(GrayView const& view)
+{
+    auto const invert = [](GrayPixel& p) { p = 255 - p; };
+
+    std::for_each(view.begin(), view.end(), invert);
+}
 ```
 
 The goal is to be able to use the GrayView class like so:
@@ -144,20 +151,11 @@ int main()
 }
 ```
 
-
-```cpp
-#include <algorithm>
-
-
-void invert_gray(GrayView const& view)
-{
-    auto const invert = [](GrayPixel& p) { p = 255 - p; };
-
-    std::for_each(view.begin(), view.end(), invert);
-}
-```
-
-From this we can see that in addition to implementing the constructor, we need begin and end iterator functions if we want to use the standard algorithms.
+Our program is going to
+* Read an image file in grayscale format
+* Make a view from a range in the center of the image
+* Invert the the grayscale values of the pixels in the range
+* Write the modifed image to file
 
 ### the view class
 
@@ -173,6 +171,7 @@ public:
 
     class iterator; // TODO: implement
 
+
     iterator begin(); // TODO: implement
 
     iterator end(); // TODO: implement
@@ -183,7 +182,7 @@ public:
 };
 ```
 
-Before we handle the iterator, we need to specify what the view object needs to be able to iterate over a range of an image.  i.e. the image's properties as well as the range.  Adding these properties makes implementing the constructor trivial.
+In order to be able to iterate over a 2D range in an image, the view needs pointer to the image's pixel data, the range to iterate over and the width in pixels of the image.  Adding these properties makes implementing the constructor trivial.
 
 ```cpp
 class GrayView
@@ -192,13 +191,12 @@ public:
 
     GrayPixel* image_data_ = nullptr;
     u32 image_width_ = 0;
-    u32 image_height_ = 0;
+    Range2Du32 range_ = {};
 
     GrayView(GrayImage const& image, Range2Du32 const& range)
     {
         image_data_ = image.data;
         image_width_ = image.width;
-        image_height_ = image.height;
         range_ = range;
     }
 
@@ -283,7 +281,7 @@ public:
 };
 ```
 
-Constructing the iterator from a view object copies the properties from the view and sets position to the beginning of the range.
+Constructing the iterator from a view object copies the properties from the view and sets the position to the beginning of the range.
 
 ```cpp
 explicit iterator(GrayView const& view)
@@ -305,7 +303,7 @@ bool operator == (iterator other) const { return x_ == other.x_ && y_ == other.y
 bool operator != (iterator other) const { return !(*this == other); }
 ```
 
-To increment, or advance the iterator to the next position, we increment the x position until we reach the width of the range.  When we reach the end of the range of x values, increment y to the next row and set the x position to the beginning of the range.  We'll place this logic in its own method.
+To increment, or advance the iterator to the next position, we increment the x position unless we reach the width of the range.  At the end of the range of x values, increment y to the next row and set the x position to the beginning of the range.  We'll place this logic in its own method.
 
 ```cpp
 void next()
@@ -325,13 +323,13 @@ The pre-increment operator increments itself and then returns itself;
 iterator& operator ++ () { next(); return *this; }
 ```
 
-The post-increment operator increments itself and returns a copy of it's state before being incremented.
+The post-increment operator increments itself and returns a copy of its state before being incremented.
 
 ```cpp
-bool operator != (iterator other) const { return !(*this == other); }
+iterator operator ++ (int) { iterator result = *this; ++(*this); return result; }
 ```
 
-Dereferencing the iterator returns a reference to the pixel at its position.  To do that we need a pointer to the pixel and its position.  Just like every memory buffer, the pointer to the pixel is at an offset from the beginning of the image buffer.  We calculate the offset using the x and y positions as well as the width of the image.
+Dereferencing the iterator returns a reference to the pixel at its position.  To do that we need a pointer to the pixel ay its position.  Just like every memory buffer, the pointer to the pixel is at an offset from the beginning of the image buffer.  We calculate the offset using the x and y positions as well as the width of the image.
 
 The number of pixels in each row of the image is the width of the image.  So the offset to the beginning of each row is the y position multiplied by the width.
 
@@ -342,7 +340,7 @@ auto image_row_offset = y_ * image_width_;
 The x position is the number of pixels from the beginning of the row.  That means that the total offset of the pixel is the offset of the row plus the x position.
 
 ```cpp
-auto offset = (size_t)(image_row_offset + x_);
+auto offset = image_row_offset + x_;
 ```
 
 We'll add a method to the iterator class that returns the pixel pointer.
@@ -351,10 +349,9 @@ We'll add a method to the iterator class that returns the pixel pointer.
 GrayPixel* xy_ptr() const
 {
     auto image_row_offset = y_ * image_width_;
-    auto offset = (size_t)(image_row_offset + x_);
-    auto ptr = image_data_ + offset;
+    auto offset = image_row_offset + x_;
 
-    return ptr;
+    return image_data_ + (size_t)offset;
 }
 ```
 
@@ -379,9 +376,129 @@ iterator end()
 
 ### Back to the view class
 
-Now that the iterator class is complete we can turn our attention back to the view to implement the begin and end iterator methods.  Including the iterator definition in the view class makes things simpler for this post's purposes.
+Now that the iterator class is complete, we can turn our attention back to the view.  Including the iterator definition inside of the view class makes things simpler for this post's purposes.
 
 This is what we have so far.
+
+```cpp
+class GrayView
+{
+public:
+
+    GrayPixel* image_data_ = nullptr;
+    u32 image_width_ = 0;
+    u32 image_height_ = 0;
+
+    Range2Du32 range_ = {};
+
+    GrayView(GrayImage const& image, Range2Du32 const& range)
+    {
+        image_data_ = image.data;
+        image_width_ = image.width;
+        image_height_ = image.height;
+        range_ = range;
+    }
+
+
+    class iterator
+    {
+    public:
+
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = GrayPixel;
+        using difference_type = std::ptrdiff_t;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+        // location within the image
+        u32 x_ = 0;
+        u32 y_ = 0;
+
+        GrayPixel* image_data_ = nullptr;
+        Range2Du32 range_ = {};
+        u32 image_width_ = 0;
+
+        explicit iterator() {}
+
+        explicit iterator(GrayView const& view)
+        {
+            image_data_ = view.image_data_;
+            range_ = view.range_;
+            image_width_ = view.image_width_;
+
+            x_ = range_.x_begin;
+            y_ = range_.y_begin;
+        }
+
+
+        void next()
+        {
+            ++x_;
+            if (x_ >= range_.x_end)
+            {
+                ++y_;
+                x_ = range_.x_begin;
+            }
+        }
+
+
+        GrayPixel* xy_ptr() const
+        {
+            auto image_row_offset = y_ * image_width_;
+            auto offset = image_row_offset + x_;
+            return image_data_ + (size_t)offset;
+        }
+
+
+        iterator end()
+        {
+            x_ = range_.x_end - 1;
+            y_ = range_.y_end - 1;
+            next();
+
+            return *this;
+        }
+
+
+        iterator& operator ++ () { next(); return *this; }
+
+        iterator operator ++ (int) { iterator result = *this; ++(*this); return result; }
+
+        bool operator == (iterator other) const { return x_ == other.x_ && y_ == other.y_; }
+
+        bool operator != (iterator other) const { return !(*this == other); }
+
+        reference operator * () const { return *xy_ptr(); }
+    };
+
+
+    iterator begin(); // TODO: implement
+
+    iterator end(); // TODO: implement
+
+    iterator begin() const; // TODO: implement
+
+    iterator end() const; // TODO: implement
+};
+```
+
+All that remains are the begin() and end() methods.  These are simple to implement now that the iterator class is complete.  For begin(), we only need to create a new iterator with the view because the position is set to the beginning of the range when constructed.
+
+```cpp
+iterator begin() { return iterator(*this); }
+
+iterator begin() const { return iterator(*this); }
+```
+
+For the end() methods, we use the iterator's end() method.
+
+```cpp
+iterator end() { return iterator(*this).end(); }
+
+iterator end() const { return iterator(*this).end(); }
+```
+
+And with that, our GrayView class is complete.
 
 ```cpp
 class GrayView
@@ -477,13 +594,12 @@ public:
     };
 
 
-    iterator begin(); // TODO: implement
+    iterator begin() { return iterator(*this); }
 
-    iterator end(); // TODO: implement
+    iterator end() { return iterator(*this).end(); }
 
-    iterator begin() const; // TODO: implement
+    iterator begin() const { return iterator(*this); }
 
-    iterator end() const; // TODO: implement
+    iterator end() const { return iterator(*this).end(); }
 };
 ```
-
