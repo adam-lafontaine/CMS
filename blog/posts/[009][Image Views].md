@@ -603,3 +603,7 @@ public:
     iterator end() const { return iterator(*this).end(); }
 };
 ```
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/pixel-character.png)
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/inverted.png)
