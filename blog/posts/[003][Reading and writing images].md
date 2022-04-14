@@ -193,8 +193,8 @@ void write_image(Image const& image_src, const char* file_path_dst)
     assert(image_src.height);
     assert(image_src.data);
 
-    int width = static_cast<int>(image_src.width);
-    int height = static_cast<int>(image_src.height);
+    int width = (int)image_src.width;
+    int height = (int)image_src.height;
     int channels = 4;
     auto const data = image_src.data;
 

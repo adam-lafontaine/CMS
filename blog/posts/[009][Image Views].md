@@ -2,6 +2,7 @@
 ## 
 
 
+
 ### The image class
 
 ```cpp
@@ -76,7 +77,7 @@ public:
 
 ### Objective
 
-Suppose we have functions for reading and writing images.  This was covered in a previous post.
+Suppose we have functions for reading and writing images.  This was covered in a previous post for color images.  See the end of this post for reading grayscale images.
 
 ```cpp
 // https://almostalwaysauto.com/posts/read-write-image
@@ -136,10 +137,10 @@ int main()
 
     // generate a view of the center region of the image
     Range2Du32 range{};
-    range.x_begin = width / 4;
-    range.x_end = width * 3 / 4;
-    range.y_begin = height / 4;
-    range.y_end = height * 3 / 4;
+    range.x_begin = width / 10;
+    range.x_end = width * 9 / 10;
+    range.y_begin = height / 3;
+    range.y_end = height * 2 / 3;
 
     GrayView view(image, range);
 
@@ -604,6 +605,89 @@ public:
 };
 ```
 
+We are now ready to try out our program.
+
+```cpp
+int main()
+{
+    // get an image from file
+    GrayImage image;
+    read_image_from_file("image path", image);
+    auto const width = image.width;
+    auto const height = image.height;
+
+    // generate a view of the center region of the image
+    Range2Du32 range{};
+    range.x_begin = width / 10;
+    range.x_end = width * 9 / 10;
+    range.y_begin = height / 3;
+    range.y_end = height * 2 / 3;
+
+    GrayView view(image, range);
+
+    // invert the grayscale colors of the pixels within the view
+    invert_gray(view);
+
+    // write the modified image to file
+    write_image(image, "new image path");
+}
+```
+
+Running the program with the following image
+
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/pixel-character.png)
 
+yields what we expect.
+
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/inverted.png)
+
+
+
+
+### Epilogue: Reading and writing grayscale images
+
+In a previous post, we covered reading and writing images (https://almostalwaysauto.com/posts/read-write-image).  The examples there were for color images.
+
+The stb_image library allows for reading and writing grayscale images as well.  It also allows reading color images as grayscale images.  The stbi_load function takes a parameter for the number of desired channels in the loaded image.  Choose 4 channels for RGBA images, 3 channel for RGB, and 1 channel for grayscale.  If the image is a color image and 1 channel is selected for the output, the image will be converted to grayscale.
+
+```cpp
+void read_image_from_file(const char* img_path_src, GrayImage& image_dst)
+{
+    int width = 0;
+    int height = 0;
+    int image_channels = 0;
+    int desired_channels = 1; // one channel for grayscale images
+
+    auto data = (GrayPixel*)stbi_load(img_path_src, &width, &height, &image_channels, desired_channels);
+
+    assert(data);
+    assert(width);
+    assert(height);
+
+    image_dst.data = data;
+    image_dst.width = width;
+    image_dst.height = height;
+}
+```
+
+There is similar functionality for writing images to file.
+
+```cpp
+void write_image(GrayImage const& image_src, const char* file_path_dst)
+{
+    assert(image_src.width);
+    assert(image_src.height);
+    assert(image_src.data);
+
+    int width = (int)image_src.width;
+    int height = (int)image_src.height;
+    int channels = 1; // one channel for grayscale images
+    auto const data = image_src.data;
+
+    int result = 0;
+
+    result = stbi_write_bmp(file_path_dst, width, height, channels, data);
+
+    assert(result);
+}
+```
