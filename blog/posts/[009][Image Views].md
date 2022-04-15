@@ -112,7 +112,7 @@ I first learned about image views from Boost GIL (Generic Image Library) (https:
 
 > An image view is a generalization of STL range concept to multiple dimensions. Similar to ranges (and iterators), image views are shallow, don’t own the underlying data and don’t propagate their constness over the data. For example, a constant image view cannot be resized, but may allow modifying the pixels.
 
-The challenge with an image view is that the ranges are 2 dimensional.  An image's pixels are a 1 dimensional memory buffer so iterating over the entire image is trivial.  We simulate two dimensions in an image by using the width and height.
+The challenge with an image view is that the ranges are 2-dimensional.  An image's pixels are a 1-dimensional memory buffer so iterating over the entire image is trivial.  We simulate two dimensions in an image by using the width and height.
 
 ```cpp
 for(auto y = 0; y < image.height; ++y)
@@ -218,7 +218,7 @@ void write_image(GrayImage const& image_src, const char* file_path_dst);
 
 ### Objective
 
-In this post, we'll create a view that acts on an image in a similar fashion as the above example for vectors.  We will create a view from an existing image using a 2 dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.  We'll first define a range of pixels within an image.
+In this post, we'll create a view that acts on an image in a similar fashion as the above example for vectors.  We will create a view from an existing image using a 2-dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.  We'll first define a range of pixels within an image.
 
 ```cpp
 class Range2Du32
@@ -507,7 +507,7 @@ The dereference operator only needs to return the dereferenced pointer of this m
 reference operator * () const { return *xy_ptr(); }
 ```
 
-The last thing the iterator needs is a way to return the "end" of the view.  In the C++ world "begin" is the first element of a collection and "end" is one past the last element.  In this case, the last element is the last pixel in the range.  One past the last pixel is simply the next one.
+The last thing the iterator needs is a way to return the "end" of the view.  In the C++ world, convention is that "begin" is the first element of a collection and "end" is one past the last element.  In this case, the last element is the last pixel in the range.  One past the last pixel is simply the next one.
 
 ```cpp
 iterator end()
@@ -785,23 +785,23 @@ int main()
 }
 ```
 
-If we run the program with the following image...
+If we run the program with on our pixel art character...
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/pixel-character.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B009%5D/pixel-character.png)
 
 The modifed image is grayscale and its center region's pixel intensities are inverted.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/inverted.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B009%5D/inverted.png)
 
 The new image is a copy of the modified image's center region.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/image_from_view.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B009%5D/image_from_view.png)
 
 ### And we're done
 
-Our STL compliant (almost) ImageView data structure is finally complete.  It was painful but now it's over.  We defined how to iterate over a 2 dimensional range within an image and can now treat both images and sections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
+Our STL compliant (almost) ImageView data structure is finally complete.  It was painful but now it's over.  We defined how to iterate over a 2-dimensional range within an image and can now treat both images and sections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
 
-This type of experience is pretty common in C++ development.  Make a container, make an iterator, provide begin() and end(), use the STL.  Sometimes it's a lot of work upfront but it has the potential to pay off over time.  
+This type of experience is pretty common in C++ development.  Make a container, make an iterator, provide begin() and end(), so that we can use the STL.  Sometimes it's a lot of work upfront but it has the potential to pay off over time.  
 
 ### Addendum: Reading and writing grayscale images
 
