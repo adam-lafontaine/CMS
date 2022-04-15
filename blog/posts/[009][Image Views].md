@@ -1,5 +1,108 @@
 # Image Views
-## 
+## Working on a range or region of pixels within an image
+
+### What is a view?
+
+Views can be described as "lightweight objects that indirectly represent iterable sequences" (https://en.cppreference.com/w/cpp/ranges).  
+
+In image processing, there is a section of the image called the Region of Interest (ROI).  The ROI is the region that contains the features we are interested in and is where we want to apply our algorithm.  Having a view to the ROI
+
+I first learned about image views from the Boost GIL library (https://www.boost.org/doc/libs/1_77_0/libs/gil/doc/html/design/image_view.html)
+
+> An image view is a generalization of STL range concept to multiple dimensions. Similar to ranges (and iterators), image views are shallow, don’t own the underlying data and don’t propagate their constness over the data. For example, a constant image view cannot be resized, but may allow modifying the pixels
+
+For example, suppose we want to select a range of elements within a vector and treat that range as a collection itself.  We want to be able to access and modify each element in the range and see the changes we made when reading the original vector.  For this, we could make something like the following.
+
+```cpp
+#include <vector>
+
+using VecIter = std::vector<int>::iterator;
+
+class VectorView
+{
+private:
+
+    size_t begin_;
+    size_t end_;
+
+    std::vector<int>* vec_;
+
+public:    
+
+    VectorView(std::vector<int>& v, size_t begin, size_t end)
+    {
+        vec_ = &v;
+        begin_ = begin;
+        end_ = end;
+    }
+
+    VecIter begin() { return (*vec_).begin() + begin_; }
+
+    VecIter end() { return (*vec_).begin() + end_; }
+
+    VecIter begin() const { return (*vec_).begin() + begin_; }
+
+    VecIter end() const { return (*vec_).begin() + end_; }
+};
+```
+
+This VectorView has a vector (pointer) and the offsets that define the range of elements it acts on.  The begin() and end() methods provide the bureaucracy needed to use the STL algorithms and other standard C++ functionality.
+
+Here's a small program to demonstrate how it would work.
+
+```cpp
+#include <cstdlib>
+
+
+int main()
+{
+    // function to display a collection in the console
+    auto const print_vec = [](auto const& vec, const char* label)
+    {
+        printf("\n%s", label);
+        printf("\n{ ");
+        for (auto const& item : vec) { printf("%d ", item); }
+        printf("}\n");
+    };
+
+    // create a vector
+    std::vector<int> vec{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    print_vec(vec, "vector before:");
+
+    // create a view
+    VectorView view(vec, 2, 7);
+    print_vec(view, "view before:");
+
+    // modify the elements of the view
+    for (auto& item : view)
+    {
+        item *= -1;
+    }
+
+    // display the results
+    print_vec(view, "view after:");
+    print_vec(vec, "vector after:");
+}
+```
+
+Output
+
+```
+vector before:
+{ 1 2 3 4 5 6 7 8 9 }
+
+view before:
+{ 3 4 5 6 7 }
+
+view after:
+{ -3 -4 -5 -6 -7 }
+
+vector after:
+{ 1 2 -3 -4 -5 -6 -7 8 9 }
+
+new vector:
+{ -3 -4 -5 -6 -7 }
+```
 
 
 
@@ -24,6 +127,9 @@ public:
 
     u8* begin() { return data; }
     u8* end() { return data + (size_t)width * (size_t)height; }
+
+    u8* begin() const { return data; }
+    u8* end() const { return data + (size_t)width * (size_t)height; }
 };
 ```
 
@@ -58,8 +164,8 @@ public:
         if (ptr)
         {
             data = ptr;
-            width = width;
-            height = height;
+            width = w;
+            height = h;
         }
     }
 
@@ -87,7 +193,7 @@ void read_image_from_file(const char* img_path_src, GrayImage& image_dst);
 void write_image(GrayImage const& image_src, const char* file_path_dst);
 ```
 
-We want to be able to create a view from an existing image using a 2 dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.
+We want to be able to create a view from an existing image using a 2 dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.  We'll first define a range of pixels within an image.
 
 ```cpp
 class Range2Du32
@@ -98,18 +204,9 @@ public:
     u32 y_begin;
     u32 y_end;
 };
-
-
-class GrayView
-{
-public:
-
-    GrayView(GrayImage const& image, Range2Du32 const& range); // TODO: implement
-    
-};
 ```
 
-For our example, we'll define a function that uses a GrayView to operate on an image's pixels.  We'll make make the view behave like a standard container so that we can use it with the standard algorithms.  In addition to implementing the constructor, we need begin() and end() iterator functions.
+For our example, we'll define a function that uses a GrayView to operate on an image's pixels.  We'll make make the view behave like a standard container so that we can use it with the standard algorithms.
 
 ```cpp
 #include <algorithm>
@@ -135,7 +232,7 @@ int main()
     auto const width = image.width;
     auto const height = image.height;
 
-    // generate a view of the center region of the image
+    // create a view
     Range2Du32 range{};
     range.x_begin = width / 10;
     range.x_end = width * 9 / 10;
@@ -144,11 +241,18 @@ int main()
 
     GrayView view(image, range);
 
-    // invert the grayscale colors of the pixels within the view
+    // modify the elements in the view
     invert_gray(view);
 
     // write the modified image to file
-    write_image(image, "new image path");
+    write_image(image, "modified image path");
+
+    // create a new image from the view
+    GrayImage new_image(view.width(), view.height());
+    std::copy(view.begin(), view.end(), new_image.begin());
+
+    // write the new image to file
+    write_image(new_image, "new image path");
 }
 ```
 
@@ -157,6 +261,7 @@ Our program is going to
 * Make a view from a range in the center of the image
 * Invert the the grayscale values of the pixels in the range
 * Write the modifed image to file
+* Create a new image from the view and write it to file
 
 ### the view class
 
@@ -168,6 +273,11 @@ class GrayView
 public:    
 
     GrayView(GrayImage const& image, Range2Du32 const& range); // TODO: implement
+
+
+    u32 width(); // TODO: implement
+
+    u32 height(); // TODO: implement
 
 
     class iterator; // TODO: implement
@@ -633,13 +743,17 @@ int main()
 }
 ```
 
-Running the program with the following image
+Run the program with the following image.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/pixel-character.png)
 
-yields what we expect.
+The modifed image is grayscale and its center region's pixel intensities are inverted.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/inverted.png)
+
+The new image is a copy of the modified image's center region.
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/post-9-image-view/blog/img/%5B009%5D/image_from_view.png)
 
 
 
