@@ -54,7 +54,7 @@ public:
     RGBAPixel* data;
 
     RGBAPixel* begin() { return data; }
-    RGBAPixel* end() { return data + static_cast<size_t>(width) * static_cast<size_t>(height); }
+    RGBAPixel* end() { return data + (size_t)width * (size_t)height; }
 };
 
 
@@ -67,7 +67,7 @@ public:
     u8* data;
 
     u8* begin() { return data; }
-    u8* end() { return data + static_cast<size_t>(width) * static_cast<size_t>(height); }
+    u8* end() { return data + (size_t)width * (size_t)height; }
 };
 ```
 
@@ -85,7 +85,7 @@ Converting a color image to black and white is done simply by iterating over eac
 ```cpp
 u8 to_grayscale(u8 red, u8 green, u8 blue)
 {
-    return static_cast<u8>(0.299 * red + 0.587 * green + 0.114 * blue);
+    return (u8)(0.299 * red + 0.587 * green + 0.114 * blue);
 }
 ```
 

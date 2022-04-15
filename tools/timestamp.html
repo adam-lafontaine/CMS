@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Timestamp</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style>
+    #btn_timestamp {
+        width: 80px;
+        height: 30px;
+    }
+
+    #txt_timespamp {
+        width: 80px;
+        height: 30px;
+    }
+</style>
+<script src=""></script>
+<body>
+    <button
+        id="btn_timestamp"
+        type="button"
+        onclick="setTimestamp()"
+    >Timestamp</button>
+    <input 
+        type="text" 
+        id="txt_timestamp"
+    ></input>
+
+<script>
+    function setTimestamp()
+    {
+        //alert("hello");
+        document.getElementById("txt_timestamp").value = `${Date.now()}`;
+    }
+</script>
+</body>
+</html>
