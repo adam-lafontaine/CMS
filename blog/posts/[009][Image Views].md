@@ -3,7 +3,7 @@
 
 ### What is a view?
 
-Views can be described as "lightweight objects that indirectly represent iterable sequences" (https://en.cppreference.com/w/cpp/ranges).  They provide access to all or part the data of another container.  Views are smaller than the container and can be cheaply created, copied and destroyed without affecting the underlying container or its memory.  Views often have a similar interface to the underlying container or other data structures which allows them to be used in contexts designed for these data structures without having to modify existing code.
+Views can be described as "lightweight objects that indirectly represent iterable sequences" (https://en.cppreference.com/w/cpp/ranges).  They provide access to all or part the data of another container.  Views are smaller than the container and can be cheaply created, copied and destroyed without affecting the underlying container or its memory.  Views often have a similar interface to the underlying container or other data structures, allowing them to be used in contexts designed for these data structures without having to modify existing code.
 
 For example, suppose we want to select a range of elements within a vector and treat that range as a collection itself.  We want to be able to access and modify each element in the range and see the changes we made when reading the original vector.  For this, we could make something like the following.
 
@@ -110,7 +110,7 @@ In image processing, there is a section of the image called the Region of Intere
 
 I first learned about image views from Boost GIL (Generic Image Library) (https://www.boost.org/doc/libs/1_77_0/libs/gil/doc/html/design/image_view.html).
 
-> An image view is a generalization of STL range concept to multiple dimensions. Similar to ranges (and iterators), image views are shallow, don’t own the underlying data and don’t propagate their constness over the data. For example, a constant image view cannot be resized, but may allow modifying the pixels.
+> "An image view is a generalization of STL range concept to multiple dimensions. Similar to ranges (and iterators), image views are shallow, don’t own the underlying data and don’t propagate their constness over the data. For example, a constant image view cannot be resized, but may allow modifying the pixels."
 
 The challenge with an image view is that the ranges are 2-dimensional.  An image's pixels are a 1-dimensional memory buffer so iterating over the entire image is trivial.  We simulate two dimensions in an image by using the width and height.
 
@@ -469,7 +469,7 @@ The pre-increment operator increments itself and then returns itself;
 iterator& operator ++ () { next(); return *this; }
 ```
 
-The post-increment operator increments itself and returns a copy of its state before being incremented.
+The post-increment operator increments itself and returns a copy of its from before it was incremented.
 
 ```cpp
 iterator operator ++ (int) { iterator result = *this; ++(*this); return result; }
@@ -799,7 +799,7 @@ The new image is a copy of the modified image's center region.
 
 ### And we're done
 
-Our STL compliant (almost) ImageView data structure is finally complete.  It was painful but now it's over.  We defined how to iterate over a 2-dimensional range within an image and can now treat both images and sections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
+Our STL compliant (almost) ImageView data structure is finally complete.  It was painful, but it's over now.  We defined how to iterate over a 2-dimensional range within an image and can now treat both images and subsections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
 
 This type of experience is pretty common in C++ development.  Make a container, make an iterator, provide begin() and end(), so that we can use the STL.  Sometimes it's a lot of work upfront but it has the potential to pay off over time.  
 
@@ -807,7 +807,7 @@ This type of experience is pretty common in C++ development.  Make a container, 
 
 In a previous post, we covered reading and writing images (https://almostalwaysauto.com/posts/read-write-image).  The examples there were for color images.
 
-The stb_image library allows for reading and writing grayscale images as well.  It also allows reading color images as grayscale images.  The stbi_load function takes a parameter for the number of desired channels in the loaded image.  Choose 4 channels for RGBA images, 3 channels for RGB, 2 channels for grayscale and alpha, and 1 channel for grayscale only.  If the image is a color image and 1 channel is selected for the output, the image will be converted to grayscale.
+The stb_image library allows for reading and writing grayscale images as well.  It also allows reading color images as grayscale images.  The stbi_load function takes a parameter for the number of desired channels in the loaded image.  Choose 4 channels for RGBA images, 3 channels for RGB, 2 channels for grayscale with alpha, and 1 channel for grayscale only.  If the image is a color image and 1 channel is selected for the output, the image will be converted to grayscale.
 
 ```cpp
 void read_image_from_file(const char* img_path_src, GrayImage& image_dst)
