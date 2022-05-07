@@ -585,6 +585,12 @@ void madd_array_of_structs()
 
 	size_t const N = 80'000'000;
 
+	auto struct_array = (MultiplyAdd*)malloc(N * sizeof(MultiplyAdd));
+	if (!struct_array)
+	{
+		return;
+	}
+
 	sw.start();
 	for (size_t i = 0; i < N; ++i)
 	{
@@ -677,4 +683,4 @@ Sometimes the end result will be worth the effort and sometimes it won't.  Somet
 
 ### First make it work, and then make it better
 
-The main objective should always be to solve the problem.  There is no point in trying to figure out the optimal implementation at the start because we won't understand the problem until after we have solved it.  Solve the problem first.  Improve it afterwards if necessary.  At least a working solution will be available for people to use while an improved version is being developed.  Remember that nothing is ever perfect so there will always be improvements to be made.  The key is to know when to stop and move on.
+The main objective should always be to solve the problem.  There is no point in trying to figure out the optimal implementation at the start because we won't understand the problem until after we have solved it.  Solve the problem first.  Improve it afterwards if necessary.  At least a working solution will be available for use while an improved version is being developed.  Remember that nothing is ever perfect so there will always be improvements to be made.  The key is to know when to stop and move on.
