@@ -216,7 +216,7 @@ Output when running in release mode.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/release.png)
 
-In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but the time adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT. Also, check and see how it affects your computer's CPU usage by openning Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
+In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but the time adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT. Also, check and see how it affects your computer's CPU usage by opening Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
 
 For instance, when I increase each value by a factor of 10 I get the following result.
 

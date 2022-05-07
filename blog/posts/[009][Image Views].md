@@ -83,9 +83,9 @@ int main()
 }
 ```
 
-Output
+Output:
 
-```
+```plaintext
 vector before:
 { 1 2 3 4 5 6 7 8 9 }
 
@@ -156,7 +156,7 @@ public:
 };
 ```
 
-We'll want the option to create a blank image given a width and a height.  And rather then having separate create() and destroy() functions to manage the memory, this time we'll have constructors and a destructor in true RAII fashion.
+We'll want the option to create a blank image given a width and a height.  Rather then having separate create() and destroy() functions to manage the memory, this time we'll have constructors and a destructor in true RAII fashion.
 
 ```cpp
 #include <cstdlib>
@@ -206,7 +206,7 @@ public:
 
 ### Prerequisits
 
-We'll need functions for reading and writing images.  This was covered in a previous post using color images as the example.  See the end of this post for reading and writing grayscale images.
+We'll need functions for reading and writing images.  This was covered in a previous post using color images.  See the end of this post for reading and writing grayscale images.
 
 ```cpp
 // https://almostalwaysauto.com/posts/read-write-image
@@ -218,7 +218,9 @@ void write_image(GrayImage const& image_src, const char* file_path_dst);
 
 ### Objective
 
-In this post, we'll create a view that acts on an image in a similar fashion as the above example for vectors.  We will create a view from an existing image using a 2-dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.  We'll first define a range of pixels within an image.
+In this post, we'll create a view that acts on an image in a similar fashion as the above example for vectors.  We will create a view from an existing image using a 2-dimensional range of pixel locations.  The view should point to the range of pixels and any operations performed on the view should only affect the pixels in the range.
+
+We'll first define a range of pixels within an image.
 
 ```cpp
 class Range2Du32
@@ -355,7 +357,7 @@ public:
 };
 ```
 
-We need to define the iterator before we can implement the remaining methods.
+We will need to define the iterator before we can implement the remaining methods.
 
 ### The iterator class
 
@@ -469,7 +471,7 @@ The pre-increment operator increments itself and then returns itself;
 iterator& operator ++ () { next(); return *this; }
 ```
 
-The post-increment operator increments itself and returns a copy of its from before it was incremented.
+The post-increment operator increments itself and returns a copy of itself from before it was incremented.
 
 ```cpp
 iterator operator ++ (int) { iterator result = *this; ++(*this); return result; }
@@ -477,7 +479,7 @@ iterator operator ++ (int) { iterator result = *this; ++(*this); return result; 
 
 Dereferencing the iterator returns a reference to the pixel at its position.  To do that we need a pointer to the pixel at its position.  Just like every memory buffer, the pointer to the pixel is at an offset from the beginning of the image buffer.  We calculate the offset using the x and y positions as well as the width of the image.
 
-The number of pixels in each row of the image is the width of the image.  So the offset to the beginning of each row is the y position multiplied by the width.
+The width of the image is equal to the number of pixels in each row.  So the offset to the beginning of each row is the y position multiplied by the width.
 
 ```cpp
 auto image_row_offset = y_ * image_width_;
@@ -507,7 +509,7 @@ The dereference operator only needs to return the dereferenced pointer of this m
 reference operator * () const { return *xy_ptr(); }
 ```
 
-The last thing the iterator needs is a way to return the "end" of the view.  In the C++ world, convention is that "begin" is the first element of a collection and "end" is one past the last element.  In this case, the last element is the last pixel in the range.  One past the last pixel is simply the next one.
+The last thing the iterator needs is a way to return the "end" of the view.  In C++, the convention is that "begin" is the first element of a collection and "end" is one past the last element.  In this case, the last element is the last pixel in the range.  One past the last pixel is simply the next one.
 
 ```cpp
 iterator end()
