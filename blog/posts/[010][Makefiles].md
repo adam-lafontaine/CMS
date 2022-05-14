@@ -1,11 +1,21 @@
 # Makefiles
 ## Automating your build system (sort of)
 
+Make is a tool for automating shell commands, and is primarily used for building C and C++ programs.  It allows for compiling only parts of a program depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well-made makefile can significantly reduce build times freeing up more time for actual work.
+
+We will cover some of the basics of makefiles while creating a template to use for future projects.  The examples in this post are done on Linux.  Make is also available for Windows but Visual Studio is much easier to use.
+
+### How To
+
+At minimum, make allows for creating a shortcut for one or more shell commands.  To start, create a file and give it the name "Makefile".  Paste the following inside of it.
+
 ```makefile
 do_command:
 	@echo "execute something"
 	@echo "execute something else"
 ```
+
+Open a terminal in that directory and type "make do_command".
 
 ```plaintext
 $ make do_command
@@ -13,27 +23,38 @@ execute something
 execute something else
 ```
 
+The two echo commands where executed.  The @ at the beginning prevents the shell command from being printed to the terminal before executing it.
+
+We created what is called a rule.  The target is do_command and is followed by a colon.  The commands for the rule are indented below it.
 
 ### Tab, not spaces
+
+The indent for the commands must a tab and not spaces.  Some editors are set to use spaces when the tab key is pressed.  If this is the case, you'll get an error like this.
 
 ```plaintext
 $ make do_command
 Makefile:37: *** missing separator.  Stop.
 ```
 
-Add a rule to create a build directory if it does not already exist
+### New Project
+
+When starting a new project, it's good to have a separate directory for all of the build files.  Usually, the build directory is ignored in git repositories.  I like to make a setup rule for myself or anyone else who clones the repository on another device.
+
+Add a rule to create a build directory if it does not already exist.
+
 ```makefile
 setup:
 	mkdir -p ./build
 ```
 
-Another rule to delete all of the files in the build directory
+Every now and then we will want to clear the build directory and rebuild from scratch.  Add another rule to delete the files.
+
 ```makefile
 clean:
 	rm -rfv ./build/*
 ```
 
-Create a directory called "code" and we'll start with a main.cpp
+Create a directory called "code" and we'll start with main.cpp.
 
 ```cpp
 // ./code/main.cpp
@@ -60,9 +81,9 @@ compile:
 
 run:
 	./build/my_program
-```
+``
 
-The Makefile so far
+So far our makefile has four rules.
 
 ```makefile
 compile:
@@ -78,14 +99,14 @@ clean:
 	rm -rfv ./build/*
 ```
 
-Run the setup rule to create the build directory with "make setup".
+Run the setup rule to create the build directory by typing "make setup" in the terminal.
 
 ```plaintext
 $ make setup
 mkdir -p ./build
 ```
 
-Compile the program with "make compile"
+Compile the program with "make compile".
 
 ```plaintext
 $ make compile
@@ -118,7 +139,7 @@ removed './build/my_program'
 
 ### Variables
 
-Create some variables.
+Make allows for using variables.  They are good for directories and file paths that are referenced multiple times.  Adding some variables makes our makefile look like so.
 
 ```makefile
 build := ./build
@@ -168,6 +189,8 @@ $ make run
 Done.
 
 ```
+
+If you didn't get any errors then your variables have been set and referenced properly.
 
 
 ### Dependencies and Automatic Variables
@@ -552,4 +575,4 @@ Done.
 
 ```
 
-Only add.cpp was recompiled.  
+Only add.cpp was recompiled.  The other implementation files, subtract.cpp and main.cpp were left alone.
