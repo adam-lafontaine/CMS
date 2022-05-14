@@ -1,7 +1,7 @@
 # Makefiles
 ## Automating your build system (sort of)
 
-Make is a tool for automating shell commands, and is primarily used for building C and C++ programs.  It allows for compiling only parts of a program depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well-made makefile can significantly reduce build times freeing up more time for actual work.
+Make is a tool for automating shell commands, and is primarily used for building C and C++ programs and libraries.  It allows for compiling only parts of a program at a time depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well made makefile can significantly reduce build times freeing up more time for actual work.
 
 We will cover some of the basics of makefiles while creating a template to use for future projects.  The examples in this post are done on Linux.  Make is also available for Windows but Visual Studio is much easier to use.
 
@@ -23,22 +23,32 @@ execute something
 execute something else
 ```
 
-The two echo commands where executed.  The @ at the beginning prevents the shell command from being printed to the terminal before executing it.
+The two echo commands where executed.  The @ at the beginning prevents the shell command from being printed to the terminal before executing it.  Without the @, the output would look like this.
 
-We created what is called a rule.  The target is do_command and is followed by a colon.  The commands for the rule are indented below it.
+```plaintext
+$ make do_command
+echo "execute something"
+execute something
+echo "execute something else"
+execute something else
+```
+
+We created what is called a rule.  The target is "do_command" and is followed by a colon.  The commands for the rule are indented below it.
 
 ### Tab, not spaces
 
-The indent for the commands must a tab and not spaces.  Some editors are set to use spaces when the tab key is pressed.  If this is the case, you'll get an error like this.
+The indent for the commands must be a tab and not spaces.  Some editors are set to use spaces when the tab key is pressed.  If this is the case, you'll get an error like this.
 
 ```plaintext
 $ make do_command
 Makefile:37: *** missing separator.  Stop.
 ```
 
+You will need to change your editor's tab settings to fix this.
+
 ### New Project
 
-When starting a new project, it's good to have a separate directory for all of the build files.  Usually, the build directory is ignored in git repositories.  I like to make a setup rule for myself or anyone else who clones the repository on another device.
+When starting a new project, it's good to have a separate directory for all of the build files.  The build directory is usually ignored in git repositories.  I like to make a setup rule for myself or anyone else who clones the repository on another device.
 
 Add a rule to create a build directory if it does not already exist.
 
@@ -54,7 +64,7 @@ clean:
 	rm -rfv ./build/*
 ```
 
-Create a directory called "code" and we'll start with main.cpp.
+Create a directory called "code" and we'll start by adding main.cpp to it.
 
 ```cpp
 // ./code/main.cpp
@@ -81,9 +91,9 @@ compile:
 
 run:
 	./build/my_program
-``
+```
 
-So far our makefile has four rules.
+So far our makefile has four rules: compile, run, setup, and clean.
 
 ```makefile
 compile:
@@ -195,48 +205,59 @@ If you didn't get any errors then your variables have been set and referenced pr
 
 ### Dependencies and Automatic Variables
 
-Compile main to an object file and then link to make the executable.
+To demonstrate other capabilities of Make, we'll compile main to an object file and then link to make the executable instead of doing it all in one compile step.
 
-To compile main.cpp into an object file.
+Here is the command to compile main.cpp into an object file.
 
 ```plaintext
 g++ -o build/main.o -c code/main.cpp
 ```
 
-Create a rule using the variables we created
+In the makefile, create variable for the object file and a rule using the variables we created
 
 ```makefile
+main_o := $(build)/main.o
+
+
 $(main_o): $(main_c)
 	@echo "\n main"
 	$(GPP) -o $(main_o) -c $(main_c)
 ```
 
-Here main.o is the target and main.cpp is the dependency.  When the target is called, the commands will only execute if there is a change in the dependency.
+Here main.o is the target and main.cpp is the dependency.  When the target is called, compilation will only happen if there is a change in main.cpp.
+
+For convenience, Make has some automatic variables so that we don't have to make sure that the files referenced in the compilation command match those in the rule. \$@ returns the filename for the target.  \$< returns the first filename in a list of dependencies.  It allows for adding additional dependencies without adding them to the command.
+
+Our rule for main.o can be updated to the following.
 
 ```makefile
-# '$@' is the file name for the target rule
-# '$<' is the first prerequisite
+# $@ returns the filename for the target
+# $< returns the first dependency
 
 $(main_o): $(main_c)
 	@echo "\n main"
 	$(GPP) -o $@ -c $<
 ```
 
-To link the object file and build the executable
+Next we want to link the object file and build the executable.
 
 ```plaintext
 g++ -o build/my_program build/main.o
 ```
 
- The executable depends on main.o.  There are usually multiple object files when linking, so we'll use another automatic variable for the entire list of dependencies.
+ The executable depends on main.o.  There are usually multiple object files when linking, so we'll use another automatic variable that returns the entire list of dependencies (\$+).  This way we can add object files as dependencies without having to modify the command.
+
+ Create a rule for the executable itself that performs the final linking step.
 
 ```makefile
-# '$+' is the list of prerequisites
+# '$+' returns the entire list of prerequisites
 
 $(program_exe): $(main_o)
 	@echo "\n $(exe_name)"
 	$(GPP) -o $@ $+
 ```
+
+We can create rules that run other rules.  This is useful when we want a commonly named rule for files that may change often or be different across projects.
 
 Create a build rule that runs the rule for the executable.
 
@@ -252,7 +273,7 @@ run: build
 	@echo "\n"
 ```
 
-We can remove the compile rule as we are now building and linking object files.
+Since are now building and linking object files, we no longer need the compile rule from earlier.  After removing it, our makefile for compiling and linking a single file is below.
 
 ```makefile
 build := ./build
@@ -281,24 +302,26 @@ build: $(program_exe)
 
 run: build
 	$(program_exe)
-	@echo "\n"
-	
+	@echo "\n"	
 
 setup:
 	mkdir -p $(build)
+	@echo "\n"
 
 clean:
 	rm -rfv $(build)/*
+	@echo "\n"
 ```
 
 Now main.o is only recompiled if there is a change in in main.cpp.  The executable only rebuilds if there is a change in main.o.
 
-Clean and then run.
+To test it out, first clean and run.
 
 ```plaintext
 $ make clean
 rm -rfv ./build/*
 removed './build/my_program'
+
 $ make run
 
  main
@@ -320,7 +343,7 @@ Done.
 
 Everything was compiled and linked before running the program.
 
-Run again
+Run it again.
 
 ```plaintext
 $ make run
@@ -338,7 +361,7 @@ Done.
 
 No changes were detected in main.cpp so only the existing executable was run.
 
-Make change to main.cpp and run again
+Make a change to main.cpp and run once more.
 
 ```plaintext
 $ make run
@@ -362,9 +385,13 @@ Done.
 
 Since main.cpp was changed, everything had to be recompiled.
 
-### More files
+### Adding Files
 
-In the code directory create math.hpp
+As a software project grows, more files will be added.  Well add some files and see how we can handle this with respect to our makefile.
+
+In the code directory create a header file with the following function definitions.
+
+math.hpp 
 
 ```cpp
 int add(int a, int b);
@@ -372,7 +399,7 @@ int add(int a, int b);
 int subtract(int a, int b);
 ```
 
-Create and implementation file for each function.
+Create a separate implementation file for each function.
 
 add.cpp
 
@@ -419,7 +446,9 @@ int main()
 }
 ```
 
-Create variables for the new files.
+We added a header file and two implementation files.  Each implementation file will need to be compiled into its own object file, and they will all need to be linked to build the executable.
+
+In the makefile, create variables for the new files.
 
 ```makefile
 math_h      := $(code)/math.hpp
@@ -431,7 +460,7 @@ subtract_c  := $(code)/subtract.cpp
 subtract_o  := $(build)/subtract.o
 ```
 
-Make rules for the new implementation files in the same fashion as main.cpp.
+Add rules for the new implementation files in the same fashion as main.cpp.
 
 ```makefile
 $(add_o): $(add_c)
@@ -443,13 +472,15 @@ $(subtract_o): $(subtract_c)
 	$(GPP) -o $@ -c $<
 ```
 
-Since main.cpp now includes math.hpp its rule must be updated to reflect the dependency.
+Since main.cpp now includes math.hpp, its rule must be updated to reflect the dependency.
 
 ```makefile
 $(main_o): $(main_c) $(math_h)
 	@echo "\n main"
 	$(GPP) -o $@ -c $<
 ```
+
+Note: \$< will only return the first file in the list of dependencies so math.hpp will not be included in the compilation command.
 
 Create a variable to store the list of object files.
 
@@ -467,7 +498,9 @@ $(program_exe): $(object_files)
 	$(GPP) -o $@ $+
 ```
 
-The final version of our makefile.
+Note: \$+ ensures that all of the dependencies in the object_files variable well included in the command.
+
+After making these changes, this is what the final version of our makefile looks like.
 
 ```makefile
 GPP   := g++
@@ -508,6 +541,7 @@ $(subtract_o): $(subtract_c)
 $(program_exe): $(object_files)
 	@echo "\n $(exe_name)"
 	$(GPP) -o $@ $+
+	
 
 build: $(program_exe)
 
@@ -517,18 +551,23 @@ run: build
 
 setup:
 	mkdir -p $(build)
+	@echo "\n"
 
 clean:
 	rm -rfv $(build)/*
+	@echo "\n"
 ```
 
-Run the new program
+Running the new program will cause everything to be compiled.
 
 ```plaintext
 $ make run
 
  main
 g++ -o build/main.o -c code/main.cpp
+
+ add
+g++ -o code/add.o -c code/add.cpp
 
  subtract
 g++ -o build/subtract.o -c code/subtract.cpp
@@ -550,6 +589,13 @@ Done.
 ```
 
 Now edit add.cpp so that the function multiplies the numbers instead of adding them.
+
+```cpp
+int add(int a, int b)
+{
+    return a * b;
+}
+```
 
 Run again.
 
@@ -575,4 +621,4 @@ Done.
 
 ```
 
-Only add.cpp was recompiled.  The other implementation files, subtract.cpp and main.cpp were left alone.
+We can see that only add.cpp was recompiled.  The other implementation files, subtract.cpp and main.cpp were left alone.
