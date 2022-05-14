@@ -3,7 +3,7 @@
 
 I'm pretty old, so I remember when dealing with images on a computer was rare.  Normally you would take your film cartrige to the store to get your pictures developed.  If you wanted your pictures right away, you would need to have a Polaroid.  This of course was back in the day when schools where placed geographically such that you would have to walk uphill to get there and then uphill again to return home.  How this was managed is a secret that my parents' generation have kept to this day.  But such conspiracies are a topic for a different website.
 
-So what is a digital image?  It's not a 2D matrix, although you can treat is as one if you like.  It is a chunk of memory on your hard drive, or in RAM if you are actually looking at it.  Actually, the same can be said for anything on your computer.  The real question is how do we deal with it in code?
+So what is a digital image?  It's not a 2D matrix, although you can treat is as one if you like.  It is a chunk of memory on your hard drive, or in RAM if you are actually processing it.  The same can also be said for anything on your computer.  The real question is how do we deal with it in code?
 
 ### Monochrome Images
 

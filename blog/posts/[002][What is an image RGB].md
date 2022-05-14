@@ -373,4 +373,4 @@ The same checkerboard pattern as the previous post using RGB grayscale.
 
 Handling color images is very similar to monochrome images.  It is more complex because there are either three or four different channels per pixel instead of just one byte.  However each channel is still one byte so an RGBA pixel is no different in memory than a 32 bit unsigned integer.  Packing the struct the way we do makes it easier to work with.
 
-In the next post we'll see how we can handle image files.  That way you'll be able to see the images generated instead of taking my word for it with the screenshots that I provide.
+In the next post we'll see how we can handle image files.  That way you'll be able to see the images generated instead of taking my word for it with the screenshots provided.

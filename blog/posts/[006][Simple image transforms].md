@@ -71,7 +71,7 @@ public:
 };
 ```
 
-And that is it.  The static casts are there to prevent compliler warnings.  Now we can do things like:
+And that is it.  Now we can do things like:
 
 ```cpp
 // make all pixels white
@@ -120,7 +120,7 @@ We get the following grayscale image
 
 ### Binarization
 
-Sometimes we want to set each pixel in an image to one of two colors (usually black or white) depending on certain conditions.  The simplest case is to take a grayscale image and evaluate each pixel to see if it falls above a given threshold.  Where it is in relation to the threshold determies the color of the pixel in the output image.
+Sometimes we want to set each pixel in an image to one of two colors (usually black or white) depending on certain conditions.  The simplest case is to take a grayscale image and evaluate each pixel to see if it falls above a given threshold.  Where it is in relation to the threshold determines the color of the pixel in the output image.
 
 ```cpp
 void binarize_simple(GrayImage& src, GrayImage& dst)
@@ -197,4 +197,4 @@ int main()
 }
 ```
 
-The standard algorithms library is a handy set of tools to have.  Getting access to it requires providing the alorithms with a means of iterating over your collection of elements.  Implementing an iterator can be prohibitive but if your data simply resides in a buffer, then it's quite easy.  The algorithms just work, they make your code more readable and are perfect for when you don't want to reinvent the wheel.  In some situations you will need to reinvent the wheel and a standard algorithm may not be suitable.  In fact, many companies have their own implementations of a standard library that works best for their technology.  Whatevever your situation, they are an excellent resource to have and worth becoming familiar with.
+The standard algorithms library is a handy set of tools to have.  Getting access to it requires providing the alorithms with a means of iterating over your collection of elements.  Implementing an iterator can be prohibitive but if your data simply resides in a buffer, then it's quite easy.  The algorithms just work, they make your code more readable and are perfect for when you don't want to reinvent the wheel.  In some situations you will need to reinvent the wheel and a standard algorithm may not be suitable.  In fact, many companies have their own implementations of a standard library that works best for their technology.  Whatevever your situation, they are an excellent resource to have and well worth becoming familiar with.

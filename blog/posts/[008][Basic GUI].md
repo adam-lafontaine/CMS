@@ -1,7 +1,7 @@
 # Basic GUI application
 ## Using SDL2
 
-This post will walk you through getting a basic application started using SDL2, which is a wrapper around operating system APIs.  The application will open a window and display a generated image based on user input.
+This post will walk you through getting a basic application started using SDL2.  SDL2 is a wrapper around operating system APIs.  The application will open a window and display a generated image based on user input.
 
 ### Install SDL2 - Windows
 
@@ -178,7 +178,7 @@ int main(int argc, char* args[])
 
 ### Set Application Framerate
 
-In general, GUI applications run an infinite loop that reads input, processes the input and other data and renders the frame in the window.  We need to control how frequently the application does this otherwise each frame will render at different speeds and more load than necessary will be placed on the CPU.
+In general, GUI applications run an infinite loop that reads input, processes the input and other data and renders the frame in the window.  We need to control how frequently the application does this, otherwise each frame will render at different speeds and more load than necessary will be placed on the CPU.
 
 60 frames per second is usually a good target.
 
@@ -523,7 +523,7 @@ public:
     u32 width;
     u32 height;
 
-    Pixel* data;
+    Pixel* data = nullptr;
 };
 
 
