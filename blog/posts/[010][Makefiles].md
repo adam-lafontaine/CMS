@@ -389,7 +389,7 @@ Since main.cpp was changed, everything had to be recompiled.
 
 ### Adding Files
 
-As a software project grows, more files will be added.  We'll add some files and see how we can handle this with respect to our makefile.
+As a software project grows, more files will be added.  We'll add some files and see how we can handle this  in our makefile.
 
 In the code directory create a header file with the following function definitions.
 
@@ -633,8 +633,8 @@ Starting with something like the makefile we made here, we can add new variables
 ```makefile
 some_header_h := $(code)/some_header.hpp
 
-some_file_c        := $(code)/some_file.cpp
-some_file_o        := $(build)/some_file.o
+some_file_c  := $(code)/some_file.cpp
+some_file_o  := $(build)/some_file.o
 object_files += $(some_file_o)
 ```
 
