@@ -1,9 +1,9 @@
 # Makefiles
 ## Automating your build system (sort of)
 
-Make is a tool for automating shell commands, and is primarily used for building C and C++ programs and libraries.  It allows for compiling only parts of a program at a time depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well made makefile can significantly reduce build times freeing up more time for actual work.
+Make is a tool for automating shell commands, and is primarily used for building C and C++ programs and libraries.  It allows for compiling only parts of a program at a time, depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well made makefile can significantly reduce build times freeing up more time for actual work.
 
-We will cover some of the basics of makefiles while creating a template to use for future projects.  The examples in this post are done on Linux.  Make is also available for Windows but Visual Studio is much easier to use.
+We will cover some of the basics of makefiles while creating a template to use for future projects.  The examples in this post are done on Linux.  Make is also available for Windows with some extra effort to get it installed.
 
 ### How To
 
@@ -48,7 +48,7 @@ You will need to change your editor's tab settings to fix this.
 
 ### New Project
 
-When starting a new project, it's good to have a separate directory for all of the build files.  The build directory is usually ignored in git repositories.  I like to make a setup rule for myself or anyone else who clones the repository on another device.
+When starting a new project, it's good to have a separate directory for all of the build files.  The build directory is usually ignored in git repositories so I like to make a setup rule for myself or anyone else who clones the repository on another device.
 
 Add a rule to create a build directory if it does not already exist.
 
@@ -205,7 +205,7 @@ If you didn't get any errors then your variables have been set and referenced pr
 
 ### Dependencies and Automatic Variables
 
-To demonstrate other capabilities of Make, we'll compile main to an object file and then link to make the executable instead of doing it all in one compile step.
+To demonstrate other capabilities of Make, we'll compile main to an object file and then link it to make the executable instead of doing it all in one compile step.
 
 Here is the command to compile main.cpp into an object file.
 
@@ -224,7 +224,9 @@ $(main_o): $(main_c)
 	$(GPP) -o $(main_o) -c $(main_c)
 ```
 
-Here main.o is the target and main.cpp is the dependency.  When the target is called, compilation will only happen if there is a change in main.cpp.
+Here main.o is the target and main.cpp is the dependency.  The compile command will only execute if a change was made to main.cpp.
+
+A rule can have multiple dependencies and they are listed to the right of the colon.
 
 For convenience, Make has some automatic variables so that we don't have to make sure that the files referenced in the compilation command match those in the rule. \$@ returns the filename for the target.  \$< returns the first filename in a list of dependencies.  It allows for adding additional dependencies without adding them to the command.
 
@@ -250,7 +252,7 @@ g++ -o build/my_program build/main.o
  Create a rule for the executable itself that performs the final linking step.
 
 ```makefile
-# '$+' returns the entire list of prerequisites
+# '$+' returns the entire list of dependencies
 
 $(program_exe): $(main_o)
 	@echo "\n $(exe_name)"
@@ -273,7 +275,7 @@ run: build
 	@echo "\n"
 ```
 
-Since are now building and linking object files, we no longer need the compile rule from earlier.  After removing it, our makefile for compiling and linking a single file is below.
+Since we are now building and linking object files, we no longer need the compile rule from earlier.  After removing it, our makefile for compiling and linking a single file is below.
 
 ```makefile
 build := ./build
@@ -387,7 +389,7 @@ Since main.cpp was changed, everything had to be recompiled.
 
 ### Adding Files
 
-As a software project grows, more files will be added.  Well add some files and see how we can handle this with respect to our makefile.
+As a software project grows, more files will be added.  We'll add some files and see how we can handle this with respect to our makefile.
 
 In the code directory create a header file with the following function definitions.
 
@@ -399,7 +401,7 @@ int add(int a, int b);
 int subtract(int a, int b);
 ```
 
-Create a separate implementation file for each function.
+For demonstration purposes, create a separate implementation file for each function.
 
 add.cpp
 
@@ -441,8 +443,7 @@ int main()
     printf("%d plus %d equals %d\n", a, b, add(a, b));
     printf("%d minus %d equals %d\n", a, b, subtract(a, b));
 
-    printf("Done.\n");
-    
+    printf("Done.\n");    
 }
 ```
 
@@ -454,7 +455,7 @@ In the makefile, create variables for the new files.
 math_h      := $(code)/math.hpp
 
 add_c       := $(code)/add.cpp
-add_o       := $(code)/add.o
+add_o       := $(build)/add.o
 
 subtract_c  := $(code)/subtract.cpp
 subtract_o  := $(build)/subtract.o
@@ -498,7 +499,7 @@ $(program_exe): $(object_files)
 	$(GPP) -o $@ $+
 ```
 
-Note: \$+ ensures that all of the dependencies in the object_files variable well included in the command.
+Note: \$+ ensures that all of the dependencies in the object_files variable will be included in the command.
 
 After making these changes, this is what the final version of our makefile looks like.
 
@@ -511,14 +512,14 @@ exe_name := my_program
 
 program_exe := $(build)/$(exe_name)
 
-main_c         := $(code)/main.cpp
-main_o         := $(build)/main.o
-object_files   := $(main_o)
-
 math_h := $(code)/math.hpp
 
+main_c       := $(code)/main.cpp
+main_o       := $(build)/main.o
+object_files := $(main_o)
+
 add_c        := $(code)/add.cpp
-add_o        := $(code)/add.o
+add_o        := $(build)/add.o
 object_files += $(add_o)
 
 subtract_c   := $(code)/subtract.cpp
@@ -541,7 +542,7 @@ $(subtract_o): $(subtract_c)
 $(program_exe): $(object_files)
 	@echo "\n $(exe_name)"
 	$(GPP) -o $@ $+
-	
+
 
 build: $(program_exe)
 
@@ -567,13 +568,13 @@ $ make run
 g++ -o build/main.o -c code/main.cpp
 
  add
-g++ -o code/add.o -c code/add.cpp
+g++ -o build/add.o -c code/add.cpp
 
  subtract
 g++ -o build/subtract.o -c code/subtract.cpp
 
  my_program
-g++ -o build/my_program build/main.o code/add.o build/subtract.o
+g++ -o build/my_program build/main.o build/add.o build/subtract.o
 ./build/my_program
 
 **********************
@@ -603,10 +604,10 @@ Run again.
 $ make run
 
  add
-g++ -o code/add.o -c code/add.cpp
+g++ -o build/add.o -c code/add.cpp
 
  my_program
-g++ -o build/my_program build/main.o code/add.o build/subtract.o
+g++ -o build/my_program build/main.o build/add.o build/subtract.o
 ./build/my_program
 
 **********************
@@ -622,3 +623,29 @@ Done.
 ```
 
 We can see that only add.cpp was recompiled.  The other implementation files, subtract.cpp and main.cpp were left alone.
+
+### Your Build System
+
+This is the extent to which I use Make.  The system follows a pattern that makes adding new files to a project pretty straight forward.
+
+Starting with something like the makefile we made here, we can add new variables for files as needed.
+
+```makefile
+some_header_h := $(code)/some_header.hpp
+
+some_file_c        := $(code)/some_file.cpp
+some_file_o        := $(build)/some_file.o
+object_files += $(some_file_o)
+```
+
+And then add a new rule for each implementation file making sure to include the correct dependencies.
+
+```makefile
+$(some_file_o): $(some_file_c) $(some_header_h)
+	@echo "\n some_file"
+	$(GPP) -o $@ -c $<
+```
+
+The rest will take care of itself with "make build" or "make run".  
+
+There is much more to Make then what was shown here.  Learning it will be time well spent and no doubt there are improvements that can be made to the build system here.  Remember that the point of a build system is to free up time for software development.  It can be tempting to get caught up on making the ultimate build system and neglect the project that you are actually working on.  Use your judgement.
