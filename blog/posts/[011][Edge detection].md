@@ -21,6 +21,29 @@ public:
 
 	u8* data;
 };
+
+
+void make_image(Image& image, u32 width, u32 height)
+{
+	assert(width);
+	assert(height);
+
+	image.width = width;
+	image.height = height;
+	image.data = (u8*)malloc(sizeof(u8) * width * height);
+
+	assert(image.data);
+}
+
+
+void dispose_image(Image& image)
+{
+	if (image.data != nullptr)
+	{
+		free(image.data);
+		image.data = nullptr;
+	}
+}
 ```
 
 ```cpp
@@ -31,24 +54,24 @@ using r32 = float;
 
 constexpr std::array<r32, 9> GRAD_X_3X3
 {
-	1.0f, 0.0f, -1.0f,
-	2.0f, 0.0f, -2.0f,
-	1.0f, 0.0f, -1.0f,
+	-0.25f,  0.0f,  0.25f,
+	-0.50f,  0.0f,  0.50f,
+	-0.25f,  0.0f,  0.25f,
 };
 
 
 constexpr std::array<r32, 9> GRAD_Y_3X3
 {
-	1.0f,  2.0f,  1.0f,
-	0.0f,  0.0f,  0.0f,
-	-1.0f, -2.0f, -1.0f,
+	-0.25f, -0.50f, -0.25f,
+	 0.0f,   0.0f,   0.0f,
+	 0.25f,  0.50f,  0.25f,
 };
 ```
 
 ```cpp
 u8* row_begin(Image const& image, u32 y)
 {
-	auto row_offset = y * image.height;
+	auto row_offset = y * image.width;
 
 	return image.data + row_offset;
 }
@@ -123,5 +146,27 @@ void gradients(Image const& src, Image const& dst)
 			dst_row[x] = (u8)grad;
 		}
 	}
+}
+```
+
+```cpp
+int main()
+{
+    Image src_image;
+	read_image_from_file(src_file_path, src_image);
+
+	Image dst_image;
+	make_image(dst_image, src_image.width, src_image.height);
+
+	gradients(src_image, dst_image);
+
+	write_image(dst_image, gradient_img_path);
+
+
+
+	//write_image(dst_image, edges_img_path);
+
+	dispose_image(src_image);
+	dispose_image(dst_image);
 }
 ```
