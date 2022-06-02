@@ -153,18 +153,87 @@ void gradients(Image const& src, Image const& dst)
 int main()
 {
     Image src_image;
-	read_image_from_file(src_file_path, src_image);
+	read_image_from_file("orange-car.bmp", src_image);
 
 	Image dst_image;
 	make_image(dst_image, src_image.width, src_image.height);
 
 	gradients(src_image, dst_image);
 
-	write_image(dst_image, gradient_img_path);
+	write_image(dst_image, "gradients.bmp");
+
+	dispose_image(src_image);
+	dispose_image(dst_image);
+}
+```
 
 
+```cpp
+u8 edge_at(Image const& img, u32 x, u32 y, u8 threshold)
+{
+	if (is_outer_pixel(img, x, y))
+	{
+		return 0.0f;
+	}
 
-	//write_image(dst_image, edges_img_path);
+	r32 grad_x = 0.0f;
+	r32 grad_y = 0.0f;
+	u32 w = 0;
+
+	for (u32 v = y - 1; v <= y + 1; ++v)
+	{
+		for (u32 u = x - 1; u <= x + 1; ++u)
+		{
+			auto p = pixel_at(img, u, v);
+
+			grad_x += GRAD_X_3X3[w] * p;
+			grad_y += GRAD_Y_3X3[w] * p;
+			++w;
+		}
+	}
+
+	auto grad = std::hypot(grad_x, grad_y);
+
+	assert(grad >= 0.0f);
+	assert(grad <= 255.0f);
+
+	return (u8)grad > threshold ? 255 : 0;
+}
+```
+
+```cpp
+void edges(Image const& src, Image const& dst, u8 threshold)
+{
+	for (u32 y = 0; y < src.height; ++y)
+	{
+		auto dst_row = row_begin(dst, y);
+
+		for (u32 x = 0; x < src.width; ++x)
+		{
+			auto edge = edge_at(src, x, y, threshold);
+
+			dst_row[x] = edge;
+		}
+	}
+}
+```
+
+```cpp
+int main()
+{
+    Image src_image;
+	read_image_from_file("orange-car.bmp", src_image);
+
+	Image dst_image;
+	make_image(dst_image, src_image.width, src_image.height);
+
+	gradients(src_image, dst_image);
+
+	write_image(dst_image, "gradients.bmp");
+
+	edges(src_image, dst_image, 60);
+
+	write_image(dst_image, "edges.bmp");
 
 	dispose_image(src_image);
 	dispose_image(dst_image);
