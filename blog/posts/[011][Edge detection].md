@@ -2,7 +2,7 @@
 ## Calculating image gradients
 
 
-
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/orange_car.bmp)
 
 ```cpp
 #include <cstdint>
