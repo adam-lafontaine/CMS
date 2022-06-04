@@ -1,5 +1,6 @@
 # Edge Detection
-## 
+## Calculating image gradients
+
 
 
 
@@ -15,10 +16,10 @@ class Image
 {
 public:
 
-	u32 width;
-	u32 height;
+	u32 width = 0;
+	u32 height = 0;
 
-	u8* data;
+	u8* data = nullptr;
 };
 
 
@@ -101,20 +102,53 @@ r32 x_gradient_at(Image const& img, u32 x, u32 y)
 {
 	r32 grad_lr = 0.0f;
 
-	u32 w = 0;
+	// x, y range
+	auto x_begin = x - 1;
+	auto x_end = x + 2;
+	auto y_begin = y - 1;
+	auto y_end = y + 2;
 
-	for (u32 v = y - 1; v <= y + 1; ++v)
+	u32 a = 0; // array index
+
+	for (u32 v = y_begin; v < y_end; ++v)
 	{
-		for (u32 u = x - 1; u <= x + 1; ++u)
+		for (u32 u = x_begin; u < x_end; ++u)
 		{
 			auto p = pixel_at(img, u, v);
 
-			grad_lr += GRAD_LR_3X3[w] * p;
-			++w;
+			grad_lr += GRAD_LR_3X3[a] * p;
+			++a;
 		}
 	}
 
 	return std::abs(grad_lr);
+}
+```
+
+```cpp
+void x_gradients(Image const& src, Image const& dst)
+{
+	zero_outer(dst);
+
+	auto x_begin = 1;
+	auto x_end = src.width - 1;
+	auto y_begin = 1;
+	auto y_end = src.height - 1;
+
+	for (u32 y = y_begin; y < y_end; ++y)
+	{
+		auto dst_row = row_begin(dst, y);
+
+		for(u32 x = x_begin; x < x_end; ++x)
+		{
+			auto grad = x_gradient_at(src, x, y);
+
+			assert(grad >= 0.0f);
+			assert(grad <= 255.0f);
+
+			dst_row[x] = (u8)grad;
+		}
+	}
 }
 ```
 
@@ -147,22 +181,28 @@ constexpr std::array<r32, 9> GRAD_TB_3X3
 ```cpp
 r32 y_gradient_at(Image const& img, u32 x, u32 y)
 {
-	r32 grad_lr = 0.0f;
+	r32 grad_tb = 0.0f;
 
-	u32 w = 0;
+	// x, y range
+	auto x_begin = x - 1;
+	auto x_end = x + 2;
+	auto y_begin = y - 1;
+	auto y_end = y + 2;
 
-	for (u32 v = y - 1; v <= y + 1; ++v)
+	u32 a = 0; // array index
+
+	for (u32 v = y_begin; v < y_end; ++v)
 	{
-		for (u32 u = x - 1; u <= x + 1; ++u)
+		for (u32 u = x_begin; u < x_end; ++u)
 		{
 			auto p = pixel_at(img, u, v);
 
-			grad_lr += GRAD_TB_3X3[w] * p;
-			++w;
+			grad_tb += GRAD_TB_3X3[a] * p;
+			++a;
 		}
 	}
 
-	return std::abs(grad_lr);
+	return std::abs(grad_tb);
 }
 
 
@@ -170,11 +210,16 @@ void y_gradients(Image const& src, Image const& dst)
 {
 	zero_outer(dst);
 
-	for (u32 y = 1; y < src.height - 1; ++y)
+	auto x_begin = 1;
+	auto x_end = src.width - 1;
+	auto y_begin = 1;
+	auto y_end = src.height - 1;
+
+	for (u32 y = y_begin; y < y_end; ++y)
 	{
 		auto dst_row = row_begin(dst, y);
 
-		for (u32 x = 1; x < src.width - 1; ++x)
+		for (u32 x = x_begin; x < x_end; ++x)
 		{
 			auto grad = y_gradient_at(src, x, y);
 
@@ -248,19 +293,25 @@ r32 gradient_at(Image const& img, u32 x, u32 y)
 	r32 grad_tblr = 0.0f;
 	r32 grad_tbrl = 0.0f;
 
-	u32 w = 0;
+	// x, y range
+	auto x_begin = x - 1;
+	auto x_end = x + 2;
+	auto y_begin = y - 1;
+	auto y_end = y + 2;
 
-	for (u32 v = y - 1; v <= y + 1; ++v)
+	u32 a = 0; // array index
+
+	for (u32 v = y_begin; v < y_end; ++v)
 	{
-		for (u32 u = x - 1; u <= x + 1; ++u)
+		for (u32 u = x_begin; u < x_end; ++u)
 		{
 			auto p = pixel_at(img, u, v);
 
-			grad_lr += GRAD_LR_3X3[w] * p;
-			grad_tb += GRAD_TB_3X3[w] * p;
-			grad_tblr += GRAD_TBLR_3X3[w] * p;
-			grad_tbrl += GRAD_TBRL_3X3[w] * p;
-			++w;
+			grad_lr += GRAD_LR_3X3[a] * p;
+			grad_tb += GRAD_TB_3X3[a] * p;
+			grad_tblr += GRAD_TBLR_3X3[a] * p;
+			grad_tbrl += GRAD_TBRL_3X3[a] * p;
+			++a;
 		}
 	}
 
@@ -273,11 +324,16 @@ void gradients(Image const& src, Image const& dst)
 {
 	zero_outer(dst);
 
-	for (u32 y = 1; y < src.height - 1; ++y)
+	auto x_begin = 1;
+	auto x_end = src.width - 1;
+	auto y_begin = 1;
+	auto y_end = src.height - 1;
+
+	for (u32 y = y_begin; y < y_end; ++y)
 	{
 		auto dst_row = row_begin(dst, y);
 
-		for (u32 x = 1; x < src.width - 1; ++x)
+		for (u32 x = x_begin; x < x_end; ++x)
 		{
 			auto grad = gradient_at(src, x, y);
 
