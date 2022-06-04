@@ -1,12 +1,11 @@
 # Edge Detection
 ## 
 
-```cpp
 
-```
 
 ```cpp
 #include <cstdint>
+#include <cassert>
 
 using u8 = uint8_t;
 using u32 = uint32_t;
@@ -47,28 +46,6 @@ void dispose_image(Image& image)
 ```
 
 ```cpp
-#include <array>
-
-using r32 = float;
-
-
-constexpr std::array<r32, 9> GRAD_X_3X3
-{
-	-0.25f,  0.0f,  0.25f,
-	-0.50f,  0.0f,  0.50f,
-	-0.25f,  0.0f,  0.25f,
-};
-
-
-constexpr std::array<r32, 9> GRAD_Y_3X3
-{
-	-0.25f, -0.50f, -0.25f,
-	 0.0f,   0.0f,   0.0f,
-	 0.25f,  0.50f,  0.25f,
-};
-```
-
-```cpp
 u8* row_begin(Image const& image, u32 y)
 {
 	auto row_offset = y * image.width;
@@ -85,30 +62,45 @@ u8 pixel_at(Image const& image, u32 x, u32 y)
 ```
 
 ```cpp
-bool is_outer_pixel(Image const& img, u32 x, u32 y)
+void zero_outer(Image const& dst)
 {
-	return
-		x == 0 ||
-		x == img.width - 1 ||
-		y == 0 ||
-		y == img.height - 1;
+	auto top_row = row_begin(dst, 0);
+	auto bottom_row = row_begin(dst, dst.height - 1);
+
+	for (u32 x = 0; x < dst.width; ++x)
+	{
+		top_row[x] = 0;
+		bottom_row[x] = 0;
+	}
+
+	for (u32 y = 1; y < dst.height - 1; ++y)
+	{
+		auto dst_row = row_begin(dst, y);
+		dst_row[0] = 0;
+		dst_row[dst.width - 1] = 0;
+	}
 }
 ```
 
 ```cpp
-#include <cmath>
-#include <cassert>
+#include <array>
+
+using r32 = float;
 
 
-r32 gradient_at(Image const& img, u32 x, u32 y)
+constexpr std::array<r32, 9> GRAD_LR_3X3
 {
-	if (is_outer_pixel(img, x, y))
-	{
-		return 0.0f;
-	}
+	-0.25f,  0.0f,  0.25f,
+	-0.50f,  0.0f,  0.50f,
+	-0.25f,  0.0f,  0.25f,
+};
+```
 
-	r32 grad_x = 0.0f;
-	r32 grad_y = 0.0f;
+```cpp
+r32 x_gradient_at(Image const& img, u32 x, u32 y)
+{
+	r32 grad_lr = 0.0f;
+
 	u32 w = 0;
 
 	for (u32 v = y - 1; v <= y + 1; ++v)
@@ -117,31 +109,77 @@ r32 gradient_at(Image const& img, u32 x, u32 y)
 		{
 			auto p = pixel_at(img, u, v);
 
-			grad_x += GRAD_X_3X3[w] * p;
-			grad_y += GRAD_Y_3X3[w] * p;
+			grad_lr += GRAD_LR_3X3[w] * p;
 			++w;
 		}
 	}
 
-	auto grad = std::hypot(grad_x, grad_y);
-
-	assert(grad >= 0.0f);
-	assert(grad <= 255.0f);
-
-	return grad;
+	return std::abs(grad_lr);
 }
 ```
 
 ```cpp
-void gradients(Image const& src, Image const& dst)
+int main()
 {
-	for (u32 y = 0; y < src.height; ++y)
+    Image chess_board_src;
+	read_image_from_file("chess_board.bmp", chess_board_src);
+
+	Image chess_board_dst;
+	make_image(chess_board_dst, chess_board_src.width, chess_board_src.height);
+
+	x_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "x_gradients.bmp");
+
+	dispose_image(chess_board_src);
+	dispose_image(chess_board_dst);
+}
+```
+
+```cpp
+constexpr std::array<r32, 9> GRAD_TB_3X3
+{
+	-0.25f, -0.50f, -0.25f,
+	 0.0f,   0.0f,   0.0f,
+	 0.25f,  0.50f,  0.25f,
+};
+```
+
+```cpp
+r32 y_gradient_at(Image const& img, u32 x, u32 y)
+{
+	r32 grad_lr = 0.0f;
+
+	u32 w = 0;
+
+	for (u32 v = y - 1; v <= y + 1; ++v)
+	{
+		for (u32 u = x - 1; u <= x + 1; ++u)
+		{
+			auto p = pixel_at(img, u, v);
+
+			grad_lr += GRAD_TB_3X3[w] * p;
+			++w;
+		}
+	}
+
+	return std::abs(grad_lr);
+}
+
+
+void y_gradients(Image const& src, Image const& dst)
+{
+	zero_outer(dst);
+
+	for (u32 y = 1; y < src.height - 1; ++y)
 	{
 		auto dst_row = row_begin(dst, y);
 
-		for (u32 x = 0; x < src.width; ++x)
+		for (u32 x = 1; x < src.width - 1; ++x)
 		{
-			auto grad = gradient_at(src, x, y);
+			auto grad = y_gradient_at(src, x, y);
+
+			assert(grad >= 0.0f);
+			assert(grad <= 255.0f);
 
 			dst_row[x] = (u8)grad;
 		}
@@ -152,32 +190,64 @@ void gradients(Image const& src, Image const& dst)
 ```cpp
 int main()
 {
-    Image src_image;
-	read_image_from_file("orange-car.bmp", src_image);
+    Image chess_board_src;
+	read_image_from_file("chess_board.bmp", chess_board_src);
 
-	Image dst_image;
-	make_image(dst_image, src_image.width, src_image.height);
+	Image chess_board_dst;
+	make_image(chess_board_dst, chess_board_src.width, chess_board_src.height);
 
-	gradients(src_image, dst_image);
+	x_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "x_gradients.bmp");
 
-	write_image(dst_image, "gradients.bmp");
+    y_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "y_gradients.bmp");
 
-	dispose_image(src_image);
-	dispose_image(dst_image);
+	dispose_image(chess_board_src);
+	dispose_image(chess_board_dst);
 }
 ```
 
 
-```cpp
-u8 edge_at(Image const& img, u32 x, u32 y, u8 threshold)
-{
-	if (is_outer_pixel(img, x, y))
-	{
-		return 0.0f;
-	}
 
-	r32 grad_x = 0.0f;
-	r32 grad_y = 0.0f;
+```cpp
+constexpr std::array<r32, 9> GRAD_TBLR_3X3
+{
+	-0.50f, -0.25f, 0.0f,
+	-0.25f,  0.0f,  0.25f,
+	 0.0f,   0.25f, 0.50f,
+};
+```
+
+```cpp
+constexpr std::array<r32, 9> GRAD_TBRL_3X3
+{
+	0.0f,  -0.25f, -0.50f,
+	0.25f,  0.0f,  -0.25f,
+	0.50f,  0.25f,  0.0f,
+};
+```
+
+```cpp
+#include <cmath>
+
+
+r32 max_abs(r32 a, r32 b, r32 c, r32 d)
+{
+	auto max_ab = std::max(std::abs(a), std::abs(b));
+	auto max_cd = std::max(std::abs(c), std::abs(d));
+
+	return std::max(max_ab, max_cd);
+}
+```
+
+```cpp
+r32 gradient_at(Image const& img, u32 x, u32 y)
+{
+	r32 grad_lr = 0.0f;
+	r32 grad_tb = 0.0f;
+	r32 grad_tblr = 0.0f;
+	r32 grad_tbrl = 0.0f;
+
 	u32 w = 0;
 
 	for (u32 v = y - 1; v <= y + 1; ++v)
@@ -186,33 +256,35 @@ u8 edge_at(Image const& img, u32 x, u32 y, u8 threshold)
 		{
 			auto p = pixel_at(img, u, v);
 
-			grad_x += GRAD_X_3X3[w] * p;
-			grad_y += GRAD_Y_3X3[w] * p;
+			grad_lr += GRAD_LR_3X3[w] * p;
+			grad_tb += GRAD_TB_3X3[w] * p;
+			grad_tblr += GRAD_TBLR_3X3[w] * p;
+			grad_tbrl += GRAD_TBRL_3X3[w] * p;
 			++w;
 		}
 	}
 
-	auto grad = std::hypot(grad_x, grad_y);
-
-	assert(grad >= 0.0f);
-	assert(grad <= 255.0f);
-
-	return (u8)grad > threshold ? 255 : 0;
+	return max_abs(grad_lr, grad_tb, grad_tblr, grad_tbrl);
 }
 ```
 
 ```cpp
-void edges(Image const& src, Image const& dst, u8 threshold)
+void gradients(Image const& src, Image const& dst)
 {
-	for (u32 y = 0; y < src.height; ++y)
+	zero_outer(dst);
+
+	for (u32 y = 1; y < src.height - 1; ++y)
 	{
 		auto dst_row = row_begin(dst, y);
 
-		for (u32 x = 0; x < src.width; ++x)
+		for (u32 x = 1; x < src.width - 1; ++x)
 		{
-			auto edge = edge_at(src, x, y, threshold);
+			auto grad = gradient_at(src, x, y);
 
-			dst_row[x] = edge;
+			assert(grad >= 0.0f);
+			assert(grad <= 255.0f);
+
+			dst_row[x] = (u8)grad;
 		}
 	}
 }
@@ -221,21 +293,71 @@ void edges(Image const& src, Image const& dst, u8 threshold)
 ```cpp
 int main()
 {
-    Image src_image;
-	read_image_from_file("orange-car.bmp", src_image);
+    Image chess_board_src;
+	read_image_from_file("chess_board.bmp", chess_board_src);
 
-	Image dst_image;
-	make_image(dst_image, src_image.width, src_image.height);
+	Image chess_board_dst;
+	make_image(chess_board_dst, chess_board_src.width, chess_board_src.height);
 
-	gradients(src_image, dst_image);
+	x_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "x_gradients.bmp");
 
-	write_image(dst_image, "gradients.bmp");
+    y_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "y_gradients.bmp");
 
-	edges(src_image, dst_image, 60);
+    gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "gradients.bmp");
 
-	write_image(dst_image, "edges.bmp");
+	dispose_image(chess_board_src);
+	dispose_image(chess_board_dst);
+}
+```
 
-	dispose_image(src_image);
-	dispose_image(dst_image);
+
+```cpp
+void edges(Image const& src, Image const& dst, u8 threshold)
+{
+	zero_outer(dst);
+
+	for (u32 y = 1; y < src.height - 1; ++y)
+	{
+		auto dst_row = row_begin(dst, y);
+
+		for (u32 x = 1; x < src.width - 1; ++x)
+		{
+			auto grad = gradient_at(src, x, y);
+
+			assert(grad >= 0.0f);
+			assert(grad <= 255.0f);
+
+			dst_row[x] = (u8)grad > threshold ? 255 : 0;
+		}
+	}
+}
+```
+
+```cpp
+int main()
+{
+    Image chess_board_src;
+	read_image_from_file("chess_board.bmp", chess_board_src);
+
+	Image chess_board_dst;
+	make_image(chess_board_dst, chess_board_src.width, chess_board_src.height);
+
+	x_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "x_gradients.bmp");
+
+    y_gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "y_gradients.bmp");
+
+    gradients(chess_board_src, chess_board_dst);
+	write_image(chess_board_dst, "gradients.bmp");
+
+    edges(chess_board_src, chess_board_dst, 25);
+	write_image(chess_board_dst, "edges.bmp");
+
+	dispose_image(chess_board_src);
+	dispose_image(chess_board_dst);
 }
 ```
