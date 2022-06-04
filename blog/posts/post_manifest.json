@@ -100,6 +100,14 @@
             "filename": "[010][Makefiles].md"
         },
         {
+            "number": "[011]",
+            "id": "1654375614991",
+            "title": "Edge detection",
+            "route": "edge-detection",
+            "tags": ["C++", "Image Processing"],
+            "filename": "[011][Edge detection].md"
+        },
+        {
             "number": "[]",
             "id": "",
             "title": "",
