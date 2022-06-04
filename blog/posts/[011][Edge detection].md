@@ -4,6 +4,8 @@
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/orange_car.bmp)
 
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
+
 ```cpp
 #include <cstdint>
 #include <cassert>
@@ -152,6 +154,8 @@ void x_gradients(Image const& src, Image const& dst)
 }
 ```
 
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/chess_board.bmp)
+
 ```cpp
 int main()
 {
@@ -168,6 +172,9 @@ int main()
 	dispose_image(chess_board_dst);
 }
 ```
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/x_gradients.bmp)
+
 
 ```cpp
 constexpr std::array<r32, 9> GRAD_TB_3X3
@@ -252,7 +259,7 @@ int main()
 }
 ```
 
-
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/y_gradients.bmp)
 
 ```cpp
 constexpr std::array<r32, 9> GRAD_TBLR_3X3
@@ -369,6 +376,8 @@ int main()
 }
 ```
 
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/gradients.bmp)
+
 
 ```cpp
 void edges(Image const& src, Image const& dst, u8 threshold)
@@ -417,3 +426,5 @@ int main()
 	dispose_image(chess_board_dst);
 }
 ```
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/edges.bmp)
