@@ -1,7 +1,7 @@
 # Edge detection
 ## Calculating image gradients
 
-Images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world.  Each pixel is its own color and that's all.  To get anything else from the image will require making some assumptions.  One assumption we make is that different objects have different colors.  Therefore when pixels close to each other have different colors, they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small areas.  When a significant change is found at a pixel, we mark it as an edge.
+Images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world.  Inferring anything else from the image requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors, they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small areas.  When a significant change is found at a pixel, we mark it as an edge.
 
 Consider the folling image.
 
@@ -11,11 +11,11 @@ After processing, we get a new image where edges are represented as white pixels
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
 
-Although there is no color in the image, much of the information is preserved.  For instance, we can still tell that the image is of a car and its front dash and steering wheel.  Edge detection is a useful tool in many image processing algorithms because it greatly simplifies an image while preserving important features.
+Although there is no color in the image, much of the information is preserved.  We can still tell that the image is of a car and its front dash and steering wheel.  Edge detection greatly simplifies an image while preserving important features making it a very useful tool for many image processing algorithms.
 
 ### Image gradients
 
-Edge detection is done by calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is an edge.  In this post we'll use grayscale images so that we only need to handle intensity differences for one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
+Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.  In this post we'll use grayscale images so that we only need to handle gradients for one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -119,7 +119,7 @@ r32 x_gradient_at_xy(Image const& img, u32 x, u32 y)
 }
 ```
 
-The above function won't work for pixels on the outer edges of the image.  For instance, on the top row there are no pixels above it.  There are diffent methods for handling image boundaries.  The easiest is to simply set the gradient to zero.
+The above function won't work for pixels on the outer edges of the image.  For instance, on the top row there are no pixels above it.  There are different methods for handling image boundaries.  The easiest is to simply set the gradient to zero.
 
 ```cpp
 void zero_outer(Image const& dst)
@@ -215,7 +215,7 @@ constexpr std::array<r32, 9> GRAD_TB_3X3
 };
 ```
 
-The logic for processing the image is exactly the same.
+The logic for processing the image is exactly the same.  The only difference is that we use the new kernel.
 
 
 ```cpp
@@ -301,7 +301,7 @@ The output image shows the horizontal lines only.
 
 ### Custom gradient
 
-Image gradients don't need to be only horizontal or vertical.  For instance, we can have a kernel that gives a gradient from top to bottom and left to right.
+Image gradients don't need to be only horizontal or vertical.  For instance, we can have a diagonal kernel that gives a gradient from top to bottom and left to right.
 
 ```cpp
 constexpr std::array<r32, 9> GRAD_TBLR_3X3
@@ -436,7 +436,7 @@ The output shows the gradients for all directions.
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/gradients.bmp)
 
 
-### Edge Detection
+### Edge detection
 
 When the algorithm for generating image gradients is complete, most of the work for edge detection is done.  Basic edge detection requires one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
 
