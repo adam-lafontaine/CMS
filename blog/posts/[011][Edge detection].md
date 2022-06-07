@@ -1,17 +1,27 @@
-# Edge Detection
+# Edge detection
 ## Calculating image gradients
 
-Edge detection is done by calculating the change in pixel intensities over a region surrounding each pixel.  Edges occur where the change in intensity is relatively high.  The change in intensity is called the gradient.  Consider the following image.
+Images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world.  Each pixel is its own color and that's all.  To get anything else from the image will require making some assumptions.  One assumption we make is that different objects have different colors.  Therefore when pixels close to each other have different colors, they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small areas.  When a significant change is found at a pixel, we mark it as an edge.
+
+Consider the folling image.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/orange_car.bmp)
 
-We can iterate over the image and calculate the gradient at each pixel.  If a gradient is high enough, we say that pixel is on an edge.  The output image is a binary image where the edge pixels are white and the non edge pixels are black.  
+After processing, we get a new image where edges are represented as white pixels on a black background.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
 
+Although there is no color in the image, much of the information is preserved.  For instance, we can still tell that the image is of a car and its front dash and steering wheel.  Edge detection is a useful tool in many image processing algorithms because it greatly simplifies an image while preserving important features.
+
+Edge detection is done by calculating the change in pixel intensities over a region surrounding each pixel.  Edges occur where the change in intensity is relatively high.  The change in intensity is called the gradient.  Consider the following image.
 
 
-In this post we'll use grayscale images so that we only need to handle differences in intensities for one channel.  Methods can be developed for RGB images but simply converting the image to grayscale is often good enough.
+
+We can iterate over the image and calculate the gradient at each pixel.  If a gradient is high enough, we say that pixel is on an edge.  The output image is a binary image where the edge pixels are white and the others are black.  
+
+
+
+In this post we'll use grayscale images so that we only need to handle intensity differences for one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -30,13 +40,8 @@ public:
 
 	u8* data = nullptr;
 };
-```
 
-Image memory management is covered here: https://almostalwaysauto.com/posts/what-is-an-image.
 
-Reading and writing grayscale images is covered at the end of this post: https://almostalwaysauto.com/posts/image-views.
-
-```cpp
 // https://almostalwaysauto.com/posts/what-is-an-image
 void make_image(Image& image, u32 width, u32 height);
 
@@ -48,7 +53,9 @@ void read_image_from_file(const char* img_path_src, Image& image_dst);
 void write_image(Image& image_src, const char* file_path_dst);
 ```
 
-When iterating over an image we'll need find which row we're on for a given y coordinate.
+Image memory management is covered here: https://almostalwaysauto.com/posts/what-is-an-image.  Reading and writing grayscale images is covered at the end of this post: https://almostalwaysauto.com/posts/image-views.
+
+When iterating over an image we'll need to find which row we're on for a given y coordinate.
 
 ```cpp
 u8* row_begin(Image const& image, u32 y)
@@ -439,7 +446,7 @@ The output shows the gradients for all directions.
 
 ### Edge Detection
 
-Most of the work is done for edge detection when the algorithm for generating image gradients is complete.  Basic edge detection requires one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
+When the algorithm for generating image gradients is complete, most of the work for edge detection is done.  Basic edge detection requires one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
 
 ```cpp
 void edges(Image const& src, Image const& dst, u8 threshold)

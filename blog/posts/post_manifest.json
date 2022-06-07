@@ -3,7 +3,7 @@
         {
             "number": "[001]",
             "id": "1628558232358",
-            "title": "What is an Image?",
+            "title": "What is an image?",
             "route": "what-is-an-image",
             "tags": [
                 "Image Processing",
@@ -86,7 +86,7 @@
         {
             "number": "[009]",
             "id": "1650043913517",
-            "title": "Image Views",
+            "title": "Image views",
             "route": "image-views",
             "tags": ["C++", "Image Processing"],
             "filename": "[009][Image Views].md"
