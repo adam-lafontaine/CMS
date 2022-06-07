@@ -13,15 +13,9 @@ After processing, we get a new image where edges are represented as white pixels
 
 Although there is no color in the image, much of the information is preserved.  For instance, we can still tell that the image is of a car and its front dash and steering wheel.  Edge detection is a useful tool in many image processing algorithms because it greatly simplifies an image while preserving important features.
 
-Edge detection is done by calculating the change in pixel intensities over a region surrounding each pixel.  Edges occur where the change in intensity is relatively high.  The change in intensity is called the gradient.  Consider the following image.
+### Image gradients
 
-
-
-We can iterate over the image and calculate the gradient at each pixel.  If a gradient is high enough, we say that pixel is on an edge.  The output image is a binary image where the edge pixels are white and the others are black.  
-
-
-
-In this post we'll use grayscale images so that we only need to handle intensity differences for one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
+Edge detection is done by calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is an edge.  In this post we'll use grayscale images so that we only need to handle intensity differences for one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -75,7 +69,7 @@ u8 pixel_at_xy(Image const& image, u32 x, u32 y)
 }
 ```
 
-### Horizontal Gradient
+### Horizontal gradient
 
 A horizontal gradient is calculated by finding the difference between the pixels to the right of a location and the pixels to the left of the location.  The following array will be used to calculate a gradient from left to right.
 
@@ -93,9 +87,7 @@ constexpr std::array<r32, 9> GRAD_LR_3X3
 };
 ```
 
-The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The rows and columns corespond to the surrounding pixels at each position in the image.  The accumulated result will give a difference from left to right with more weight is given to the pixels directly to the right and left.
-
-At each position in the image, start with the pixel one row above and one column to the left.  
+The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The array and the pixels will be iterated over in such a way that the rows and columns corespond to the surrounding pixels at each position in the image.  Each value in the array is multiplied by the pixel value at that position.  The accumulated result gives a weighted difference between the pixels to the right and the pixels to the left.
 
 We don't care if the result is positive or negative so we'll return the absolute value.
 
@@ -206,11 +198,11 @@ The program...
 * Calculates the gradients
 * Writes the gradient image to file
 
-The image generated shows the shows the vertical lines but not the horizontal ones.  
+The image generated shows the vertical lines but not the horizontal ones.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/x_gradients.bmp)
 
-### Vertical Gradient
+### Vertical gradient
 
 Calculating the vertical gradients is the identical approach except the values in the kernel are rotated so that the difference calculated will be from top to bottom.
 
@@ -280,7 +272,7 @@ void y_gradients(Image const& src, Image const& dst)
 }
 ```
 
-Update the program with the y_gradients function.
+Now we can update the program with the y_gradients function.
 
 ```cpp
 int main()
@@ -307,7 +299,7 @@ The output image shows the horizontal lines only.
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/y_gradients.bmp)
 
 
-### Custom Gradient
+### Custom gradient
 
 Image gradients don't need to be only horizontal or vertical.  For instance, we can have a kernel that gives a gradient from top to bottom and left to right.
 
@@ -334,7 +326,7 @@ constexpr std::array<r32, 9> GRAD_TBRL_3X3
 
 We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along various angles, not just along the vertical and horizontal.
 
-This function returns the maximum absolute value of four numbers.
+This helper function returns the maximum absolute value of four numbers.
 
 ```cpp
 #include <cmath>
@@ -510,3 +502,4 @@ Notes
 * blur image, preprocessing
 * kernel(s)
 * different kernel sizes, larger images
+* negative/positive gradients
