@@ -1,21 +1,23 @@
 # Edge detection
 ## Calculating image gradients
 
-Since images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world, inferring anything else from an image requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small regions.  When a significant change is found at a pixel, we mark it as being an edge.
+Since images are digital representations of 2-dimensional pictures and don't have any information about the 3-dimensional world, inferring anything else from requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors they represent a boundary between two objects.  These boundary pixels are found by scanning an image and looking for relatively large changes in color over small regions.  When a significant change is found at a pixel, we mark it as being an edge.
 
 Consider the following image.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/orange_car.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/orange_car.bmp)
 
 While processing, we can generate a new image where the edges are represented as white pixels on a black background.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/car_edges.bmp)
 
-Although there is no color in the image, much of the information is preserved.  We can still tell that the image is of a car and its front dash and steering wheel.  Edge detection greatly simplifies an image while preserving important features, making it a very useful tool for many image processing applications.
+Although there is no color in the image, much of the information is preserved.  We can still tell that the image is of a car and its front dash and steering wheel.  Edge detection greatly simplifies an image while preserving important features.  This makes it a very useful tool for many image processing applications.
 
 ### Image gradients
 
-Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.  We'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
+Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.
+
+We'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -87,7 +89,7 @@ constexpr std::array<r32, 9> GRAD_LR_3X3
 };
 ```
 
-The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The array and the pixels will be iterated over in such a way that the rows and columns corespond to the surrounding pixels at each position in the image.  Each value in the array is multiplied by the pixel value at that position.  The accumulated result gives a weighted difference between the pixels to the right and the pixels to the left.
+The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The array and the pixels will be iterated over in such a way that the rows and columns of the kernel corespond to the surrounding pixels at each position in the image.  Each value in the array is multiplied by the pixel value at that position.  The accumulated result gives a weighted difference between the pixels to the right and the pixels to the left.
 
 We don't care if the result is positive or negative so we'll return the absolute value.
 
@@ -142,7 +144,7 @@ void zero_outer(Image const& dst)
 }
 ```
 
-We can now calculate the gradient for each pixel in an image and write the result to a new image.  The pixel brightness in the output image will be the value of the calculated gradient.
+Now we can calculate the gradient for each pixel in an image and write the result to a new image.  The pixel brightness in the output image will be the value of the calculated gradient.
 
 ```cpp
 void x_gradients(Image const& src, Image const& dst)
@@ -173,7 +175,7 @@ void x_gradients(Image const& src, Image const& dst)
 
 We'll use the following image and the sample program below.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/chess_board.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/chess_board.bmp)
 
 ```cpp
 int main()
@@ -200,7 +202,7 @@ The program...
 
 The image generated shows the vertical lines but not the horizontal ones.  Some of the lines are brigher than others.  The brighter pixels are those with the stronger gradients.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/x_gradients.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/x_gradients.bmp)
 
 ### Vertical gradient
 
@@ -295,7 +297,7 @@ int main()
 
 This output image shows the horizontal lines only.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/y_gradients.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/y_gradients.bmp)
 
 
 ### Custom gradient
@@ -431,12 +433,12 @@ int main()
 
 The output shows the gradients for all directions.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/gradients.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/gradients.bmp)
 
 
 ### Edge detection
 
-When the algorithm for generating image gradients is complete, most of the work for edge detection is done already.  Basic edge detection requires only one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
+When the algorithm for generating image gradients is complete, most of the work for edge detection is done already.  Basic edge detection requires only one more step, which is to only show the gradients that are at or above a given threshold.  To find an edge we can binarize each pixel after calculating its gradient.
 
 ```cpp
 void edges(Image const& src, Image const& dst, u8 threshold)
@@ -490,17 +492,15 @@ int main()
 
 Only the significant edges are displayed and everything else is ignored.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/edges.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/edges.bmp)
 
 
 ### Notes
 
 There is no definitive process for finding edges in an image but the core principles remain the same.  Many decisions need to be made that will depend on the application.  For instance, the appropriate threshold depends on the brightness and contrast of the image.
 
-Sometimes to make edges appear smoother the image is blurred first.  However in some situations this can also be accomplished with a modified kernel.
-
-Image gradients can be calculated in any number of ways.  Different kernels can be used having different values or dimensions.  For larger images with higher resolutions, larger kernels may be more appropriate if you need to look for edges accross a greater number of pixels.  Kernels do not need to be square either.  They can be rectangular or even 1 dimensional if you want to emphasize the gradient in one direction.
+Image gradients can be calculated in any number of ways.  Different kernels can be used having different values or dimensions.  For larger images with higher resolutions, larger kernels may be more appropriate if you need to look for edges accross a greater number of pixels.  Kernels do not need to be square either.  They can be rectangular or even 1-dimensional if you want to emphasize the gradient in one direction.
 
 The horizontal and vertical gradients give us the orientation of an edge which allows for taking rotation into account when scanning for specific features.
 
-Computers can't think or percieve the way humans can when they see an image.  In fact they can't even see the image, they can only execute logic as they iterate over pixels.  Edge detection allows us to boil down the image to something simpler that still contains the information we want, but in a format that is more digestible for a software algorithm to process.
+Computers can't think or percieve the way humans can when shown an image.  They can only execute logic as they iterate over pixels.  Edge detection allows us to boil down the image to something simpler that still contains the information we want, but in a format that is more digestible for a software algorithm to process.
