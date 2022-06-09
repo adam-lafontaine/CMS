@@ -1,4 +1,4 @@
-# Image Views
+# Image views
 ## A range or region of pixels within an image
 
 ### What is a view?
