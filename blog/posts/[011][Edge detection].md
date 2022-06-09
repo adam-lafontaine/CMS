@@ -1,7 +1,7 @@
 # Edge detection
 ## Calculating image gradients
 
-Images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world.  Inferring anything else from the image requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors, they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small areas.  When a significant change is found at a pixel, we mark it as an edge.
+Since images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world, inferring anything else from an image requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small regions.  When a significant change is found at a pixel, we mark it as being an edge.
 
 Consider the following image.
 
@@ -11,11 +11,11 @@ While processing, we can generate a new image where the edges are represented as
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
 
-Although there is no color in the image, much of the information is preserved.  We can still tell that the image is of a car and its front dash and steering wheel.  Edge detection greatly simplifies an image while preserving important features making it a very useful tool for many image processing applications.
+Although there is no color in the image, much of the information is preserved.  We can still tell that the image is of a car and its front dash and steering wheel.  Edge detection greatly simplifies an image while preserving important features, making it a very useful tool for many image processing applications.
 
 ### Image gradients
 
-Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.  In this post we'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
+Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.  We'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -49,7 +49,7 @@ void write_image(Image& image_src, const char* file_path_dst);
 
 Image memory management is covered here: https://almostalwaysauto.com/posts/what-is-an-image.  Reading and writing grayscale images is covered at the end of this post: https://almostalwaysauto.com/posts/image-views.
 
-When iterating over an image we'll need to find which row we're on for a given y coordinate.
+When iterating over an image we need to find which row we're on for a given y coordinate.
 
 ```cpp
 u8* row_begin(Image const& image, u32 y)
@@ -322,7 +322,7 @@ constexpr std::array<r32, 9> GRAD_TBRL_3X3
 };
 ```
 
-We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along different angles, not just along the vertical and horizontal.
+We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along different angles as well.
 
 This helper function returns the maximum absolute value of four numbers.
 
