@@ -3,11 +3,11 @@
 
 Images are digital representations of 2 dimensional pictures and don't have any information about the 3 dimensional world.  Inferring anything else from the image requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors, they represent a boundary between two objects.  These boundary pixels are found by scanning an image looking for relatively large changes in color over small areas.  When a significant change is found at a pixel, we mark it as an edge.
 
-Consider the folling image.
+Consider the following image.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/orange_car.bmp)
 
-While processing, we can generate a new image where edges are represented as white pixels on a black background.
+While processing, we can generate a new image where the edges are represented as white pixels on a black background.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/car_edges.bmp)
 
@@ -171,7 +171,7 @@ void x_gradients(Image const& src, Image const& dst)
 }
 ```
 
-We'll use the following image and and the sample program below.
+We'll use the following image and the sample program below.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p11-edge-detection/blog/img/%5B011%5D/chess_board.bmp)
 
@@ -204,7 +204,7 @@ The image generated shows the vertical lines but not the horizontal ones.  Some 
 
 ### Vertical gradient
 
-Calculating the vertical gradients is the identical approach except the values in the kernel are rotated so that the difference calculated will be from top to bottom.
+Calculating vertical gradients uses the identical approach except the values in the kernel are rotated so that the difference calculated will be from top to bottom.
 
 ```cpp
 constexpr std::array<r32, 9> GRAD_TB_3X3
@@ -322,7 +322,7 @@ constexpr std::array<r32, 9> GRAD_TBRL_3X3
 };
 ```
 
-We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along various angles, not just along the vertical and horizontal.
+We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along different angles, not just along the vertical and horizontal.
 
 This helper function returns the maximum absolute value of four numbers.
 
@@ -436,7 +436,7 @@ The output shows the gradients for all directions.
 
 ### Edge detection
 
-When the algorithm for generating image gradients is complete, most of the work for edge detection is done already.  Basic edge detection requires one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
+When the algorithm for generating image gradients is complete, most of the work for edge detection is done already.  Basic edge detection requires only one more step, which is to only show the gradients that are at or above a given threshold.  We can binarize each pixel after calculating its gradient.
 
 ```cpp
 void edges(Image const& src, Image const& dst, u8 threshold)
@@ -454,7 +454,7 @@ void edges(Image const& src, Image const& dst, u8 threshold)
 			assert(grad >= 0.0f);
 			assert(grad <= 255.0f);
 
-			dst_row[x] = (u8)grad > threshold ? 255 : 0;
+			dst_row[x] = (u8)grad >= threshold ? 255 : 0;
 		}
 	}
 }
@@ -480,7 +480,7 @@ int main()
     gradients(chess_board_src, chess_board_dst);
 	write_image(chess_board_dst, "gradients.bmp");
 
-    edges(chess_board_src, chess_board_dst, 25);
+    edges(chess_board_src, chess_board_dst, 26);
 	write_image(chess_board_dst, "edges.bmp");
 
 	dispose_image(chess_board_src);
@@ -495,11 +495,12 @@ Only the significant edges are displayed and everything else is ignored.
 
 ### Notes
 
-There is no definitive process for finding edges in an image.  Many decisions need to be made that will depend on the application.  For instance, the appropriate threshold depends on the brightness and contrast of the image.
+There is no definitive process for finding edges in an image but the core principles remain the same.  Many decisions need to be made that will depend on the application.  For instance, the appropriate threshold depends on the brightness and contrast of the image.
 
-Image gradients can be calculated in any number of ways.  Different kernels can be used having different values or different dimensions.  For larger images with higher resolutions, larger kernels may be more appropriate if you need to look for edges accross a greater number of pixels.  Kernels do not need to be square either.  They can be rectangular or even 1 dimensional if you want to emphasize the gradient in one direction.
+Sometimes to make edges appear smoother the image is blurred first.  However in some situations this can also be accomplished with a modified kernel.
 
-To make edges appear smoother, sometimes the image is blurred first.  However in some situations this can also be accomplished with a modified kernel.
+Image gradients can be calculated in any number of ways.  Different kernels can be used having different values or dimensions.  For larger images with higher resolutions, larger kernels may be more appropriate if you need to look for edges accross a greater number of pixels.  Kernels do not need to be square either.  They can be rectangular or even 1 dimensional if you want to emphasize the gradient in one direction.
 
-Image gradients are not only useful for edge detection.  Calculating the horizontal and vertical gradients gives us the orientation of the feature in the image.  This information can help take rotation into account when scanning an image for specific features.
+The horizontal and vertical gradients give us the orientation of an edge which allows for taking rotation into account when scanning for specific features.
 
+Computers can't think or percieve the way humans can when they see an image.  In fact they can't even see the image, they can only execute logic as they iterate over pixels.  Edge detection allows us to boil down the image to something simpler that still contains the information we want, but in a format that is more digestible for a software algorithm to process.

@@ -101,7 +101,7 @@
         },
         {
             "number": "[011]",
-            "id": "1654375614991",
+            "id": "1654723462438",
             "title": "Edge detection",
             "route": "edge-detection",
             "tags": ["C++", "Image Processing"],
