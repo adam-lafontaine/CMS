@@ -5,7 +5,7 @@ Since images are digital representations of 2-dimensional pictures and don't hav
 
 Consider the following image.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/orange_car.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/blurb/blog/img/%5B011%5D/orange_car.bmp)
 
 When processing, we can generate a new image where the edges are represented as white pixels on a black background.
 
