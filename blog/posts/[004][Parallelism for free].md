@@ -73,7 +73,9 @@ Another option is the std::ranges namespace introduced in C++20.  That is a topi
 std::ranges::sort(vec);
 ```
 
-In any case, begin and end iterators are still required to define the range we want to perform an algorithm on.  We also have the option to apply an algorithm to a subset of a range.  For example, we can sort only the first 10 elements of a containiner.
+In any case, begin and end iterators are still required to define the range we want to perform an algorithm on.
+
+We also have the option to apply an algorithm to a subset of a range.  For example, we can sort only the first 10 elements of a containiner.
 
 ```cpp
 std::sort(vec.begin(), vec.begin() + 10);
@@ -216,7 +218,9 @@ Output when running in release mode.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/release.png)
 
-In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but the time adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT. Also, check and see how it affects your computer's CPU usage by opening Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
+In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but they adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT.
+
+You can check and see how it affects your computer's CPU usage by opening Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
 
 For instance, when I increase each value by a factor of 10 I get the following result.
 

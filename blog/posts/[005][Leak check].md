@@ -33,7 +33,7 @@ Leaks are more likely to occur when a program is complicated and there is no cle
 
 ### Testing for memory leaks
 
-There are tools to help us ensure that we are handling the program's memory properly.  One such tool is Visual Studio on Windows.  The Winows API function _CrtSetDbgFlag() function allows for detecting and reporting memory leaks in a program.  An example of its use is below.
+There are tools to help us ensure that we are handling the program's memory properly.  One such tool is Visual Studio on Windows.  The Windows API function _CrtSetDbgFlag() function allows for detecting and reporting memory leaks in a program.  An example of its use is below.
 
 ```cpp
 #if defined(_WIN32) && defined(_DEBUG)

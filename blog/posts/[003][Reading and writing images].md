@@ -4,10 +4,10 @@
 
 ### stb
 
-We will be using two public domain libraries called stb_image and stb_image_write.  the stb libraries (https://github.com/nothings/stb) is a collection of single-file public domain libraries provided by Sean T. Barrett and others.  They are easy to use because there is nothing to install and you only need to include the file(s) in your project.
+We will be using two public domain libraries called stb_image and stb_image_write.  The stb libraries (https://github.com/nothings/stb) are a collection of single-file public domain libraries provided by Sean T. Barrett and others.  They are easy to use because there is nothing to install.  You only need to include the file(s) in your project.
 
 ### Reading image files
-In order to read image files we need stb_image.
+In order to read image files we need stb_image header.
 
 https://github.com/nothings/stb/blob/master/stb_image.h
 
@@ -115,13 +115,13 @@ void read_image_from_file(const char* img_path_src, Image& image_dst)
     int image_channels = 0;
     int desired_channels = 4;
 
-    auto data = (Pixel*)stbi_load(img_path_src, &width, &height, &image_channels, desired_channels);
+    auto data = stbi_load(img_path_src, &width, &height, &image_channels, desired_channels);
 
     assert(data);
     assert(width);
     assert(height);
 
-    image_dst.data = data;
+    image_dst.data = (Pixel*)data;
     image_dst.width = width;
     image_dst.height = height;
 }
@@ -131,7 +131,7 @@ The 4 channels are interleaved, meaning that each pixel is 4 consecutive bytes. 
 
 ### Writing images
 
-The code needed to write image files is contained in another library called stb_image_write.
+The code needed to write image files is contained in another header called stb_image_write.
 
 https://github.com/nothings/stb/blob/master/stb_image_write.h
 
@@ -181,7 +181,7 @@ We will use the bitmap (bmp) version for our example.
 STBIWDEF int stbi_write_bmp(char const *filename, int w, int h, int comp, const void  *data);
 ```
 
-Here is a function we can use to write one our images.
+Here is a function we can use to write our images.
 
 ```cpp
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -301,7 +301,7 @@ void for_each_pixel(Image const& image, std::function<void(Pixel& p)> const& fun
 
 Pixel pixel_value(Image const& image, u32 x, u32 y)
 {
-    auto row_offset = static_cast<size_t>(y * image.width);
+    auto row_offset = (size_t)(y * image.width);
     auto row_begin = image.data + row_offset;
 
     return row_begin[x];

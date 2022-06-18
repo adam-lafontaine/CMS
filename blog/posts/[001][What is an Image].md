@@ -104,7 +104,7 @@ for(u32 y = 0; y < image.height; ++y)
 {
     // each y value is another row
     // its distance from the beginning is the y value times the width
-    auto row_offset = static_cast<size_t>(y * image.width);
+    auto row_offset = (size_t)(y * image.width);
     
     // pointer to the beginning of the current row
     auto row_begin = image.data + row_offset;
@@ -123,7 +123,7 @@ void for_each_pixel(MonoImage const& image, std::function<void(u8& p, u32 x, u32
 {
     for(u32 y = 0; y < image.height; ++y)
     {
-        auto row_offset = static_cast<size_t>(y * image.width);
+        auto row_offset = (size_t)(y * image.width);
         auto row_begin = image.data + row_offset;
 
         for(u32 x = 0; x < image.width; ++x)
@@ -139,7 +139,7 @@ Using what we know from above, we can get the value of a pixel at a given x and 
 ```cpp
 u8 pixel_value(MonoImage const& image, u32 x, u32 y)
 {
-    auto row_offset = static_cast<size_t>(y * image.width);
+    auto row_offset = (size_t)(y * image.width);
     auto row_begin = image.data + row_offset;
 
     return row_begin[x];
@@ -203,7 +203,7 @@ void for_each_pixel(MonoImage const& image, std::function<void(u8& p, u32 x, u32
 {
     for(u32 y = 0; y < image.height; ++y)
     {
-        auto row_offset = static_cast<size_t>(y * image.width);
+        auto row_offset = (size_t)(y * image.width);
         auto row_begin = image.data + row_offset;
 
         for(u32 x = 0; x < image.width; ++x)
@@ -217,7 +217,7 @@ void for_each_pixel(MonoImage const& image, std::function<void(u8& p, u32 x, u32
 
 u8 pixel_value(MonoImage const& image, u32 x, u32 y)
 {
-    auto row_offset = static_cast<size_t>(y * image.width);
+    auto row_offset = (size_t)(y * image.width);
     auto row_begin = image.data + row_offset;
 
     return row_begin[x];

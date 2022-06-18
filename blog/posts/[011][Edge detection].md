@@ -1,13 +1,13 @@
 # Edge detection
 ## Calculating image gradients
 
-Since images are digital representations of 2-dimensional pictures and don't have any information about the 3-dimensional world, inferring anything else from requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors they represent a boundary between two objects.  These boundary pixels are found by scanning an image and looking for relatively large changes in color over small regions.  When a significant change is found at a pixel, we mark it as being an edge.
+Since images are digital representations of 2-dimensional pictures and don't have any information about the 3-dimensional world, inferring anything else requires making some assumptions.  One reasonable assumption we can make is that different objects have different colors.  Therefore when pixels that are close to each other have different colors they represent a boundary between two objects.  These boundary pixels are found by scanning an image and looking for relatively large changes in color over small regions.  When a significant change is found at a pixel, we mark it as being an edge.
 
 Consider the following image.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/orange_car.bmp)
 
-While processing, we can generate a new image where the edges are represented as white pixels on a black background.
+When processing, we can generate a new image where the edges are represented as white pixels on a black background.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B011%5D/car_edges.bmp)
 
@@ -17,7 +17,7 @@ Although there is no color in the image, much of the information is preserved.  
 
 Edge detection is done by first calculating the change in pixel intensities over the region surrounding each pixel.  The change in intensity is called the gradient.  If the gradient is high enough, the pixel is at an edge.
 
-We'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but simply converting the image to grayscale is often good enough.
+We'll use grayscale images so that we only need to deal with one channel.  Methods can be developed for color images but converting the image to grayscale is often good enough.
 
 ```cpp
 #include <cstdint>
@@ -89,7 +89,7 @@ constexpr std::array<r32, 9> GRAD_LR_3X3
 };
 ```
 
-The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The array and the pixels will be iterated over in such a way that the rows and columns of the kernel corespond to the surrounding pixels at each position in the image.  Each value in the array is multiplied by the pixel value at that position.  The accumulated result gives a weighted difference between the pixels to the right and the pixels to the left.
+The array is arranged as a 3 x 3 matrix called a kernel to show how it will be used with each pixel.  The array and the pixels will be iterated over in such a way that the rows and columns of the kernel correspond to the surrounding pixels at each position in the image.  Each value in the array is multiplied by the pixel value at that position.  The accumulated result gives a weighted difference between the pixels to the right and the pixels to the left.
 
 We don't care if the result is positive or negative so we'll return the absolute value.
 
@@ -324,7 +324,7 @@ constexpr std::array<r32, 9> GRAD_TBRL_3X3
 };
 ```
 
-We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along different angles as well.
+We'll make a custom gradient algorithm that uses all four kernels and returns the maximum gradient found.  This helps account for edges along different angles.
 
 This helper function returns the maximum absolute value of four numbers.
 
