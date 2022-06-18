@@ -1,7 +1,7 @@
 # Makefiles
 ## Automating your build system (sort of)
 
-Make is a tool for automating shell commands, and is primarily used for building C and C++ programs and libraries.  It allows for compiling only parts of a program at a time, depending on which files have changed since the last build.  If your project is small, then recompiling everything is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well made makefile can significantly reduce build times freeing up more time for actual work.
+Make is a tool for automating shell commands, and is primarily used for building C and C++ programs and libraries.  It allows for compiling only parts of a program at a time, depending on which files have changed since the last build.  If your project is small, then recompiling everything together is usually good enough.  For large projects however, recompiling can take several minutes after making only a small change.  A well made makefile can significantly reduce build times freeing up more time for actual work.
 
 We will cover some of the basics of makefiles while creating a template to use for future projects.  The examples in this post are done on Linux.  Make is also available for Windows with some extra effort to get it installed.
 
@@ -622,7 +622,7 @@ Done.
 
 ```
 
-We can see that only add.cpp was recompiled.  The other implementation files, subtract.cpp and main.cpp were left alone.
+We can see that only add.cpp was recompiled.  The other object files, subtract.o and main.o were left alone.
 
 ### Your Build System
 
