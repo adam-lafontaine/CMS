@@ -3,7 +3,7 @@ s# Simple Image Transforms
 
 ### The standard algorithms
 
-In a [previous post](https://almostalwaysauto.com/posts/parallelism-for-free) I wrote about the C++ Standard Template Library (STL) and demonstrated some of the algorithms that are available.  These algorithms are not only available for standard containers such as std::vector and std::array, but they can be used for any container with a valid iterator.  How to write a valid iterator is another topic and doing it is kind of irritating.  It is basically an object that behaves like a pointer to an item in the container.  The idea is that when we create our custom containers, we can have access to the STL algorthms at the cost of implementing some C++ bureaucracy.  When the iterator of your container is a raw pointer, the bureaucracy is minimal.
+In a [previous post](https://almostalwaysauto.com/posts/parallelism-for-free) I wrote about the C++ Standard Template Library (STL) and demonstrated some of the algorithms that are available.  These algorithms are not only available for standard containers such as std::vector and std::array, but they can be used for any container with a valid iterator.  How to write a valid iterator is another topic and doing it is kind of irritating.  An iterator is an object that behaves like a pointer to an item in the container.  The idea is that when we create our custom containers, we can have access to the STL algorthms at the cost of implementing some C++ bureaucracy.  When the iterator of your container is a raw pointer, the bureaucracy is minimal.
 
 In this post, our containers are images and the items in our containers are pixels.
 
@@ -156,7 +156,7 @@ Applying the function with the grayscale image we just generated gives the follo
 
 ### Example Program
 
-Below is a program demonstrating what was covered.  There are a few functions that were implemented in previous posts that I'm not repeating here.  Technically only color images were covered for writing images, but figuring it out for grayscale images shouldn't be too difficult.
+Below is a program demonstrating what was covered.  There are a few functions that were implemented in previous posts that I'm not repeating here.  Only color images were covered for writing images, but figuring it out for grayscale images shouldn't be too difficult.
 
 ```cpp
 // https://almostalwaysauto.com/posts/read-write-image
@@ -197,4 +197,4 @@ int main()
 }
 ```
 
-The standard algorithms library is a handy set of tools to have.  Getting access to it requires providing the alorithms with a means of iterating over your collection of elements.  Implementing an iterator can be prohibitive but if your data simply resides in a buffer, then it's quite easy.  The algorithms just work, they make your code more readable and are perfect for when you don't want to reinvent the wheel.  In some situations you will need to reinvent the wheel and a standard algorithm may not be suitable.  In fact, many companies have their own implementations of a standard library that works best for their technology.  Whatevever your situation, they are an excellent resource to have and well worth becoming familiar with.
+The standard algorithms library is a handy set of tools to have.  Getting access to it requires providing the alorithms with a means of iterating over your collection of elements.  Implementing an iterator can be prohibitive but if your data simply resides in a buffer, then it's quite easy.  The algorithms just work, they make your code more readable and are perfect for when you don't want to reinvent the wheel.  In some situations you will need to reinvent the wheel and a standard algorithm may not be suitable.  In fact, many companies have their own implementations of a standard library that works best for their technology.  Whatever your situation, they are an excellent resource to have and well worth becoming familiar with.
