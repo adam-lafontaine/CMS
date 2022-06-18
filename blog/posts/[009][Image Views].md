@@ -361,7 +361,7 @@ We will need to define the iterator before we can implement the remaining method
 
 ### The iterator class
 
-Iterators in C++ are part of the language's beaurocracy.  Defining an iterator for your data structure is not necessary and may not be worth the effort.  It is only required if you want access to the standard algorithms.  We are free to implement our own algorithms and often it is better to do so.  The standard algortims are defined with a standard in mind.  We implement an iterator when we want to conform to that standard.  The payoff is having access to the ever growing list of algorithms and functionality (https://almostalwaysauto.com/posts/parallelism-for-free).
+Iterators in C++ are part of the language's beaurocracy.  Defining an iterator for your data structure is not necessary and may not be worth the effort.  It is only required if you want access to the standard algorithms.  We are free to implement our own algorithms and often it is better to do so.  The standard algortims are defined with a standard in mind.  We implement an iterator in order to conform to that standard.  The payoff is having access to the ever growing list of algorithms and functionality (https://almostalwaysauto.com/posts/parallelism-for-free).
 
 The iterator for the GrayView class needs to be a forward iterator.  That means it must be able to increment (++), dereference(*) and compare equality (==, !=).  We'll start with the following definitions.
 
