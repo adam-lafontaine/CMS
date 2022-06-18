@@ -852,3 +852,5 @@ void write_image(GrayImage const& image_src, const char* file_path_dst)
     assert(result);
 }
 ```
+
+some text at the end
