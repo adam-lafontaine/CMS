@@ -12,7 +12,30 @@ using socket_t = SOCKET;
 using addr_t = SOCKADDR;
 ```
 
-Send bytes
+Initialize
+
+```cpp
+inline bool os_socket_init()
+{	
+	WSAData wsa;
+	int result = WSAStartup(MAKEWORD(2, 2), &wsa);
+
+	return result == 0;
+}
+```
+
+Open
+
+```cpp
+bool os_socket_open(socket_t& socket_handle)
+{
+	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	return socket_handle != INVALID_SOCKET;
+}
+```
+
+Receive bytes
 
 ```cpp
 inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
@@ -21,7 +44,7 @@ inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 }
 ```
 
-Receive bytes
+Send bytes
 
 ```cpp
 inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
@@ -58,6 +81,21 @@ Linux
 
 using socket_t = int;
 using addr_t = struct sockaddr;
+
+
+inline bool os_socket_init()
+{	
+    // no socket initializtion on Linux
+	return true;
+}
+
+
+bool os_socket_open(socket_t& socket_handle)
+{
+	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	return socket_handle >= 0;
+}
 
 
 inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
@@ -107,6 +145,39 @@ using socket_t = int;
 using addr_t = struct sockaddr;
 
 #endif
+
+
+inline bool os_socket_init()
+{	
+#if defined(_WIN32)
+
+	WSAData wsa;
+	int result = WSAStartup(MAKEWORD(2, 2), &wsa);
+
+	return result == 0;
+
+#else
+
+	return true;
+
+#endif
+}
+
+
+bool os_socket_open(socket_t& socket_handle)
+{
+	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+#if defined(_WIN32)
+
+	return socket_handle != INVALID_SOCKET;
+
+#else
+
+	return socket_handle >= 0;
+
+#endif
+}
 
 
 inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
@@ -181,6 +252,7 @@ public:
 
 	socklen_t client_len;
 
+	bool open = false;
 	bool bind = false;
 	bool listen = false;
 
@@ -188,18 +260,26 @@ public:
 	bool client_connected = false;
 
 	const char* ip_address = "";
-
-
-	ServerSocketInfo(int port)
-	{
-		server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-		server_addr = { 0 };
-		server_addr.sin_family = AF_INET;
-		server_addr.sin_addr.s_addr = INADDR_ANY;
-		server_addr.sin_port = htons(port);
-	}
 };
+```
+
+Open
+
+```cpp
+inline bool os_server_open(ServerSocketInfo& server_info, int port)
+{
+	server_info.open = os_socket_open(server_info.server_socket);
+
+	if (server_info.open)
+	{
+		server_info.server_addr = { 0 };
+		server_info.server_addr.sin_family = AF_INET;
+		server_info.server_addr.sin_addr.s_addr = INADDR_ANY;
+		server_info.server_addr.sin_port = htons(port);
+	}	
+
+	return server_info.open;
+}
 ```
 
 Bind
@@ -281,5 +361,224 @@ inline bool os_socket_accept(ServerSocketInfo& socket_info)
 #endif
 
 	return socket_info.client_connected;
+}
+```
+
+### Finding the server's public IP address
+
+Windows
+
+```cpp
+inline bool os_find_public_ip(ServerSocketInfo& server_info)
+{
+	char* ip = nullptr;
+	bool found = false;
+
+	char host_name[255];
+	PHOSTENT host_info;
+
+	if (gethostname(host_name, sizeof(host_name)) != 0 || (host_info = gethostbyname(host_name)) == NULL)
+	{
+		return false;
+	}
+
+	// TODO: gets last ip in the list?
+	int count = 0;	
+	while (host_info->h_addr_list[count])
+	{
+		ip = inet_ntoa(*(struct in_addr*)host_info->h_addr_list[count]);
+		found = true;
+		++count;
+    }
+
+	if (found && ip)
+	{
+		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
+	}
+
+	return found && ip;
+}
+```
+
+Linux
+
+```cpp
+inline bool os_find_public_ip(ServerSocketInfo& server_info)
+{
+    char* ip = nullptr;
+	bool found = false;
+
+    //https://www.binarytides.com/get-local-ip-c-linux/
+
+	FILE* f;
+	char line[100];
+	char* p = NULL;
+	char* c = NULL;
+
+	f = fopen("/proc/net/route", "r");
+
+	while (fgets(line, 100, f))
+	{
+		p = strtok(line, " \t");
+		c = strtok(NULL, " \t");
+
+		if (p != NULL && c != NULL)
+		{
+			if (strcmp(c, "00000000") == 0)
+			{
+				m_net_interface = std::string(p);
+				break;
+			}
+		}
+	}
+
+	//which family do we require , AF_INET or AF_INET6
+	int fm = AF_INET; //AF_INET6
+	struct ifaddrs* ifaddr, * ifa;
+	int family, s;
+	char host[NI_MAXHOST];
+
+	if (getifaddrs(&ifaddr) == -1)
+	{
+		return false;
+	}
+
+	//Walk through linked list, maintaining head pointer so we can free list later
+	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if (ifa->ifa_addr == NULL)
+			continue;
+
+		family = ifa->ifa_addr->sa_family;
+		if (strcmp(ifa->ifa_name, p) != 0)
+			continue;
+
+		if (family != fm)
+			continue;
+
+		auto family_size = (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
+
+		s = getnameinfo(ifa->ifa_addr, family_size, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+		if (s != 0)
+		{			
+			return false;
+		}
+
+        found = true;
+		ip = host;
+	}
+
+	freeifaddrs(ifaddr);
+
+    if (found && ip)
+	{
+		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
+	}
+
+	return found && ip;
+}
+```
+
+Platform independent
+
+```cpp
+inline bool os_find_public_ip(ServerSocketInfo& server_info)
+{
+	char* ip = nullptr;
+	bool found = false;
+
+#if defined(_WIN32)
+
+	char host_name[255];
+	PHOSTENT host_info;
+
+	if (gethostname(host_name, sizeof(host_name)) != 0 || (host_info = gethostbyname(host_name)) == NULL)
+	{
+		return false;
+	}
+
+	// TODO: gets last ip in the list?
+	int count = 0;	
+	while (host_info->h_addr_list[count])
+	{
+		ip = inet_ntoa(*(struct in_addr*)host_info->h_addr_list[count]);
+		found = true;
+		++count;
+	}		
+
+#else
+
+	//https://www.binarytides.com/get-local-ip-c-linux/
+
+	FILE* f;
+	char line[100];
+	char* p = NULL;
+	char* c = NULL;
+
+	f = fopen("/proc/net/route", "r");
+
+	while (fgets(line, 100, f))
+	{
+		p = strtok(line, " \t");
+		c = strtok(NULL, " \t");
+
+		if (p != NULL && c != NULL)
+		{
+			if (strcmp(c, "00000000") == 0)
+			{
+				m_net_interface = std::string(p);
+				break;
+			}
+		}
+	}
+
+	//which family do we require , AF_INET or AF_INET6
+	int fm = AF_INET; //AF_INET6
+	struct ifaddrs* ifaddr, * ifa;
+	int family, s;
+	char host[NI_MAXHOST];
+
+	if (getifaddrs(&ifaddr) == -1)
+	{
+		return false;
+	}
+
+	//Walk through linked list, maintaining head pointer so we can free list later
+	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if (ifa->ifa_addr == NULL)
+			continue;
+
+		family = ifa->ifa_addr->sa_family;
+		if (strcmp(ifa->ifa_name, p) != 0)
+			continue;
+
+		if (family != fm)
+			continue;
+
+		auto family_size = (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
+
+		s = getnameinfo(ifa->ifa_addr, family_size, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+		if (s != 0)
+		{
+			return false;
+		}
+
+		found = true;
+		ip = host;
+	}
+
+	freeifaddrs(ifaddr);
+
+#endif
+
+	if (found && ip)
+	{
+		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
+	}
+
+	return found && ip;
 }
 ```
