@@ -108,6 +108,14 @@
             "filename": "[011][Edge detection].md"
         },
         {
+            "number": "[012]",
+            "id": "",
+            "title": "Web sockets",
+            "route": "web-sockets",
+            "tags": ["C++", "Networking"],
+            "filename": "[012][Web sockets].md"
+        },
+        {
             "number": "[]",
             "id": "",
             "title": "",
