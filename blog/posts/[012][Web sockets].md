@@ -15,7 +15,7 @@ using addr_t = SOCKADDR;
 Initialize
 
 ```cpp
-inline bool os_socket_init()
+bool os_socket_init()
 {	
 	WSAData wsa;
 	int result = WSAStartup(MAKEWORD(2, 2), &wsa);
@@ -38,7 +38,7 @@ bool os_socket_open(socket_t& socket_handle)
 Receive bytes
 
 ```cpp
-inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
 	return recv(socket, dst, n_bytes, 0);
 }
@@ -47,7 +47,7 @@ inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 Send bytes
 
 ```cpp
-inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
 	return send(socket, src, n_bytes, 0);
 }
@@ -56,7 +56,7 @@ inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 Close socket
 
 ```cpp
-inline void os_socket_close(socket_t socket)
+void os_socket_close(socket_t socket)
 {
 	closesocket(socket);
 }
@@ -65,7 +65,7 @@ inline void os_socket_close(socket_t socket)
 Cleanup socket resources
 
 ```cpp
-inline void os_socket_cleanup()
+void os_socket_cleanup()
 {
 	WSACleanup();
 }
@@ -83,7 +83,7 @@ using socket_t = int;
 using addr_t = struct sockaddr;
 
 
-inline bool os_socket_init()
+bool os_socket_init()
 {	
     // no socket initializtion on Linux
 	return true;
@@ -98,25 +98,25 @@ bool os_socket_open(socket_t& socket_handle)
 }
 
 
-inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
 	return read(socket, dst, n_bytes - 1);
 }
 
 
-inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
 	return write(socket, src, n_bytes);
 }
 
 
-inline void os_socket_close(socket_t socket)
+void os_socket_close(socket_t socket)
 {
 	close(socket);
 }
 
 
-inline void os_socket_cleanup()
+void os_socket_cleanup()
 {
 	// Do nothing
     // Linux has no socket cleanup
@@ -147,7 +147,7 @@ using addr_t = struct sockaddr;
 #endif
 
 
-inline bool os_socket_init()
+bool os_socket_init()
 {	
 #if defined(_WIN32)
 
@@ -180,7 +180,7 @@ bool os_socket_open(socket_t& socket_handle)
 }
 
 
-inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
 #if defined(_WIN32)
 
@@ -194,7 +194,7 @@ inline int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 }
 
 
-inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
 #if defined(_WIN32)
 
@@ -208,7 +208,7 @@ inline int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 }
 
 
-inline void os_socket_close(socket_t socket)
+void os_socket_close(socket_t socket)
 {
 #if defined(_WIN32)
 
@@ -222,7 +222,7 @@ inline void os_socket_close(socket_t socket)
 }
 
 
-inline void os_socket_cleanup()
+void os_socket_cleanup()
 {
 #if defined(_WIN32)
 
@@ -266,7 +266,7 @@ public:
 Open
 
 ```cpp
-inline bool os_server_open(ServerSocketInfo& server_info, int port)
+bool os_server_open(ServerSocketInfo& server_info, int port)
 {
 	server_info.open = os_socket_open(server_info.server_socket);
 
@@ -285,7 +285,7 @@ inline bool os_server_open(ServerSocketInfo& server_info, int port)
 Bind
 
 ```cpp
-inline bool os_socket_bind(ServerSocketInfo& socket_info)
+bool os_socket_bind(ServerSocketInfo& socket_info)
 {
 	auto socket = socket_info.server_socket;
 	auto addr = (addr_t*)&socket_info.server_addr;
@@ -308,7 +308,7 @@ inline bool os_socket_bind(ServerSocketInfo& socket_info)
 Listen
 
 ```cpp
-inline bool os_socket_listen(ServerSocketInfo& socket_info)
+bool os_socket_listen(ServerSocketInfo& socket_info)
 {
 	auto socket = socket_info.server_socket;
 	int backlog = 1;
@@ -330,7 +330,7 @@ inline bool os_socket_listen(ServerSocketInfo& socket_info)
 Accept
 
 ```cpp
-inline bool os_socket_accept(ServerSocketInfo& socket_info)
+bool os_socket_accept(ServerSocketInfo& socket_info)
 {
 	socket_info.client_len = sizeof(socket_info.client_addr);
 
@@ -369,7 +369,7 @@ inline bool os_socket_accept(ServerSocketInfo& socket_info)
 Windows
 
 ```cpp
-inline bool os_find_public_ip(ServerSocketInfo& server_info)
+bool os_find_public_ip(ServerSocketInfo& server_info)
 {
 	char* ip = nullptr;
 	bool found = false;
@@ -403,7 +403,7 @@ inline bool os_find_public_ip(ServerSocketInfo& server_info)
 Linux
 
 ```cpp
-inline bool os_find_public_ip(ServerSocketInfo& server_info)
+bool os_find_public_ip(ServerSocketInfo& server_info)
 {
     char* ip = nullptr;
 	bool found = false;
@@ -483,7 +483,7 @@ inline bool os_find_public_ip(ServerSocketInfo& server_info)
 Platform independent
 
 ```cpp
-inline bool os_find_public_ip(ServerSocketInfo& server_info)
+bool os_find_public_ip(ServerSocketInfo& server_info)
 {
 	char* ip = nullptr;
 	bool found = false;
@@ -580,5 +580,62 @@ inline bool os_find_public_ip(ServerSocketInfo& server_info)
 	}
 
 	return found && ip;
+}
+```
+
+### Client
+
+```cpp
+class ClientSocketInfo
+{
+public:
+
+	sockaddr_in server_addr = { 0 };
+	socket_t client_socket = NULL;
+
+	bool open = false;
+	bool connected = false;	
+};
+```
+
+Open
+
+```cpp
+bool os_client_open(ClientSocketInfo& client_info, const char* server_ip, int server_port)
+{
+	client_info.open = os_socket_open(client_info.client_socket);
+
+	if (client_info.open)
+	{
+		client_info.server_addr = { 0 };
+		client_info.server_addr.sin_family = AF_INET;
+		client_info.server_addr.sin_addr.s_addr = inet_addr(server_ip);
+		client_info.server_addr.sin_port = htons(server_port);
+	}
+
+	return client_info.open;
+}
+```
+
+Connect
+
+```cpp
+bool os_client_connect(ClientSocketInfo& client_info)
+{
+	auto socket = client_info.client_socket;
+	auto addr = (addr_t*)&client_info.server_addr;
+	int size = sizeof(client_info.server_addr);
+
+#if defined(_WIN32)
+
+	client_info.connected = connect(socket, addr, size) != SOCKET_ERROR;
+
+#else
+
+	client_info.connected = connect(socket, addr, size) >= 0;
+
+#endif
+
+	return client_info.connected;
 }
 ```
