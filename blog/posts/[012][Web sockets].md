@@ -7,9 +7,6 @@ Windows
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #pragma comment (lib,"ws2_32.lib")
-
-using socket_t = SOCKET;
-using addr_t = SOCKADDR;
 ```
 
 Initialize
@@ -27,7 +24,7 @@ bool os_socket_init()
 Open
 
 ```cpp
-bool os_socket_open(socket_t& socket_handle)
+bool os_socket_open(SOCKET& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -38,7 +35,7 @@ bool os_socket_open(socket_t& socket_handle)
 Receive bytes
 
 ```cpp
-inline bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
 {
 	return recv(socket, dst, n_bytes, 0) != SOCKET_ERROR;
 }
@@ -47,7 +44,7 @@ inline bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 Send bytes
 
 ```cpp
-inline bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
 {
 	return send(socket, src, n_bytes, 0) != SOCKET_ERROR;
 }
@@ -56,7 +53,7 @@ inline bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 Close socket
 
 ```cpp
-void os_socket_close(socket_t socket)
+void os_socket_close(SOCKET socket)
 {
 	closesocket(socket);
 }
@@ -79,18 +76,8 @@ Linux
 #include <netdb.h>
 #include <ifaddrs.h>
 
-using socket_t = int;
-using addr_t = struct sockaddr;
 
-
-bool os_socket_init()
-{	
-    // no socket initializtion on Linux
-	return true;
-}
-
-
-bool os_socket_open(socket_t& socket_handle)
+bool os_socket_open(int& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -98,28 +85,21 @@ bool os_socket_open(socket_t& socket_handle)
 }
 
 
-inline bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+inline bool os_socket_receive_buffer(int socket, char* dst, int n_bytes)
 {
 	return recv(socket, dst, n_bytes, 0) >= 0;
 }
 
 
-inline bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+inline bool os_socket_send_buffer(int socket, const char* src, int n_bytes)
 {
 	return send(socket, src, n_bytes, 0) >= 0;
 }
 
 
-void os_socket_close(socket_t socket)
+void os_socket_close(int socket)
 {
 	close(socket);
-}
-
-
-void os_socket_cleanup()
-{
-	// Do nothing
-    // Linux has no socket cleanup
 }
 ```
 
@@ -224,8 +204,8 @@ class ServerSocketInfo
 {
 public:
 
-	socket_t server_socket = NULL;
-	socket_t client_socket = NULL;
+	socket_t server_socket = nullptr;
+	socket_t client_socket = nullptr;
 
 	struct sockaddr_in server_addr = { 0 };
 	struct sockaddr_in client_addr = { 0 };
@@ -323,7 +303,7 @@ class ClientSocketInfo
 public:
 
 	sockaddr_in server_addr = { 0 };
-	socket_t client_socket = NULL;
+	socket_t client_socket = nullptr;
 
 	bool open = false;
 	bool connected = false;	
@@ -369,42 +349,44 @@ Server program
 ```cpp
 #include <cstdio>
 
-int main()
+
+void run_server()
 {
 	int port = 58002;
-	const char* ip_address = "192.168.137.1";
 
 	ServerSocketInfo server{};
+
+	printf("\nServer\n\n");
 
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	if (!os_server_open(server, port))
 	{
 		printf("server open failed.\n");
-		return EXIT_FAILURE;
-	}
+		return;
+	}	
 
 	if (!os_server_bind(server))
 	{
 		printf("server bind failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	if (!os_server_listen(server))
 	{
 		printf("server listen failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
-	
+
 	printf("Waiting for client to connect on port %d\n", server.port);
 	if (!os_server_accept(server))
 	{
 		printf("client connect failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	printf("Client connected\n");
@@ -435,29 +417,31 @@ Client program
 #include <cstdio>
 
 
-int main()
+void run_client()
 {
 	int server_port = 58002;
 	const char* server_ip_address = "192.168.137.1";
 
 	ClientSocketInfo client{};
 
+	printf("\nClient\n\n");
+
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	if (!os_client_open(client, server_ip_address, server_port))
 	{
 		printf("client open failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	if (!os_client_connect(client))
 	{
 		printf("client connect failed.\n");
-		return EXIT_FAILURE;
+		return;
 	}
 
 	printf("Client connected.\n");
@@ -479,4 +463,27 @@ int main()
 	os_socket_close(client.client_socket);
 	os_socket_cleanup();
 }
+```
+
+Firewall
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p12-sockets/blog/img/%5B012%5D/firewall.bmp)
+
+Server output
+
+```plaintext
+Server
+
+Waiting for client to connect on port 58002
+Client connected
+recv: Hello from client
+```
+
+Client output
+
+```plaintext
+Client
+
+Client connected.
+recv: hello from server
 ```
