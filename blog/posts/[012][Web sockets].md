@@ -38,18 +38,18 @@ bool os_socket_open(socket_t& socket_handle)
 Receive bytes
 
 ```cpp
-int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+inline bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
-	return recv(socket, dst, n_bytes, 0);
+	return recv(socket, dst, n_bytes, 0) != SOCKET_ERROR;
 }
 ```
 
 Send bytes
 
 ```cpp
-int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+inline bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
-	return send(socket, src, n_bytes, 0);
+	return send(socket, src, n_bytes, 0) != SOCKET_ERROR;
 }
 ```
 
@@ -98,15 +98,15 @@ bool os_socket_open(socket_t& socket_handle)
 }
 
 
-int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+inline bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
-	return read(socket, dst, n_bytes - 1);
+	return recv(socket, dst, n_bytes, 0) >= 0;
 }
 
 
-int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+inline bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
-	return write(socket, src, n_bytes);
+	return send(socket, src, n_bytes, 0) >= 0;
 }
 
 
@@ -134,6 +134,7 @@ Cross platform API
 
 using socket_t = SOCKET;
 using addr_t = SOCKADDR;
+using socklen_t = int;
 
 #else
 
@@ -143,6 +144,9 @@ using addr_t = SOCKADDR;
 
 using socket_t = int;
 using addr_t = struct sockaddr;
+
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
 
 #endif
 
@@ -168,43 +172,19 @@ bool os_socket_open(socket_t& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-#if defined(_WIN32)
-
 	return socket_handle != INVALID_SOCKET;
-
-#else
-
-	return socket_handle >= 0;
-
-#endif
 }
 
 
-int os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
+bool os_socket_receive_buffer(socket_t socket, char* dst, int n_bytes)
 {
-#if defined(_WIN32)
-
-	return recv(socket, dst, n_bytes, 0);
-
-#else
-
-	return read(socket, dst, n_bytes - 1);
-
-#endif
+	return recv(socket, dst, n_bytes, 0) != SOCKET_ERROR;
 }
 
 
-int os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
+bool os_socket_send_buffer(socket_t socket, const char* src, int n_bytes)
 {
-#if defined(_WIN32)
-
-	return send(socket, src, n_bytes, 0);
-
-#else
-
-	return write(socket, src, n_bytes);
-
-#endif
+	return send(socket, src, n_bytes, 0) != SOCKET_ERROR;
 }
 
 
@@ -260,6 +240,7 @@ public:
 	bool client_connected = false;
 
 	const char* ip_address = "";
+	int port;
 };
 ```
 
@@ -276,6 +257,8 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 		server_info.server_addr.sin_family = AF_INET;
 		server_info.server_addr.sin_addr.s_addr = INADDR_ANY;
 		server_info.server_addr.sin_port = htons(port);
+
+		server_info.port = port;
 	}	
 
 	return server_info.open;
@@ -285,23 +268,15 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 Bind
 
 ```cpp
-bool os_socket_bind(ServerSocketInfo& socket_info)
+bool os_server_bind(ServerSocketInfo& server_info)
 {
-	auto socket = socket_info.server_socket;
-	auto addr = (addr_t*)&socket_info.server_addr;
-	int size = sizeof(socket_info.server_addr);
+	auto socket = server_info.server_socket;
+	auto addr = (addr_t*)&server_info.server_addr;
+	int size = sizeof(server_info.server_addr);
 
-#if defined(_WIN32)
+	server_info.bind = bind(socket, addr, size) != SOCKET_ERROR;
 
-	socket_info.bind = bind(socket, addr, size) != SOCKET_ERROR;
-
-#else
-
-	socket_info.bind = bind(socket, addr, size) >= 0;
-
-#endif
-
-	return socket_info.bind;
+	return server_info.bind;
 }
 ```
 
@@ -310,20 +285,12 @@ Listen
 ```cpp
 bool os_socket_listen(ServerSocketInfo& socket_info)
 {
-	auto socket = socket_info.server_socket;
+	auto socket = server_info.server_socket;
 	int backlog = 1;
 
-#if defined(_WIN32)
+	server_info.listen = listen(socket, backlog) != SOCKET_ERROR;
 
-	socket_info.listen = listen(socket, backlog) != SOCKET_ERROR;
-
-#else
-
-	socket_info.listen = listen(socket, backlog) >= 0;
-
-#endif
-
-	return socket_info.listen;
+	return server_info.listen;
 }
 ```
 
@@ -332,254 +299,19 @@ Accept
 ```cpp
 bool os_socket_accept(ServerSocketInfo& socket_info)
 {
-	socket_info.client_len = sizeof(socket_info.client_addr);
+	server_info.client_len = sizeof(server_info.client_addr);
 
-	socket_info.client_connected = false;
+	server_info.client_connected = false;
 
-	auto srv_socket = socket_info.server_socket;
-	auto cli_addr = (addr_t*)&socket_info.client_addr;
-	auto cli_len = &socket_info.client_len;
+	auto srv_socket = server_info.server_socket;
+	auto cli_addr = (addr_t*)&server_info.client_addr;
+	auto cli_len = &server_info.client_len;
 
-#if defined(_WIN32)
+	server_info.client_socket = accept(srv_socket, cli_addr, cli_len);
 
-	socket_info.client_socket = SOCKET_ERROR;
+	server_info.client_connected = server_info.client_socket != INVALID_SOCKET;
 
-	while (socket_info.client_socket == SOCKET_ERROR)
-	{
-		socket_info.client_socket = accept(srv_socket, cli_addr, cli_len);
-	}
-
-	socket_info.client_connected = true;
-
-#else
-
-	// waits for client to connect        
-	socket_info.client_socket = accept(srv_socket, cli_addr, cli_len);
-
-	socket_info.client_connected = socket_info.client_socket >= 0;
-
-#endif
-
-	return socket_info.client_connected;
-}
-```
-
-### Finding the server's public IP address
-
-Windows
-
-```cpp
-bool os_find_public_ip(ServerSocketInfo& server_info)
-{
-	char* ip = nullptr;
-	bool found = false;
-
-	char host_name[255];
-	PHOSTENT host_info;
-
-	if (gethostname(host_name, sizeof(host_name)) != 0 || (host_info = gethostbyname(host_name)) == NULL)
-	{
-		return false;
-	}
-
-	// TODO: gets last ip in the list?
-	int count = 0;	
-	while (host_info->h_addr_list[count])
-	{
-		ip = inet_ntoa(*(struct in_addr*)host_info->h_addr_list[count]);
-		found = true;
-		++count;
-    }
-
-	if (found && ip)
-	{
-		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
-	}
-
-	return found && ip;
-}
-```
-
-Linux
-
-```cpp
-bool os_find_public_ip(ServerSocketInfo& server_info)
-{
-    char* ip = nullptr;
-	bool found = false;
-
-    //https://www.binarytides.com/get-local-ip-c-linux/
-
-	FILE* f;
-	char line[100];
-	char* p = NULL;
-	char* c = NULL;
-
-	f = fopen("/proc/net/route", "r");
-
-	while (fgets(line, 100, f))
-	{
-		p = strtok(line, " \t");
-		c = strtok(NULL, " \t");
-
-		if (p != NULL && c != NULL)
-		{
-			if (strcmp(c, "00000000") == 0)
-			{
-				m_net_interface = std::string(p);
-				break;
-			}
-		}
-	}
-
-	//which family do we require , AF_INET or AF_INET6
-	int fm = AF_INET; //AF_INET6
-	struct ifaddrs* ifaddr, * ifa;
-	int family, s;
-	char host[NI_MAXHOST];
-
-	if (getifaddrs(&ifaddr) == -1)
-	{
-		return false;
-	}
-
-	//Walk through linked list, maintaining head pointer so we can free list later
-	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-	{
-		if (ifa->ifa_addr == NULL)
-			continue;
-
-		family = ifa->ifa_addr->sa_family;
-		if (strcmp(ifa->ifa_name, p) != 0)
-			continue;
-
-		if (family != fm)
-			continue;
-
-		auto family_size = (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
-
-		s = getnameinfo(ifa->ifa_addr, family_size, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-
-		if (s != 0)
-		{			
-			return false;
-		}
-
-        found = true;
-		ip = host;
-	}
-
-	freeifaddrs(ifaddr);
-
-    if (found && ip)
-	{
-		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
-	}
-
-	return found && ip;
-}
-```
-
-Platform independent
-
-```cpp
-bool os_find_public_ip(ServerSocketInfo& server_info)
-{
-	char* ip = nullptr;
-	bool found = false;
-
-#if defined(_WIN32)
-
-	char host_name[255];
-	PHOSTENT host_info;
-
-	if (gethostname(host_name, sizeof(host_name)) != 0 || (host_info = gethostbyname(host_name)) == NULL)
-	{
-		return false;
-	}
-
-	// TODO: gets last ip in the list?
-	int count = 0;	
-	while (host_info->h_addr_list[count])
-	{
-		ip = inet_ntoa(*(struct in_addr*)host_info->h_addr_list[count]);
-		found = true;
-		++count;
-	}		
-
-#else
-
-	//https://www.binarytides.com/get-local-ip-c-linux/
-
-	FILE* f;
-	char line[100];
-	char* p = NULL;
-	char* c = NULL;
-
-	f = fopen("/proc/net/route", "r");
-
-	while (fgets(line, 100, f))
-	{
-		p = strtok(line, " \t");
-		c = strtok(NULL, " \t");
-
-		if (p != NULL && c != NULL)
-		{
-			if (strcmp(c, "00000000") == 0)
-			{
-				m_net_interface = std::string(p);
-				break;
-			}
-		}
-	}
-
-	//which family do we require , AF_INET or AF_INET6
-	int fm = AF_INET; //AF_INET6
-	struct ifaddrs* ifaddr, * ifa;
-	int family, s;
-	char host[NI_MAXHOST];
-
-	if (getifaddrs(&ifaddr) == -1)
-	{
-		return false;
-	}
-
-	//Walk through linked list, maintaining head pointer so we can free list later
-	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-	{
-		if (ifa->ifa_addr == NULL)
-			continue;
-
-		family = ifa->ifa_addr->sa_family;
-		if (strcmp(ifa->ifa_name, p) != 0)
-			continue;
-
-		if (family != fm)
-			continue;
-
-		auto family_size = (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
-
-		s = getnameinfo(ifa->ifa_addr, family_size, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-
-		if (s != 0)
-		{
-			return false;
-		}
-
-		found = true;
-		ip = host;
-	}
-
-	freeifaddrs(ifaddr);
-
-#endif
-
-	if (found && ip)
-	{
-		memcpy(server_info.ip_address, ip, strlen(ip) + 1);
-	}
-
-	return found && ip;
+	return server_info.client_connected;
 }
 ```
 
@@ -626,16 +358,125 @@ bool os_client_connect(ClientSocketInfo& client_info)
 	auto addr = (addr_t*)&client_info.server_addr;
 	int size = sizeof(client_info.server_addr);
 
-#if defined(_WIN32)
-
 	client_info.connected = connect(socket, addr, size) != SOCKET_ERROR;
 
-#else
-
-	client_info.connected = connect(socket, addr, size) >= 0;
-
-#endif
-
 	return client_info.connected;
+}
+```
+
+Server program
+
+```cpp
+#include <cstdio>
+
+int main()
+{
+	int port = 58002;
+	const char* ip_address = "192.168.137.1";
+
+	ServerSocketInfo server{};
+
+	if (!os_socket_init())
+	{
+		printf("socket init failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (!os_server_open(server, port))
+	{
+		printf("server open failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (!os_server_bind(server))
+	{
+		printf("server bind failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (!os_server_listen(server))
+	{
+		printf("server listen failed.\n");
+		return EXIT_FAILURE;
+	}
+	
+	printf("Waiting for client to connect on port %d\n", server.port);
+	if (!os_server_accept(server))
+	{
+		printf("client connect failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("Client connected\n");
+
+	char message_buffer[50] = "hello from server";
+
+	os_socket_send_buffer(server.client_socket, message_buffer, strlen(message_buffer));
+
+	memset(message_buffer, 0, 50);
+
+	os_socket_receive_buffer(server.client_socket, message_buffer, 50);
+
+	printf("recv: %s\n", message_buffer);
+
+	os_socket_receive_buffer(server.client_socket, message_buffer, 50);
+
+	auto c = getchar();
+
+	os_socket_close(server.client_socket);
+	os_socket_close(server.server_socket);
+	os_socket_cleanup();
+}
+```
+
+Client program
+
+```cpp
+#include <cstdio>
+
+
+int main()
+{
+	int server_port = 58002;
+	const char* server_ip_address = "192.168.137.1";
+
+	ClientSocketInfo client{};
+
+	if (!os_socket_init())
+	{
+		printf("socket init failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (!os_client_open(client, server_ip_address, server_port))
+	{
+		printf("client open failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (!os_client_connect(client))
+	{
+		printf("client connect failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("Client connected.\n");
+
+	char message_buffer[50] = "";
+
+	os_socket_receive_buffer(client.client_socket, message_buffer, 50);
+
+	printf("recv: %s\n", message_buffer);
+
+	memset(message_buffer, 0, 50);
+
+	sprintf_s(message_buffer, "Hello from client");
+
+	os_socket_send_buffer(client.client_socket, message_buffer, strlen(message_buffer));
+
+	auto c = getchar();
+
+	os_socket_close(client.client_socket);
+	os_socket_cleanup();
 }
 ```
