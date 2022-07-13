@@ -1,15 +1,16 @@
 # Web sockets
-## TODO
+## Create a basic cross platform socket API
+
+
 
 Windows
 
 ```cpp
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #pragma comment (lib,"ws2_32.lib")
 ```
 
-Initialize
+On Windows we need to first initialize the library.
 
 ```cpp
 bool os_socket_init()
@@ -21,10 +22,10 @@ bool os_socket_init()
 }
 ```
 
-Open
+Create a socket endpoint for communication.
 
 ```cpp
-bool os_socket_open(SOCKET& socket_handle)
+bool os_socket_create(SOCKET& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -32,7 +33,7 @@ bool os_socket_open(SOCKET& socket_handle)
 }
 ```
 
-Receive bytes
+Make a socket ready to receive by providing a character buffer for it to write to.  By default the call will wait for a message to arrive and block the thread it is running on.  If the message is larger than the number of bytes provided, then the message will be truncated.
 
 ```cpp
 inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
@@ -41,7 +42,7 @@ inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
 }
 ```
 
-Send bytes
+Send bytes over a socket connection.  Can be called at any time as long as the socket is connected.  The recipient must ready to receive or the message will be missed.
 
 ```cpp
 inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
@@ -50,7 +51,7 @@ inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
 }
 ```
 
-Close socket
+Disonnect a socket connection and free all associated resources.
 
 ```cpp
 void os_socket_close(SOCKET socket)
@@ -59,7 +60,7 @@ void os_socket_close(SOCKET socket)
 }
 ```
 
-Cleanup socket resources
+Cleanup the socket library when finished.
 
 ```cpp
 void os_socket_cleanup()
@@ -69,7 +70,7 @@ void os_socket_cleanup()
 ```
 
 
-Linux
+Linux has similar functions and uses a different convention for their return types.  There is also no need to initialize and cleanup the socket library.
 
 ```cpp
 #include <unistd.h>
@@ -77,7 +78,7 @@ Linux
 #include <ifaddrs.h>
 
 
-bool os_socket_open(int& socket_handle)
+bool os_socket_create(int& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -103,12 +104,11 @@ void os_socket_close(int socket)
 }
 ```
 
-Cross platform API
+We can make all of these functions look identical for both operating systems with some strategic type aliasing preprocessor macros.
 
 ```cpp
 #if defined(_WIN32)
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #pragma comment (lib,"ws2_32.lib")
 
@@ -148,7 +148,7 @@ bool os_socket_init()
 }
 
 
-bool os_socket_open(socket_t& socket_handle)
+bool os_socket_create(socket_t& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -188,24 +188,23 @@ void os_socket_cleanup()
 
 	WSACleanup();
 
-#else
-
-	// Do nothing
-	// Linux has no socket cleanup
-
 #endif
 }
 ```
 
+With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.
+
 ### Server
+
+
 
 ```cpp
 class ServerSocketInfo
 {
 public:
 
-	socket_t server_socket = nullptr;
-	socket_t client_socket = nullptr;
+	socket_t server_socket = 0;
+	socket_t client_socket = 0;
 
 	struct sockaddr_in server_addr = { 0 };
 	struct sockaddr_in client_addr = { 0 };
@@ -219,7 +218,7 @@ public:
 	bool server_running = false;
 	bool client_connected = false;
 
-	const char* ip_address = "";
+	char ip_address[20];
 	int port;
 };
 ```
@@ -229,7 +228,7 @@ Open
 ```cpp
 bool os_server_open(ServerSocketInfo& server_info, int port)
 {
-	server_info.open = os_socket_open(server_info.server_socket);
+	server_info.open = os_socket_create(server_info.server_socket);
 
 	if (server_info.open)
 	{
@@ -303,7 +302,7 @@ class ClientSocketInfo
 public:
 
 	sockaddr_in server_addr = { 0 };
-	socket_t client_socket = nullptr;
+	socket_t client_socket = 0;
 
 	bool open = false;
 	bool connected = false;	
@@ -315,7 +314,7 @@ Open
 ```cpp
 bool os_client_open(ClientSocketInfo& client_info, const char* server_ip, int server_port)
 {
-	client_info.open = os_socket_open(client_info.client_socket);
+	client_info.open = os_socket_create(client_info.client_socket);
 
 	if (client_info.open)
 	{
@@ -361,32 +360,32 @@ void run_server()
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return;
+		return -1;
 	}
 
 	if (!os_server_open(server, port))
 	{
 		printf("server open failed.\n");
-		return;
+		return -1;
 	}	
 
 	if (!os_server_bind(server))
 	{
 		printf("server bind failed.\n");
-		return;
+		return -1;
 	}
 
 	if (!os_server_listen(server))
 	{
 		printf("server listen failed.\n");
-		return;
+		return -1;
 	}
 
 	printf("Waiting for client to connect on port %d\n", server.port);
 	if (!os_server_accept(server))
 	{
 		printf("client connect failed.\n");
-		return;
+		return -1;
 	}
 
 	printf("Client connected\n");
@@ -401,8 +400,6 @@ void run_server()
 
 	printf("recv: %s\n", message_buffer);
 
-	os_socket_receive_buffer(server.client_socket, message_buffer, 50);
-
 	auto c = getchar();
 
 	os_socket_close(server.client_socket);
@@ -416,11 +413,17 @@ Client program
 ```cpp
 #include <cstdio>
 
+#if defined(_WIN32)
+
+#define sprintf sprintf_s
+
+#endif
+
 
 void run_client()
 {
 	int server_port = 58002;
-	const char* server_ip_address = "192.168.137.1";
+	const char* server_ip_address = "127.0.0.1";
 
 	ClientSocketInfo client{};
 
@@ -429,19 +432,19 @@ void run_client()
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return;
+		return -1;
 	}
 
 	if (!os_client_open(client, server_ip_address, server_port))
 	{
 		printf("client open failed.\n");
-		return;
+		return -1;
 	}
 
 	if (!os_client_connect(client))
 	{
 		printf("client connect failed.\n");
-		return;
+		return -1;
 	}
 
 	printf("Client connected.\n");
@@ -454,7 +457,7 @@ void run_client()
 
 	memset(message_buffer, 0, 50);
 
-	sprintf_s(message_buffer, "Hello from client");
+	sprintf(message_buffer, "Hello from client");
 
 	os_socket_send_buffer(client.client_socket, message_buffer, strlen(message_buffer));
 
