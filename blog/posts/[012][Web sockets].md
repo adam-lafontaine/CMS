@@ -1,5 +1,5 @@
 # Web sockets
-## Create a basic cross platform socket API
+## A basic cross platform socket API
 
 
 
@@ -104,7 +104,7 @@ void os_socket_close(int socket)
 }
 ```
 
-We can make all of these functions look identical for both operating systems with some strategic type aliasing preprocessor macros.
+We can make all of these functions look identical for both operating systems with some strategic type aliasing and preprocessor definitions.
 
 ```cpp
 #if defined(_WIN32)
@@ -192,10 +192,11 @@ void os_socket_cleanup()
 }
 ```
 
-With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.
+With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.  With the type aliasing above, the implentations will be same for Windows and Linux.
 
 ### Server
 
+We'll create a structure to store the current state of a socket server.
 
 
 ```cpp
@@ -223,7 +224,7 @@ public:
 };
 ```
 
-Open
+The first step is to create the socket and set the server address properties if successful.
 
 ```cpp
 bool os_server_open(ServerSocketInfo& server_info, int port)
@@ -244,7 +245,9 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 }
 ```
 
-Bind
+The AF_INET constant indicates that we are using IPV4 addressing.  INADDR_ANY means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
+
+The server socket must be bound the given IP address(es).
 
 ```cpp
 bool os_server_bind(ServerSocketInfo& server_info)
@@ -259,10 +262,10 @@ bool os_server_bind(ServerSocketInfo& server_info)
 }
 ```
 
-Listen
+In order to accept connections, the socket must be in a listening state.  A backlog is used to set the maximum number of client connections.
 
 ```cpp
-bool os_socket_listen(ServerSocketInfo& socket_info)
+bool os_server_listen(ServerSocketInfo& socket_info)
 {
 	auto socket = server_info.server_socket;
 	int backlog = 1;
@@ -273,10 +276,10 @@ bool os_socket_listen(ServerSocketInfo& socket_info)
 }
 ```
 
-Accept
+The server can accept a pending connection in its backlog or wait for a client connection to be requested if there are no connections available.  By default the call to accept() is blocking.  Execution will stop until a client connection is established.
 
 ```cpp
-bool os_socket_accept(ServerSocketInfo& socket_info)
+bool os_server_accept(ServerSocketInfo& socket_info)
 {
 	server_info.client_len = sizeof(server_info.client_addr);
 
@@ -294,7 +297,31 @@ bool os_socket_accept(ServerSocketInfo& socket_info)
 }
 ```
 
+Disconnect from a client by closing the client socket.
+
+```cpp
+void os_server_disconnect(ServerSocketInfo& server_info)
+{
+	os_socket_close(server_info.client_socket);
+	server_info.client_connected = false;
+}
+```
+
+The server socket can be closed when we are done with it.
+
+```cpp
+void os_server_close(ServerSocketInfo& server_info)
+{	
+	os_socket_close(server_info.server_socket);
+	server_info.listen = false;
+	server_info.bind = false;
+	server_info.open = false;
+}
+```
+
 ### Client
+
+Create a structure to store the state of the client socket.
 
 ```cpp
 class ClientSocketInfo
@@ -309,7 +336,7 @@ public:
 };
 ```
 
-Open
+Set the server information if the socket is created successfully.  The client needs to know which IP address and port number the server is listening on.
 
 ```cpp
 bool os_client_open(ClientSocketInfo& client_info, const char* server_ip, int server_port)
@@ -328,7 +355,7 @@ bool os_client_open(ClientSocketInfo& client_info, const char* server_ip, int se
 }
 ```
 
-Connect
+Connect to a listening server socket.  A connection will be established if accept() has been called on the server socket.
 
 ```cpp
 bool os_client_connect(ClientSocketInfo& client_info)
@@ -343,7 +370,22 @@ bool os_client_connect(ClientSocketInfo& client_info)
 }
 ```
 
-Server program
+Close the socket to disconnect from the server.
+
+```cpp
+void os_client_close(ClientSocketInfo& client_info)
+{
+	os_socket_close(client_info.client_socket);
+	client_info.connected = false;
+	client_info.open = false;
+}
+```
+
+### Sample programs
+
+To demonstrate how to use this API, we'll make a client and a server connect to each other and exchange messages.
+
+The first program creates a server socket and waits for a client connection.  When a connection is made, messages are exchanged and then the server disconnects and shuts down.
 
 ```cpp
 #include <cstdio>
@@ -360,32 +402,32 @@ void run_server()
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return -1;
+		return 1;
 	}
 
 	if (!os_server_open(server, port))
 	{
 		printf("server open failed.\n");
-		return -1;
+		return 1;
 	}	
 
 	if (!os_server_bind(server))
 	{
 		printf("server bind failed.\n");
-		return -1;
+		return 1;
 	}
 
 	if (!os_server_listen(server))
 	{
 		printf("server listen failed.\n");
-		return -1;
+		return 1;
 	}
 
 	printf("Waiting for client to connect on port %d\n", server.port);
 	if (!os_server_accept(server))
 	{
 		printf("client connect failed.\n");
-		return -1;
+		return 1;
 	}
 
 	printf("Client connected\n");
@@ -402,13 +444,13 @@ void run_server()
 
 	auto c = getchar();
 
-	os_socket_close(server.client_socket);
-	os_socket_close(server.server_socket);
+	os_server_disconnect(server);
+	os_server_close(server);
 	os_socket_cleanup();
 }
 ```
 
-Client program
+The next program creates a client socket and connects to a waiting server socket.  After the exhange of messages, the client disconnects and shuts down.
 
 ```cpp
 #include <cstdio>
@@ -432,19 +474,19 @@ void run_client()
 	if (!os_socket_init())
 	{
 		printf("socket init failed.\n");
-		return -1;
+		return 1;
 	}
 
 	if (!os_client_open(client, server_ip_address, server_port))
 	{
 		printf("client open failed.\n");
-		return -1;
+		return 1;
 	}
 
 	if (!os_client_connect(client))
 	{
 		printf("client connect failed.\n");
-		return -1;
+		return 1;
 	}
 
 	printf("Client connected.\n");
@@ -463,16 +505,20 @@ void run_client()
 
 	auto c = getchar();
 
-	os_socket_close(client.client_socket);
+	os_client_close(client);
 	os_socket_cleanup();
 }
 ```
 
-Firewall
+When running these, you may get a message like the following from Windows Firewall.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p12-sockets/blog/img/%5B012%5D/firewall.bmp)
 
-Server output
+Give your application(s) access in order to continue.
+
+Compile both programs separately and start the server program before starting the client program.  The server will wait until the client program connects and the two programs exchange messages.
+
+Here is the output from the server.
 
 ```plaintext
 Server
@@ -482,7 +528,7 @@ Client connected
 recv: Hello from client
 ```
 
-Client output
+And the output from the client.
 
 ```plaintext
 Client
