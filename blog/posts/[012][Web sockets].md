@@ -1,18 +1,17 @@
 # Web sockets
 ## A basic cross platform socket API
 
+Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar to each other but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality while hiding the differences between system calls.
 
-
-Windows
-
-```cpp
-#include <WinSock2.h>
-#pragma comment (lib,"ws2_32.lib")
-```
+### Windows
 
 On Windows we need to first initialize the library.
 
 ```cpp
+#include <WinSock2.h>
+#pragma comment (lib,"ws2_32.lib")
+
+
 bool os_socket_init()
 {	
 	WSAData wsa;
@@ -33,16 +32,7 @@ bool os_socket_create(SOCKET& socket_handle)
 }
 ```
 
-Make a socket ready to receive by providing a character buffer for it to write to.  By default the call will wait for a message to arrive and block the thread it is running on.  If the message is larger than the number of bytes provided, then the message will be truncated.
-
-```cpp
-inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
-{
-	return recv(socket, dst, n_bytes, 0) != SOCKET_ERROR;
-}
-```
-
-Send bytes over a socket connection.  Can be called at any time as long as the socket is connected.  The recipient must ready to receive or the message will be missed.
+Send bytes over a socket connection.  Can be called at any time as long as the socket is connected.  The recipient must be ready to receive or the message will be missed.
 
 ```cpp
 inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
@@ -51,7 +41,16 @@ inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
 }
 ```
 
-Disonnect a socket connection and free all associated resources.
+Make a socket available to receive a message by providing a character buffer for it to write to.  By default the call will wait for a message to arrive and block the thread it is running on.  If the message is larger than the number of bytes provided, then the message will be truncated.
+
+```cpp
+inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
+{
+	return recv(socket, dst, n_bytes, 0) != SOCKET_ERROR;
+}
+```
+
+When finished with a socket, close it and free all associated resources.
 
 ```cpp
 void os_socket_close(SOCKET socket)
@@ -70,7 +69,7 @@ void os_socket_cleanup()
 ```
 
 
-Linux has similar functions and uses a different convention for their return types.  There is also no need to initialize and cleanup the socket library.
+Linux has similar functions and uses a different convention for their return types.  There is also no need to initialize or cleanup the socket library.
 
 ```cpp
 #include <unistd.h>
@@ -82,19 +81,19 @@ bool os_socket_create(int& socket_handle)
 {
 	socket_handle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	return socket_handle >= 0;
-}
-
-
-inline bool os_socket_receive_buffer(int socket, char* dst, int n_bytes)
-{
-	return recv(socket, dst, n_bytes, 0) >= 0;
+	return socket_handle != -1;
 }
 
 
 inline bool os_socket_send_buffer(int socket, const char* src, int n_bytes)
 {
-	return send(socket, src, n_bytes, 0) >= 0;
+	return send(socket, src, n_bytes, 0) != -1;
+}
+
+
+inline bool os_socket_receive_buffer(int socket, char* dst, int n_bytes)
+{
+	return recv(socket, dst, n_bytes, 0) != -1;
 }
 
 
@@ -192,7 +191,7 @@ void os_socket_cleanup()
 }
 ```
 
-With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.  With the type aliasing above, the implentations will be same for Windows and Linux.
+With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.  With the type aliasing above, the implentations will be the same for Windows and Linux.
 
 ### Server
 
@@ -245,9 +244,9 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 }
 ```
 
-The AF_INET constant indicates that we are using IPV4 addressing.  INADDR_ANY means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
+The AF_INET constant indicates that we are using IPv4 addressing.  INADDR_ANY means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
 
-The server socket must be bound the given IP address(es).
+The server socket must be bound to the given IP address(es).
 
 ```cpp
 bool os_server_bind(ServerSocketInfo& server_info)
@@ -262,7 +261,7 @@ bool os_server_bind(ServerSocketInfo& server_info)
 }
 ```
 
-In order to accept connections, the socket must be in a listening state.  A backlog is used to set the maximum number of client connections.
+In order to accept connections, the socket must be in a listening state.  A backlog amount is used to set the maximum number of client connections.
 
 ```cpp
 bool os_server_listen(ServerSocketInfo& socket_info)
@@ -276,7 +275,7 @@ bool os_server_listen(ServerSocketInfo& socket_info)
 }
 ```
 
-The server can accept a pending connection in its backlog or wait for a client connection to be requested if there are no connections available.  By default the call to accept() is blocking.  Execution will stop until a client connection is established.
+The server can accept a pending connection in its backlog, or wait for a client to request a connection if there are no connections available.  By default the call to accept() is blocking.  Execution will stop until a client connection is established.
 
 ```cpp
 bool os_server_accept(ServerSocketInfo& socket_info)
@@ -383,7 +382,7 @@ void os_client_close(ClientSocketInfo& client_info)
 
 ### Sample programs
 
-To demonstrate how to use this API, we'll make a client and a server connect to each other and exchange messages.
+To demonstrate how these function work, we'll make a client and a server connect to each other and exchange messages.
 
 The first program creates a server socket and waits for a client connection.  When a connection is made, messages are exchanged and then the server disconnects and shuts down.
 
@@ -516,9 +515,9 @@ When running these, you may get a message like the following from Windows Firewa
 
 Give your application(s) access in order to continue.
 
-Compile both programs separately and start the server program before starting the client program.  The server will wait until the client program connects and the two programs exchange messages.
+Compile both programs separately and start the server program first.  The server will wait until the client program connects and the two programs will exchange messages.
 
-Here is the output from the server.
+The output from the server should look like so.
 
 ```plaintext
 Server
