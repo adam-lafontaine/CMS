@@ -214,7 +214,6 @@ public:
 
 	bool open = false;
 	bool bind = false;
-	bool listen = false;
 
 	bool server_running = false;
 	bool client_connected = false;
@@ -270,9 +269,9 @@ bool os_server_listen(ServerSocketInfo& socket_info)
 	auto socket = server_info.server_socket;
 	int backlog = 1;
 
-	server_info.listen = listen(socket, backlog) != SOCKET_ERROR;
+	server_info.server_running = listen(socket, backlog) != SOCKET_ERROR;
 
-	return server_info.listen;
+	return server_info.server_running;
 }
 ```
 
@@ -314,7 +313,7 @@ The server socket can be closed when we are done with it.
 void os_server_close(ServerSocketInfo& server_info)
 {	
 	os_socket_close(server_info.server_socket);
-	server_info.listen = false;
+	server_info.server_running = false;
 	server_info.bind = false;
 	server_info.open = false;
 }
