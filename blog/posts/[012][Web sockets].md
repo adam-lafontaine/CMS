@@ -1,7 +1,7 @@
 # Web sockets
 ## A basic cross platform socket API
 
-Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar to each other but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality while hiding the differences between system calls.
+Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar to each other but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality and how to hide the differences between system calls.
 
 ### Windows
 
@@ -41,7 +41,7 @@ inline bool os_socket_send_buffer(SOCKET socket, const char* src, int n_bytes)
 }
 ```
 
-Make a socket available to receive a message by providing a character buffer for it to write to.  By default the call will wait for a message to arrive and block the thread it is running on.  If the message is larger than the number of bytes provided, then the message will be truncated.
+Make a socket available to receive a message by providing a character buffer for it to write to.  By default the call will wait for a message to arrive and block the thread it is running on.  If the message is larger than the number of bytes provided, the message will be truncated.
 
 ```cpp
 inline bool os_socket_receive_buffer(SOCKET socket, char* dst, int n_bytes)
@@ -68,8 +68,9 @@ void os_socket_cleanup()
 }
 ```
 
+### Linux
 
-Linux has similar functions and uses a different convention for the return types.  There is also no need to initialize or cleanup the socket library.
+Linux has similar functions and uses a different convention for the data types.  There is also no need to initialize or cleanup the socket library.
 
 ```cpp
 #include <unistd.h>
@@ -536,6 +537,12 @@ Client connected.
 recv: Hello from server
 ```
 
+Try running each program on different machines on the same network.  Be sure that the client has the correct IP address for the server.
+
 ### Now for the hard part
 
-Your operating system provides a fairly simple means for allowing devices to communicate over a network.  Differences between operating systems add some complications but this post showed that they are pretty easy to overcome.  The difficult part is getting devices to agree on how to communicate.  Messages can be sent at anytime, devices can disconnect at anytime, errors can occur at anytime.  Each device probably has different software running as well.  There is no way to trust that the device on the other end will behave properly either.  Every application needs to have rules that each device can agree with.  Rules about how to connect and disconnect, what to do when a device disconnects unexpectedly, how messages are structured etc.  Often the communication protocol that you need to implement requires more effort than the core functionality of the application simply because of all of the edge cases that need to be considered.  Getting this right can take a while but once it works you'll have it forever.  At least the socket part is easy.
+Your operating system provides a fairly simple means for allowing devices to communicate over a network.  Differences between operating systems add some complications but this post showed that they are pretty easy to overcome.  The difficult part is getting devices to agree on how to communicate.  Messages can be sent at any time, devices can disconnect at any time, errors can occur at any time.  Each device probably has different software running as well.  There is no way to trust that the device on the other end will behave properly either.
+
+Every application needs to have rules that each device can agree with.  Rules about how to connect and disconnect, what to do when a device disconnects unexpectedly, how messages are structured etc.  Often the communication protocol that you need to implement requires more effort than the core functionality of the application, simply because of all of the edge cases that need to be considered.  Getting this right can take a while but once it works you'll have it forever.
+
+At least the socket part is easy.
