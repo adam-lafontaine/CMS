@@ -69,7 +69,7 @@ void os_socket_cleanup()
 ```
 
 
-Linux has similar functions and uses a different convention for their return types.  There is also no need to initialize or cleanup the socket library.
+Linux has similar functions and uses a different convention for the return types.  There is also no need to initialize or cleanup the socket library.
 
 ```cpp
 #include <unistd.h>
@@ -382,7 +382,7 @@ void os_client_close(ClientSocketInfo& client_info)
 
 ### Sample programs
 
-To demonstrate how these function work, we'll make a client and a server connect to each other and exchange messages.
+To demonstrate how these functions work, we'll make a client and a server connect to each other and exchange messages.
 
 The first program creates a server socket and waits for a client connection.  When a connection is made, messages are exchanged and then the server disconnects and shuts down.
 
@@ -431,7 +431,7 @@ void run_server()
 
 	printf("Client connected\n");
 
-	char message_buffer[50] = "hello from server";
+	char message_buffer[50] = "Hello from server";
 
 	os_socket_send_buffer(server.client_socket, message_buffer, strlen(message_buffer));
 
@@ -533,5 +533,9 @@ And the output from the client.
 Client
 
 Client connected.
-recv: hello from server
+recv: Hello from server
 ```
+
+### Now for the hard part
+
+Your operating system provides a fairly simple means for allowing devices to communicate over a network.  Differences between operating systems add some complications but this post showed that they are pretty easy to overcome.  The difficult part is getting devices to agree on how to communicate.  Messages can be sent at anytime, devices can disconnect at anytime, errors can occur at anytime.  Each device probably has different software running as well.  There is no way to trust that the device on the other end will behave properly either.  Every application needs to have rules that each device can agree with.  Rules about how to connect and disconnect, what to do when a device disconnects unexpectedly, how messages are structured etc.  Often the communication protocol that you need to implement requires more effort than the core functionality of the application simply because of all of the edge cases that need to be considered.  Getting this right can take a while but once it works you'll have it forever.  At least the socket part is easy.
