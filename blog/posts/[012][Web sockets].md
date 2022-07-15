@@ -1,7 +1,7 @@
 # Web sockets
-## A basic cross platform socket API
+## Basic cross platform socket API
 
-Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar to each other but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality and how to hide the differences between system calls.
+Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality and how to hide the differences between system calls.
 
 ### Windows
 
@@ -192,7 +192,7 @@ void os_socket_cleanup()
 }
 ```
 
-With that, all of the differences between operating systems is taken care of.  What's left is to implement functionality specific to the server and client.  With the type aliasing above, the implentations will be the same for Windows and Linux.
+With that, all of the differences between operating systems are taken care of.  What's left is to implement functionality specific to the server and client.  With the type aliasing above, the server and client implentations will be the same for both Windows and Linux.
 
 ### Server
 
@@ -247,7 +247,7 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 
 The AF_INET constant indicates that we are using IPv4 addressing.  INADDR_ANY means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
 
-The server socket must be bound to the given IP address(es).
+The server socket must then be bound to the given IP address(es).
 
 ```cpp
 bool os_server_bind(ServerSocketInfo& server_info)
@@ -289,6 +289,7 @@ bool os_server_accept(ServerSocketInfo& socket_info)
 	auto cli_addr = (addr_t*)&server_info.client_addr;
 	auto cli_len = &server_info.client_len;
 
+	// Execution will stop here until a client connects
 	server_info.client_socket = accept(srv_socket, cli_addr, cli_len);
 
 	server_info.client_connected = server_info.client_socket != INVALID_SOCKET;
@@ -543,6 +544,6 @@ Try running each program on different machines on the same network.  Be sure tha
 
 Your operating system provides a fairly simple means for allowing devices to communicate over a network.  Differences between operating systems add some complications but this post showed that they are pretty easy to overcome.  The difficult part is getting devices to agree on how to communicate.  Messages can be sent at any time, devices can disconnect at any time, errors can occur at any time.  Each device probably has different software running as well.  There is no way to trust that the device on the other end will behave properly either.
 
-Every application needs to have rules that each device can agree with.  Rules about how to connect and disconnect, what to do when a device disconnects unexpectedly, how messages are structured etc.  Often the communication protocol that you need to implement requires more effort than the core functionality of the application, simply because of all of the edge cases that need to be considered.  Getting this right can take a while but once it works you'll have it forever.
+Every application needs to have rules that each device can agree with.  Rules about how to connect and disconnect, what to do when a device disconnects unexpectedly, how messages are structured etc.  Often the communication protocol that you need to implement requires more effort than the core functionality of the application.  Getting this right can take a while but once it works you'll have it forever.
 
 At least the socket part is easy.
