@@ -123,6 +123,7 @@ int main()
 }
 ```
 
+Here is a summary of what the program does.  Each step will be explained in turn.
 * Allocate memory on the computer and the GPU
 * Initialize arrays on the computer with data for processing
 * Initialize arrays on the GPU
@@ -130,6 +131,8 @@ int main()
 * Process the data on the GPU
 * Copy the results from the GPU to the computer
 * Verify the results
+
+If everything works as it should, the output will look like so.
 
 ```plaintext
 Multiply-Add 1,000,000 elements
@@ -145,6 +148,10 @@ free memory
 ```
 
 ### Memory management
+
+The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different pieces of hardware, i.e. device memory on the GPU and host memory in RAM.
+
+The first step in program defines a couple of lamdas to allocate and free memory using objects called FloatBuffer.
 
 ```cpp
 FloatBuffer host_buffer{};
@@ -171,6 +178,7 @@ if(!allocate())
 }
 ```
 
+The FloatBuffer is just a container for managing a buffer of floats in memory.  One is used for host data and the other for device data.
 
 ```cpp
 class FloatBuffer
@@ -183,6 +191,7 @@ public:
 };
 ```
 
+Host memory is handled as usual using malloc() and free().
 
 ```cpp
 bool host_malloc(FloatBuffer& buffer, u32 n_elements)
@@ -217,6 +226,7 @@ void host_free(FloatBuffer& buffer)
 }
 ```
 
+Allocating memory on the the device requires a CUDA api function called cudaMalloc().  It takes a reference to a pointer and the number of bytes to allocate.  If successful, it sets the pointer to the address on the device where the memory has been allocated.
 
 ```cpp
 #include <cuda_runtime.h>
@@ -242,8 +252,13 @@ bool device_malloc(FloatBuffer& buffer, u32 n_elements)
 
     return result;
 }
+```
 
+If the call is not successful, cudaMalloc() will return a cudaError_t value that is other than the constant cudaSuccess.  Most if not all of the CUDA api functions return cudaError_t.  Checking error codes will be covered in a bit.
 
+Device memory also needs to be freed when we're done with it.  We do that with cudaFree();
+
+```cpp
 bool device_free(FloatBuffer& buffer)
 {
     buffer.capacity = 0;
@@ -265,6 +280,8 @@ bool device_free(FloatBuffer& buffer)
 
 ### Error checking
 
+Generally it's a good idea to check for errors after each api call.  How error handling should be done depends on the application and if it is still in development or production.  For our example, we'll simply print the error to the console.
+
 ```cpp
 void check_error(cudaError_t err)
 {
@@ -274,12 +291,14 @@ void check_error(cudaError_t err)
     }
 
     printf("\n*** CUDA ERROR ***\n\n");
+
     printf("%s", cudaGetErrorString(err));
     
     printf("\n\n******************\n\n");
 }
 ```
 
+To force an error, we can attempt to process more data than what the GPU can handle.  I am using a Jetson Nano, so 4 arrays of one billion 32 bit elements does the trick.
 
 ```plaintext
 Multiply-Add 1,000,000,000 elements
@@ -293,6 +312,8 @@ out of memory
 ```
 
 ### Memory access
+
+The next step in the program is to divide the host and device memory into four equally sized arrays.  Host data is initialized with values that will be copied to the device for processing.
 
 ```cpp
 // 3 * 4 + 5 = 17
@@ -316,6 +337,7 @@ r32* device_5 = push_elements(device_buffer, n_elements);
 r32* device_17 = push_elements(device_buffer, n_elements);
 ```
 
+The host and device do not have access to each other's memory.  However, cudaMalloc() provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done the same way for the host and device data.
 
 ```cpp
 r32* push_elements(FloatBuffer& buffer, u32 n_elements)
@@ -344,6 +366,7 @@ r32* push_elements(FloatBuffer& buffer, u32 n_elements)
 }
 ```
 
+In order for data to be process on the GPU, it must first be copied to device memory.  
 
 ```cpp
 // copy the first 3 arrays in one call
