@@ -106,7 +106,7 @@ int main()
     printf("check results\n");
     auto begin = host_17;
     auto end = begin + n_elements;
-    auto result = std::all_of(begin, end, [](r32 val){ return fabs(val - 17.0f) < 1e-5; });
+    bool result = std::all_of(begin, end, [](r32 val){ return fabs(val - 17.0f) < 1e-5; });
 
     if(result)
     {
@@ -340,6 +340,9 @@ r32* device_17 = push_elements(device_buffer, n_elements);
 The host and device do not have access to each other's memory.  However, cudaMalloc() provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done the same way for the host and device data.
 
 ```cpp
+#include <cassert>
+
+
 r32* push_elements(FloatBuffer& buffer, u32 n_elements)
 {
     assert(buffer.data);
@@ -366,7 +369,7 @@ r32* push_elements(FloatBuffer& buffer, u32 n_elements)
 }
 ```
 
-In order for data to be process on the GPU, it must first be copied to device memory.  
+In order for data to be processed on the GPU, it must first be copied to device memory.  Here we are copying all three arrays in one shot because their memory is contiguous and at the beginning of the buffer.
 
 ```cpp
 // copy the first 3 arrays in one call
@@ -380,6 +383,7 @@ if(!copy)
 }
 ```
 
+Copying memory from host to device is done using cudaMemcpy() with the constant cudaMemcpyHostToDevice.  Provide the address of where to copy from and where to copy to with the number of bytes to copy.
 
 ```cpp
 bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes)
@@ -394,10 +398,11 @@ bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes)
 }
 ```
 
+When the data has been copied to the device it can be processed.  Device "kernels" are called from the host to initiate the parallel processing done by the GPU.  This will be covered in more detail later.
 
 ```cpp
 printf("launch kernel\n");
-auto launch = launch_kernel(device_3, device_4, device_5, device_17, n_elements);
+bool launch = launch_kernel(device_3, device_4, device_5, device_17, n_elements);
 if(!launch)
 {
     cleanup();
@@ -405,6 +410,7 @@ if(!launch)
 }
 ```
 
+After processing, the results need to be copied from the device to the host.
 
 ```cpp
 printf("copy device results to host\n");
@@ -416,6 +422,23 @@ if(!copy)
     return 1;
 }
 ```
+
+Copying from device to host is also done with cudaMemcpy().  The device address with the data and the host address where it should be copied to need to be provided.  Along with the constant cudaMemcpyDeviceToHost.
+
+```cpp
+bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
+{
+    assert(device_src);
+    assert(host_dst);
+
+    cudaError_t err = cudaMemcpy(host_dst, device_src, n_bytes, cudaMemcpyDeviceToHost);
+    check_error(err);
+
+    return err == cudaSuccess;
+}
+```
+
+Finally, the program checks all of the results to make sure they are what we expect.
 
 
 ```cpp
@@ -438,9 +461,9 @@ cleanup();
 return 0;
 ```
 
+### Device kernels
 
-### GPU programming
-
+Before seing how our program processes data on the GPU, we'll first check out an example provided by Nvidia.
 
 ```cpp
 /**
@@ -449,8 +472,8 @@ return 0;
  * Computes the vector addition of A and B into C. The 3 vectors have the same
  * number of elements numElements.
  */
-__global__ void
-vectorAdd(const float *A, const float *B, float *C, int numElements)
+__global__
+void vectorAdd(const float *A, const float *B, float *C, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -461,11 +484,85 @@ vectorAdd(const float *A, const float *B, float *C, int numElements)
 }
 ```
 
+The __global__ declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
+
+Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two and must be at least as many as the number of elements in the arrays.
+
+Each thread has its own id and is retreived with
+
+```cpp
+int i = blockDim.x * blockIdx.x + threadIdx.x;
+```
+
+For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.
+
+Since the number of threads can be greater than the number of elements to process, we need to check to make sure that the given thread id is within the bounds of the array.
+
+```cpp
+if (i < numElements)
+{
+    ...
+}
+```
+
+The kernel is called from the host code like so.
+
+```cpp
+// vectorAdd example
+int main()
+{
+    ...
+
+    // Launch the Vector Add CUDA Kernel
+    int threadsPerBlock = 256;
+    int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
+    printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
+
+    vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+    err = cudaGetLastError();
+
+    ...
+}
+```
+
+A kernel is launched using the execution configuration syntax (<<<...>>>) where the number of blocks and the threads per block are specified.  The api function cudaGetLastError() returns an error code if there were any problems during kernel execution.
+
+### Device functions
+
+We can call functions from device code as long as we use the __device__ declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
+
+```cpp
+__device __
+float add(float a, float b)
+{
+    return a + b;
+}
+
+
+__global__
+void vectorAdd(const float *A, const float *B, float *C, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (i < numElements)
+    {
+        C[i] = add(A[i], B[i]);
+    }
+}
+```
+
+### Back to our program
+
+Double underscores are not very aesthetically pleasing, so I define the following macros.
+
 ```cpp
 #define GPU_KERNAL __global__
 #define GPU_FUNCTION __device__
+```
 
+Our device code will consist of a fuction that performs a multiply and add and a kernel that calls the function for a given thread id / array index.
 
+```cpp
 GPU_FUNCTION
 r32 multipy_add(r32 a, r32 b, r32 c)
 {
@@ -487,6 +584,7 @@ void gpu_multiply_add(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
 }
 ```
 
+Our launch_kernel() function sets up the thread blocks, launches the kernel, and checks for errors.
 
 ```cpp
 bool launch_kernel(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
@@ -504,3 +602,9 @@ bool launch_kernel(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
     return err == cudaSuccess;
 }
 ```
+
+The maximum number of threads in a block is 1024.  The number of blocks calculated for the minimum number of blocks required given the number of threads in each block.
+
+Pointers to the device data are passed to the kernel for processing.
+
+This time error checking is done using cudaDeviceSynchronize().  This blocks until all device execution completes and returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.  During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.
