@@ -1,5 +1,5 @@
 # How to CUDA
-## Parallel programming with NVIDIA GPUs
+## Parallel programming with NVIDIA
 
 
 ```cpp
@@ -149,9 +149,9 @@ free memory
 
 ### Memory management
 
-The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different pieces of hardware, i.e. device memory on the GPU and host memory in RAM.
+The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different pieces of hardware.  i.e. device memory on the GPU and host memory in RAM.
 
-The first step in program defines a couple of lamdas to allocate and free memory using objects called FloatBuffer.
+The first part of the program defines a couple of lamdas to allocate and free memory using objects called `FloatBuffer`.
 
 ```cpp
 FloatBuffer host_buffer{};
@@ -178,7 +178,7 @@ if(!allocate())
 }
 ```
 
-The FloatBuffer is just a container for managing a buffer of floats in memory.  One is used for host data and the other for device data.
+The `FloatBuffer` is just a container for managing a buffer of floats in memory.  One is used for host data and the other for device data.
 
 ```cpp
 class FloatBuffer
@@ -191,7 +191,7 @@ public:
 };
 ```
 
-Host memory is handled as usual using malloc() and free().
+Host memory is handled as usual using `malloc()` and `free()`.
 
 ```cpp
 bool host_malloc(FloatBuffer& buffer, u32 n_elements)
@@ -226,7 +226,7 @@ void host_free(FloatBuffer& buffer)
 }
 ```
 
-Allocating memory on the the device requires a CUDA api function called cudaMalloc().  It takes a reference to a pointer and the number of bytes to allocate.  If successful, it sets the pointer to the address on the device where the memory has been allocated.
+Allocating memory on the the device requires a CUDA api function called `cudaMalloc()`.  It takes a reference to a pointer variable and the number of bytes to allocate.  If successful, it sets the pointer to the address on the device where the memory has been allocated.
 
 ```cpp
 #include <cuda_runtime.h>
@@ -254,9 +254,9 @@ bool device_malloc(FloatBuffer& buffer, u32 n_elements)
 }
 ```
 
-If the call is not successful, cudaMalloc() will return a cudaError_t value that is other than the constant cudaSuccess.  Most if not all of the CUDA api functions return cudaError_t.  Checking error codes will be covered in a bit.
+If the call is not successful, `cudaMalloc()` will return a `cudaError_t` value that is other than the constant `cudaSuccess`.  Most if not all of the CUDA api functions return `cudaError_t`.  Checking error codes will be covered in a bit.
 
-Device memory also needs to be freed when we're done with it.  We do that with cudaFree();
+Device memory also needs to be freed when we're done with it.  We do that with `cudaFree()`.
 
 ```cpp
 bool device_free(FloatBuffer& buffer)
@@ -337,7 +337,7 @@ r32* device_5 = push_elements(device_buffer, n_elements);
 r32* device_17 = push_elements(device_buffer, n_elements);
 ```
 
-The host and device do not have access to each other's memory.  However, cudaMalloc() provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done the same way for the host and device data.
+The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done the same way for the host and device data.
 
 ```cpp
 #include <cassert>
@@ -369,7 +369,7 @@ r32* push_elements(FloatBuffer& buffer, u32 n_elements)
 }
 ```
 
-In order for data to be processed on the GPU, it must first be copied to device memory.  Here we are copying all three arrays in one shot because their memory is contiguous and at the beginning of the buffer.
+In order for data to be processed on the GPU, it must first be copied to device memory.  Here we are copying all three arrays in one shot because their memory is contiguous and starts at the beginning of the buffer.
 
 ```cpp
 // copy the first 3 arrays in one call
@@ -383,7 +383,7 @@ if(!copy)
 }
 ```
 
-Copying memory from host to device is done using cudaMemcpy() with the constant cudaMemcpyHostToDevice.  Provide the address of where to copy from and where to copy to with the number of bytes to copy.
+Copying memory from host to device is done using `cudaMemcpy()` with the constant `cudaMemcpyHostToDevice`.  Provide the address of where to copy from and where to copy to with the number of bytes to copy.
 
 ```cpp
 bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes)
@@ -423,7 +423,7 @@ if(!copy)
 }
 ```
 
-Copying from device to host is also done with cudaMemcpy().  The device address with the data and the host address where it should be copied to need to be provided.  Along with the constant cudaMemcpyDeviceToHost.
+Copying from device to host is also done with `cudaMemcpy()`.  The device address with the data and the host address where it should be copied to need to be provided.  Along with the constant `cudaMemcpyDeviceToHost`.
 
 ```cpp
 bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
@@ -463,7 +463,7 @@ return 0;
 
 ### Device kernels
 
-Before seing how our program processes data on the GPU, we'll first check out an example provided by Nvidia.
+Before seeing how our program processes data on the GPU, we'll first check out an example provided by Nvidia.
 
 ```cpp
 /**
@@ -484,7 +484,7 @@ void vectorAdd(const float *A, const float *B, float *C, int numElements)
 }
 ```
 
-The __global__ declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
+The \__global__ declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
 
 Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two and must be at least as many as the number of elements in the arrays.
 
@@ -525,11 +525,11 @@ int main()
 }
 ```
 
-A kernel is launched using the execution configuration syntax (<<<...>>>) where the number of blocks and the threads per block are specified.  The api function cudaGetLastError() returns an error code if there were any problems during kernel execution.
+A kernel is launched using the execution configuration syntax (<<<...>>>) where the number of blocks and the threads per block are specified.  The api function `cudaGetLastError()` returns an error code if there were any problems during kernel execution.
 
 ### Device functions
 
-We can call functions from device code as long as we use the __device__ declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
+We can call functions from device code as long as we use the \__device__ declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
 
 ```cpp
 __device __
@@ -560,7 +560,7 @@ Double underscores are not very aesthetically pleasing, so I define the followin
 #define GPU_FUNCTION __device__
 ```
 
-Our device code will consist of a fuction that performs a multiply and add and a kernel that calls the function for a given thread id / array index.
+Our device code will consist of a function that performs a multiply and add and a kernel that calls the function for a given thread id / array index.
 
 ```cpp
 GPU_FUNCTION
@@ -584,7 +584,7 @@ void gpu_multiply_add(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
 }
 ```
 
-Our launch_kernel() function sets up the thread blocks, launches the kernel, and checks for errors.
+Our launch_kernel() function that's called from main() sets up the thread blocks, launches the kernel, and checks for errors.
 
 ```cpp
 bool launch_kernel(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
@@ -607,4 +607,4 @@ The maximum number of threads in a block is 1024.  The number of blocks calculat
 
 Pointers to the device data are passed to the kernel for processing.
 
-This time error checking is done using cudaDeviceSynchronize().  This blocks until all device execution completes and returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.  During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.
+This time error checking is done using `cudaDeviceSynchronize()`.  This blocks until all device execution completes and returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.  During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.
