@@ -42,7 +42,7 @@ public:
 };
 ```
 
-The algorithms require a range of elements to iterate over.  The standard containters provide functions called begin() and end().  begin() points to the first item in the container and end() points to one past the last item.  So if we want to use the STL algorithms on our images, all we need to do is implement begin() and end() functions.  The first item is pointed to by the data pointer.  One past the last item will be the number of pixels (i.e. width x height) after the first.  Our image classes become the following.
+The algorithms require a range of elements to iterate over.  The standard containters provide functions called `begin()` and `end()`.  `begin()` points to the first item in the container and `end()` points to one past the last item.  So if we want to use the STL algorithms on our images, all we need to do is implement `begin()` and `end()` functions.  The first item is pointed to by the data pointer.  One past the last item will be the number of pixels (i.e. width x height) after the first.  Our image classes become the following.
 
 ```cpp
 class RGBAImage
@@ -89,7 +89,7 @@ u8 to_grayscale(u8 red, u8 green, u8 blue)
 }
 ```
 
-To convert an image to grayscale, we would use the std::transform algorithm.
+To convert an image to grayscale, we would use the `std::transform` algorithm.
 
 ```cpp
 #include <cassert>

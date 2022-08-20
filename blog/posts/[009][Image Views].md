@@ -40,7 +40,7 @@ public:
 };
 ```
 
-This VectorView has a vector (pointer) and the offsets that define the range of elements it acts on.  The begin() and end() methods provide the interface needed to use the STL algorithms and other standard C++ functionality.
+This VectorView has a vector (pointer) and the offsets that define the range of elements it acts on.  The `begin()` and `end()` functions provide the interface needed to use the STL algorithms and other standard C++ functionality.
 
 Here's a small program to demonstrate how it would work.
 
@@ -129,7 +129,7 @@ The key to writing an image view is to be able to seemlessly iterate over a rang
 
 ### The image class
 
-As in previous posts, our image class will be fairly simple.  We'll give it the width and height of the image, a pointer to the pixels in memory, and the begin() and end() methods for a more standard C++ interface.
+As in previous posts, our image class will be fairly simple.  We'll give it the width and height of the image, a pointer to the pixels in memory, and the `begin()` and `end()` functions for a more standard C++ interface.
 
 ```cpp
 #include <cstdint>
@@ -156,7 +156,7 @@ public:
 };
 ```
 
-We'll want the option to create a blank image given a width and a height.  Rather then having separate create() and destroy() functions to manage the memory, this time we'll have constructors and a destructor in true RAII fashion.
+We'll want the option to create a blank image given a width and a height.  Rather then having separate `create()` and `destroy()` functions to manage the memory, this time we'll have constructors and a destructor in true RAII fashion.
 
 ```cpp
 #include <cstdlib>
@@ -233,7 +233,7 @@ public:
 };
 ```
 
-For our example, we'll define a function that uses a GrayView to operate on an image's pixels.  We'll make make the view behave like a standard container so that we can use it with the standard algorithms.
+For our example, we'll define a function that uses a `GrayView` to operate on an image's pixels.  We'll make make the view behave like a standard container so that we can use it with the standard algorithms.
 
 ```cpp
 #include <algorithm>
@@ -293,7 +293,7 @@ Our program is going to
 
 ### The view class
 
-Given our requirements, the GrayView class needs to have at minimun the following structure.
+Given our requirements, the `GrayView` class needs to have at minimun the following structure.
 
 ```cpp
 class GrayView
@@ -321,7 +321,7 @@ public:
 };
 ```
 
-In order to be able to iterate over a 2D range in an image, the view also needs a pointer to the image's pixel data, the range to iterate over, and the width in pixels of the image.  Adding these properties makes implementing the constructor trivial.  The width() and height() methods can be implemented using the values in the range.
+In order to be able to iterate over a 2D range in an image, the view also needs a pointer to the image's pixel data, the range to iterate over, and the width in pixels of the image.  Adding these properties makes implementing the constructor trivial.  The `width()` and `height()` functions can be implemented using the values in the range.
 
 ```cpp
 class GrayView
@@ -363,7 +363,7 @@ We will need to define the iterator before we can implement the remaining method
 
 Iterators in C++ are part of the language's beaurocracy.  Defining an iterator for your data structure is not necessary and may not be worth the effort.  It is only required if you want access to the standard algorithms.  We are free to implement our own algorithms and often it is better to do so.  The standard algortims are defined with a standard in mind.  We implement an iterator in order to conform to that standard.  The payoff is having access to the ever growing list of algorithms and functionality (https://almostalwaysauto.com/posts/parallelism-for-free).
 
-The iterator for the GrayView class needs to be a forward iterator.  That means it must be able to increment (++), dereference(*) and compare equality (==, !=).  We'll start with the following definitions.
+The iterator for the `GrayView` class needs to be a forward iterator.  That means it must be able to increment (`++`), dereference(`*`) and compare equality (`==`, `!=`).  We'll start with the following definitions.
 
 ```cpp
 class GrayView::iterator
@@ -628,7 +628,7 @@ public:
 };
 ```
 
-All that remains are the begin() and end() methods.  These are simple to implement now that the iterator class is complete.  For begin(), we only need to create a new iterator because the position is set to the beginning of the range when constructed.
+All that remains are the `begin()` and `end()` functions.  These are simple to implement now that the iterator class is complete.  For `begin()`, we only need to create a new iterator because the position is set to the beginning of the range when constructed.
 
 ```cpp
 iterator begin() { return iterator(*this); }
@@ -636,7 +636,7 @@ iterator begin() { return iterator(*this); }
 iterator begin() const { return iterator(*this); }
 ```
 
-For the end() methods, we use the iterator's end() method.
+For the `end()` functions, we use the iterator's `end()` function.
 
 ```cpp
 iterator end() { return iterator(*this).end(); }
@@ -644,7 +644,7 @@ iterator end() { return iterator(*this).end(); }
 iterator end() const { return iterator(*this).end(); }
 ```
 
-And with that, our GrayView class is complete.
+And with that, our `GrayView` class is complete.
 
 ```cpp
 class GrayView
@@ -801,9 +801,9 @@ The new image is a copy of the modified image's center region.
 
 ### And we're done
 
-Our STL compliant (almost) ImageView data structure is finally complete.  It was painful, but it's over now.  We defined how to iterate over a 2-dimensional range within an image and can now treat both images and subsections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
+Our STL compliant (almost) `GrayView` data structure is finally complete.  It was painful, but it's over now.  We defined how to iterate over a 2-dimensional range within an image and can now treat both images and subsections of images as STL containers.  This opens up all kinds of possibilities and gives us a lot of "out of the box" functionality.
 
-This type of experience is pretty common in C++ development.  Make a container, make an iterator, provide begin() and end(), so that we can use the STL.  Sometimes it's a lot of work upfront but it has the potential to pay off over time.  
+This type of experience is pretty common in C++ development.  Make a container, make an iterator, implement `begin()` and `end()`, so that we can use the STL.  Sometimes it's a lot of work upfront but it has the potential to pay off over time.  
 
 ### Addendum: Reading and writing grayscale images
 
