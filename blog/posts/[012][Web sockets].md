@@ -70,7 +70,7 @@ void os_socket_cleanup()
 
 ### Linux
 
-Linux has similar functions and uses a different convention for the data types.  There is also no need to initialize or cleanup the socket library.
+Linux has similar functions and uses a different convention for the data types.  Also, there is no need to initialize or cleanup the socket library.
 
 ```cpp
 #include <unistd.h>
@@ -244,7 +244,7 @@ bool os_server_open(ServerSocketInfo& server_info, int port)
 }
 ```
 
-The AF_INET constant indicates that we are using IPv4 addressing.  INADDR_ANY means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
+The `AF_INET` constant indicates that we are using IPv4 addressing.  `INADDR_ANY` means that the server can use any available IP address on the machine, i.e. any connected network adaptor.
 
 The server socket must then be bound to the given IP address(es).
 
@@ -275,7 +275,7 @@ bool os_server_listen(ServerSocketInfo& socket_info)
 }
 ```
 
-The server can accept a pending connection in its backlog, or wait for a client to request a connection if there are no connections available.  By default the call to accept() is blocking.  Execution will stop until a client connection is established.
+The server can accept a pending connection in its backlog, or wait for a client to request a connection if there are no connections available.  By default the call to `accept()` is blocking.  Execution will stop until a client connection is established.
 
 ```cpp
 bool os_server_accept(ServerSocketInfo& socket_info)
@@ -355,7 +355,7 @@ bool os_client_open(ClientSocketInfo& client_info, const char* server_ip, int se
 }
 ```
 
-Connect to a listening server socket.  A connection will be established if accept() has been called on the server socket.
+Connect to a listening server socket.  A connection will be established if `accept()` has been called on the server socket.
 
 ```cpp
 bool os_client_connect(ClientSocketInfo& client_info)
