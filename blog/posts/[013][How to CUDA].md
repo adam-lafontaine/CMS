@@ -1,9 +1,9 @@
 # How to CUDA
 ## Parallel programming with Nvidia
 
-Graphical Processing Units (GPUs) are no longer just for rendering computer graphics.  Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
+Graphical Processing Units (GPUs) are no longer just for computer graphics.  Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
 
-In this post we'll perform a multiply-add operation using arrays of one million elements and cover some of the CUDA api that allows our programs to interact with a GPU.
+In this post we'll perform a multiply-add operation using arrays of one million elements, and cover some of the CUDA api that allows our programs to interact with a GPU.
 
 Actually executing the program however will not be covered here.  Nvidia has its own compiler which works in much the same way as other C++ compilers but has its differences.  Compiling and running different types of programs on different platforms will be a topic for a later post.
 
@@ -296,7 +296,7 @@ bool device_free(FloatBuffer& buffer)
 
 ### Error checking
 
-Generally it's a good idea to check for errors after each api call.  How error handling should be done depends on the application and if it is still in development or production.  For our example, we'll simply print the error to the console.
+Generally it's a good idea to check for errors after each api call.  How error handling should be done depends on the application and if it is still in development or production.  For our example, we'll simply print the error to the console with `cudaGetErrorString()`.
 
 ```cpp
 void check_error(cudaError_t err)
@@ -353,7 +353,7 @@ r32* device_5 = push_elements(device_buffer, n_elements);
 r32* device_17 = push_elements(device_buffer, n_elements);
 ```
 
-The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done the same way for the host and device data.
+The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done in the same way for the host and the device data.
 
 ```cpp
 #include <cassert>
@@ -399,7 +399,7 @@ if(!copy)
 }
 ```
 
-Copying memory from host to device is done using `cudaMemcpy()` with the constant `cudaMemcpyHostToDevice`.  Provide the address of where the data resides on the host and the address of where to copy on the device with the number of bytes to copy.
+Copying memory from host to device is done using `cudaMemcpy()` with the constant `cudaMemcpyHostToDevice`.  Provide the address of where the data resides on the host and the address of where to copy to on the device with the number of bytes to copy.
 
 ```cpp
 bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes)
@@ -439,7 +439,7 @@ if(!copy)
 }
 ```
 
-Copying from device to host is also done with `cudaMemcpy()`.  The device address with the data and the host address where it should be copied to need to be provided along with the number of bytes to copy.  The constant `cudaMemcpyDeviceToHost` tells the api that we are copying data from device memory to host memory.
+Copying from device to host is also done with `cudaMemcpy()`.  The device address at the data and the host address where it should be copied to need to be provided along with the number of bytes to copy.  The constant `cudaMemcpyDeviceToHost` tells the api that we are copying data from device memory to host memory.
 
 ```cpp
 bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
@@ -499,9 +499,9 @@ void vectorAdd(const float *A, const float *B, float *C, int numElements)
 }
 ```
 
-The `__global__` declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
+The `__global__` declaration specifier informs Nvidia's compiler that the function is a "device kernel" and therefore executes in parallel with the number of threads specifed where its called.
 
-Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two.  Since we want to process each array index on its own thread the number of threads must be at least as many as the number of elements in each array.
+Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two.  Since we want to process each array index on its own thread, the number of threads must be at least as many as the number of elements in each array.
 
 Each thread has its own id and is retreived from the thread blocks like so.
 
@@ -509,7 +509,7 @@ Each thread has its own id and is retreived from the thread blocks like so.
 int i = blockDim.x * blockIdx.x + threadIdx.x;
 ```
 
-For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.  `blockDim`, `blockIdx`, and `threadIdx` are built-in variables that allow for finding the thread id based on how the blocks of threads are set up.
+For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.  The built-in variables `blockDim`, `blockIdx`, and `threadIdx` allow for finding the thread id based on how the blocks of threads are set up.
 
 Since the number of threads can be greater than the number of elements to process, we need to check to make sure that the given thread id is within the bounds of the array.
 
@@ -530,7 +530,7 @@ int main()
 
     // Launch the Vector Add CUDA Kernel
     int threadsPerBlock = 256;
-    int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
+    int blocksPerGrid = (numElements + threadsPerBlock - 1) / threadsPerBlock;
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
 
     vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
@@ -544,7 +544,7 @@ A kernel is launched using the execution configuration syntax (`<<<...>>>`) wher
 
 ### Device functions
 
-We can call functions from device code as long as we use the `__device__` declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
+We can call functions from device code as long as we use the `__device__` declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds two values.
 
 ```cpp
 __device __
@@ -618,10 +618,20 @@ bool launch_kernel(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
 }
 ```
 
-A thread block can consist of a maximum of 1024 threads.  The number of blocks is calculated for the minimum number of blocks required given the number of threads in each block.
+A thread block can consist of a maximum of 1024 threads.  The number of blocks is calculated to be the minimum number of blocks required given the number of threads in each block.
 
 Pointers to the device data are passed to the kernel for processing.
 
-This time error checking is done using `cudaDeviceSynchronize()`.  This blocks the program until all device execution completes.  It returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.
+This time error checking is done using `cudaDeviceSynchronize()`.  This blocks the program until all device execution completes.  It returns an error code if there were any problems.  It isn't really necessary here, but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.
 
-During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.
+### Parallelism is not free
+
+As you can see, it is quite a bit of work just to perform a simple operation.  The payoff is that we are able to do the operation on a very large data set all at once.  More work would be required to get the code running optimally in the context of a larger program.  This code is far from optimal but the first step in development is always to just get it working.
+
+During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  This has a performance cost but when we're confident that the application works, we can relax on the error handling and start optimizing in order to get the most out of the GPU.
+
+As with anything, there is work involved making a GPU compatible program.  For an idea of how much work, check out the CUDA programming guide.  
+
+https://docs.nvidia.com/cuda/pdf/CUDA_C_Programming_Guide.pdf
+
+It is 454 pages long as of the writing of this post.
