@@ -3,7 +3,7 @@
 
 Graphical Processing Units (GPUs) are no longer just for computer graphics.  Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
 
-In this post we'll perform a multiply-add operation using arrays of one million elements, and cover some of the CUDA api that allows our programs to interact with a GPU.
+In this post we'll perform a multiply-add operation using arrays of one million elements while covering some of the CUDA api that allows our programs to interact with a GPU.
 
 Actually executing the program however will not be covered here.  Nvidia has its own compiler which works in much the same way as other C++ compilers but has its differences.  Compiling and running different types of programs on different platforms will be a topic for a later post.
 
@@ -167,7 +167,7 @@ free memory
 
 The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different pieces of hardware.  i.e. device memory on the GPU and host memory in RAM.
 
-The first part of the program defines a couple of lamdas to allocate and free memory using objects called `FloatBuffer`.
+The first part of the program defines a couple of lamdas that allocate and free memory using `FloatBuffer` objects.
 
 ```cpp
 FloatBuffer host_buffer{};
@@ -207,7 +207,7 @@ public:
 };
 ```
 
-Host memory is handled as usual using `malloc()` and `free()`.
+Host memory is handled using `malloc()` and `free()` as usual.
 
 ```cpp
 bool host_malloc(FloatBuffer& buffer, u32 n_elements)
@@ -353,7 +353,7 @@ r32* device_5 = push_elements(device_buffer, n_elements);
 r32* device_17 = push_elements(device_buffer, n_elements);
 ```
 
-The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address to the host and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done in the same way for the host and the device data.
+The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done in the same way for the host and the device data.
 
 ```cpp
 #include <cassert>
@@ -439,7 +439,7 @@ if(!copy)
 }
 ```
 
-Copying from device to host is also done with `cudaMemcpy()`.  The device address at the data and the host address where it should be copied to need to be provided along with the number of bytes to copy.  The constant `cudaMemcpyDeviceToHost` tells the api that we are copying data from device memory to host memory.
+Copying from device to host is also done with `cudaMemcpy()`.  The device address of the data and the host address where it should be copied to need to be provided along with the number of bytes to copy.  The constant `cudaMemcpyDeviceToHost` tells the api that we are copying data from device memory to host memory.
 
 ```cpp
 bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
@@ -499,7 +499,7 @@ void vectorAdd(const float *A, const float *B, float *C, int numElements)
 }
 ```
 
-The `__global__` declaration specifier informs Nvidia's compiler that the function is a "device kernel" and therefore executes in parallel with the number of threads specifed where its called.
+The `__global__` declaration specifier informs Nvidia's compiler that the function is a "device kernel" and therefore executes in parallel with the number of threads specifed where it is called.
 
 Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two.  Since we want to process each array index on its own thread, the number of threads must be at least as many as the number of elements in each array.
 
@@ -511,7 +511,7 @@ int i = blockDim.x * blockIdx.x + threadIdx.x;
 
 For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.  The built-in variables `blockDim`, `blockIdx`, and `threadIdx` allow for finding the thread id based on how the blocks of threads are set up.
 
-Since the number of threads can be greater than the number of elements to process, we need to check to make sure that the given thread id is within the bounds of the array.
+Since the number of threads can be greater than the number of elements to process, we need to make sure that the given thread id is within the bounds of the array.
 
 ```cpp
 if (i < numElements)
@@ -628,7 +628,7 @@ This time error checking is done using `cudaDeviceSynchronize()`.  This blocks t
 
 As you can see, it is quite a bit of work just to perform a simple operation.  The payoff is that we are able to do the operation on a very large data set all at once.  More work would be required to get the code running optimally in the context of a larger program.  This code is far from optimal but the first step in development is always to just get it working.
 
-During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  This has a performance cost but when we're confident that the application works, we can relax on the error handling and start optimizing in order to get the most out of the GPU.
+During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  This has a performance cost but when we are confident that the application works, we can relax on the error handling and start optimizing in order to get the most out of the GPU.
 
 As with anything, there is work involved making a GPU compatible program.  For an idea of how much work, check out the CUDA programming guide.  
 
