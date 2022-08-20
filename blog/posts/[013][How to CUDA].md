@@ -1,7 +1,9 @@
 # How to CUDA
 ## Parallel programming with Nvidia
 
-Graphical Processing Units (GPUs) are no longer just for computer graphics.  Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
+Graphical Processing Units (GPUs) are no longer just for computer graphics.
+
+Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
 
 In this post we'll perform a multiply-add operation using arrays of one million elements while covering some of the CUDA api that allows our programs to interact with a GPU.
 
