@@ -165,7 +165,7 @@ free memory
 
 ### Memory management
 
-The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different pieces of hardware.  i.e. device memory on the GPU and host memory in RAM.
+The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different hardware.  i.e. device memory on the GPU and host memory in RAM.
 
 The first part of the program defines a couple of lamdas that allocate and free memory using `FloatBuffer` objects.
 
@@ -194,7 +194,7 @@ if(!allocate())
 }
 ```
 
-The `FloatBuffer` is just a container for managing a buffer of floats in memory.  One is used for host data and the other for device data.
+The `FloatBuffer` is just a container for managing a buffer of float data in memory.  One is used for host data and the other for device data.
 
 ```cpp
 class FloatBuffer
@@ -329,7 +329,7 @@ out of memory
 
 ### Memory access
 
-The next step in the program is to divide the host and device memory into four equally sized arrays.  Host data is initialized with values that will be copied to the device for processing.
+The next step in the program is to divide the host and device memory into four equally sized arrays.  Host arrays are initialized with values that will be copied to the device for processing.
 
 ```cpp
 // 3 * 4 + 5 = 17
@@ -353,7 +353,7 @@ r32* device_5 = push_elements(device_buffer, n_elements);
 r32* device_17 = push_elements(device_buffer, n_elements);
 ```
 
-The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done in the same way for the host and the device data.
+The host and device do not have access to each other's memory.  However, `cudaMalloc()` provides the device memory address, and device pointer arithmetic is allowed on the host.  So assigning addresses to each array can be done in the same way for the host and the device data.
 
 ```cpp
 #include <cassert>
