@@ -1,6 +1,19 @@
 # How to CUDA
-## Parallel programming with NVIDIA
+## Parallel programming with Nvidia
 
+Graphical Processing Units (GPUs) are no longer just for rendering computer graphics.  Computer graphics is essentially a series of fairly simple linear algebra calculations performed for each pixel in a window.  Rather than performing these pixel calculations in sequence on a CPU, GPU's were developed so that identical calculations could be performed for each pixel in parallel.  Each "mini" processor on a GPU is nowhere near as powerful as a modern CPU but the volume of data that can be processed at once more than makes up for it.  
+
+In this post we'll perform a multiply-add operation using arrays of one million elements and cover some of the CUDA api that allows our programs to interact with a GPU.
+
+Actually executing the program however will not be covered here.  Nvidia has its own compiler which works in much the same way as other C++ compilers but has its differences.  Compiling and running different types of programs on different platforms will be a topic for a later post.
+
+Getting up and running is not difficult though.  If your computer has a Nvidia GPU, you can get started by downloading and installing the CUDA toolkit.
+
+https://developer.nvidia.com/cuda-downloads
+
+### Example program
+
+Below is our main program along with definitions for some helper functions.
 
 ```cpp
 #include <cstdio>
@@ -11,12 +24,15 @@
 using r32 = float;
 using u32 = unsigned;
 
+// Helpers and api wrappers
 class FloatBuffer;
 
 bool host_malloc(FloatBuffer& buffer, u32 n_elements);
 void host_free(FloatBuffer& buffer);
+
 bool device_malloc(FloatBuffer& buffer, u32 n_elements);
 bool device_free(FloatBuffer& buffer);
+
 r32* push_elements(FloatBuffer& buffer, u32 n_elements);
 
 bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes);
@@ -123,7 +139,7 @@ int main()
 }
 ```
 
-Here is a summary of what the program does.  Each step will be explained in turn.
+Each step of the program will be explained in turn.
 * Allocate memory on the computer and the GPU
 * Initialize arrays on the computer with data for processing
 * Initialize arrays on the GPU
@@ -383,7 +399,7 @@ if(!copy)
 }
 ```
 
-Copying memory from host to device is done using `cudaMemcpy()` with the constant `cudaMemcpyHostToDevice`.  Provide the address of where to copy from and where to copy to with the number of bytes to copy.
+Copying memory from host to device is done using `cudaMemcpy()` with the constant `cudaMemcpyHostToDevice`.  Provide the address of where the data resides on the host and the address of where to copy on the device with the number of bytes to copy.
 
 ```cpp
 bool memcpy_to_device(const void* host_src, void* device_dst, size_t n_bytes)
@@ -423,7 +439,7 @@ if(!copy)
 }
 ```
 
-Copying from device to host is also done with `cudaMemcpy()`.  The device address with the data and the host address where it should be copied to need to be provided.  Along with the constant `cudaMemcpyDeviceToHost`.
+Copying from device to host is also done with `cudaMemcpy()`.  The device address with the data and the host address where it should be copied to need to be provided along with the number of bytes to copy.  The constant `cudaMemcpyDeviceToHost` tells the api that we are copying data from device memory to host memory.
 
 ```cpp
 bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
@@ -439,7 +455,6 @@ bool memcpy_to_host(const void* device_src, void* host_dst, size_t n_bytes)
 ```
 
 Finally, the program checks all of the results to make sure they are what we expect.
-
 
 ```cpp
 printf("check results\n");
@@ -484,17 +499,17 @@ void vectorAdd(const float *A, const float *B, float *C, int numElements)
 }
 ```
 
-The \__global__ declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
+The `__global__` declaration specifier informs Nvidia's compiler that the function is a kernel and  therefore executes in parallel with the number of threads specifed where its called.
 
-Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two and must be at least as many as the number of elements in the arrays.
+Threads are set up in a grid of thread blocks.  The number of threads in each block and the number of blocks are specifed at kernel launch.  The total number threads is the product of the two.  Since we want to process each array index on its own thread the number of threads must be at least as many as the number of elements in each array.
 
-Each thread has its own id and is retreived with
+Each thread has its own id and is retreived from the thread blocks like so.
 
 ```cpp
 int i = blockDim.x * blockIdx.x + threadIdx.x;
 ```
 
-For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.
+For convienence, blocks can be one, two, or three-dimensional to allow for simple element lookup in multi-dimensional data structures.  `blockDim`, `blockIdx`, and `threadIdx` are built-in variables that allow for finding the thread id based on how the blocks of threads are set up.
 
 Since the number of threads can be greater than the number of elements to process, we need to check to make sure that the given thread id is within the bounds of the array.
 
@@ -525,11 +540,11 @@ int main()
 }
 ```
 
-A kernel is launched using the execution configuration syntax (<<<...>>>) where the number of blocks and the threads per block are specified.  The api function `cudaGetLastError()` returns an error code if there were any problems during kernel execution.
+A kernel is launched using the execution configuration syntax (`<<<...>>>`) where the number of blocks and the threads per block are specified.  The api function `cudaGetLastError()` returns an error code if there were any problems during kernel execution.
 
 ### Device functions
 
-We can call functions from device code as long as we use the \__device__ declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
+We can call functions from device code as long as we use the `__device__` declaration specifier.  For example, we can modify the vectorAdd example by having the kernel call a function that adds the two values.
 
 ```cpp
 __device __
@@ -553,7 +568,7 @@ void vectorAdd(const float *A, const float *B, float *C, int numElements)
 
 ### Back to our program
 
-Double underscores are not very aesthetically pleasing, so I define the following macros.
+Double underscores are not very aesthetically pleasing, so lets define the following macros.
 
 ```cpp
 #define GPU_KERNAL __global__
@@ -603,8 +618,10 @@ bool launch_kernel(r32* a, r32* b, r32* c, r32* result, u32 n_elements)
 }
 ```
 
-The maximum number of threads in a block is 1024.  The number of blocks calculated for the minimum number of blocks required given the number of threads in each block.
+A thread block can consist of a maximum of 1024 threads.  The number of blocks is calculated for the minimum number of blocks required given the number of threads in each block.
 
 Pointers to the device data are passed to the kernel for processing.
 
-This time error checking is done using `cudaDeviceSynchronize()`.  This blocks until all device execution completes and returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.  During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.
+This time error checking is done using `cudaDeviceSynchronize()`.  This blocks the program until all device execution completes.  It returns an error code if there were any problems.  It isn't really necessary here but it is useful during development.  Device code execution is invisible to the host.  Simply launching a kernel will not throw any errors.  The CUDA runtime will record an error code and only return the last error when it is requested.
+
+During development it is wise to check for errors after every api call and kernel launch in order catch any errors as soon as possible.  We can relax when we're confident that the application works and is ready for production.

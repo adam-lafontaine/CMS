@@ -120,7 +120,7 @@
             "id": "1660816124145",
             "title": "How to CUDA",
             "route": "how-to-cuda",
-            "tags": ["C", "C++", "CUDA"],
+            "tags": ["C++", "CUDA"],
             "filename": "[013][How to CUDA].md"
         },
         {
