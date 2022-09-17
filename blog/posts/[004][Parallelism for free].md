@@ -6,7 +6,7 @@
 
 There are a multitude of algorithms available in the C++ Standard Template Library (STL).  Cppreference is a good resource https://en.cppreference.com/w/cpp/algorithm.  There's no need to have them all memorized, but it's good to know what is available.  There is a good chance that what you need to do already exists.  It can save you a lot of time trying to implement it yourself, while making your code cleaner and more readable.
 
-The STL algorithms operate on a range of elements specified by providing an iterator to the first element and another to one past the last element.  The standard containers have methods for begin() and end() respectively.  Consider the following example.
+The STL algorithms operate on a range of elements specified by providing an iterator to the first element and another to one past the last element.  The standard containers have methods for `begin()` and `end()` respectively.  Consider the following example.
 
 ```cpp
 #include <vector>
@@ -65,7 +65,7 @@ void sort(T& container)
 }
 ```
 
-Another option is the std::ranges namespace introduced in C++20.  That is a topic worthy of its own post, but one thing it allows for is more concise function calls.
+Another option is the `std::ranges` namespace introduced in C++20.  That is a topic worthy of its own post, but one thing it allows for is more concise function calls.
 
 ```cpp
 // https://en.cppreference.com/w/cpp/algorithm/ranges/sort
@@ -116,7 +116,7 @@ void process_vector_par(std::vector<int>& src, std::vector<int>& dst)
 }
 ```
 
-This example is the same as the one above except that we passed the Execution Policy std::execution::par to std::for_each and std::transform.  This should be faster but we need to test it.
+This example is the same as the one above except that we passed the Execution Policy `std::execution::par` to `std::for_each` and `std::transform`.  This should be faster but we need to test it.
 
 
 ### Speed Test
@@ -218,7 +218,7 @@ Output when running in release mode.
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B004%5D/release.png)
 
-In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but they adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of AMOUNT_OF_WORK and ELEMENT_COUNT.
+In both cases, the sequential version took almost 5 times longer to execute.  The times in this example are still very small but they adds up when working with larger collections and when the processing is more intensive.  You can experiment with this yourself by changing the values of `AMOUNT_OF_WORK` and `ELEMENT_COUNT`.
 
 You can check and see how it affects your computer's CPU usage by opening Task Manager (Ctrl+Shift+Esc) and selecting the Performance tab.
 

@@ -43,7 +43,7 @@ Include the following in your g++ command line arguments when compiling and link
 `sdl2-config --cflags --libs`
 ```
 
-Note: You may receive an error similar to the following when running your application.
+Note: You may receive an error similar to the following when running your application on a device with an ARM based processor.
 
 ```
 dbus[8661]: arguments to dbus_message_new_method_call() were incorrect, assertion "path != NULL" failed in file ../../../dbus/dbus-message.c line 1362.
@@ -275,7 +275,7 @@ int main(int argc, char* args[])
 
 ### Keyboard Input
 
-In every frame, SDL checks for an input event and stores the information in a SDL_Event struct.  We will only concern ourselves with keyboard events when the A, B, C or D keys are pressed.
+In every frame, SDL checks for an input event and stores the information in a `SDL_Event` struct.  We will only concern ourselves with keyboard events when the A, B, C or D keys are pressed.
 
 ```cpp
 void handle_keyboard_event(SDL_Event const& event)
@@ -387,7 +387,7 @@ int main(int argc, char* args[])
 
 ### Enable Rendering
 
-For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group them together and call it a WindowBuffer.
+For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group them together and call it a `WindowBuffer`.
 
 ```cpp
 class WindowBuffer
@@ -443,7 +443,7 @@ void destroy_window_buffer(WindowBuffer& buffer)
 }
 ```
 
-Add a global WindowBuffer variable.
+Add a global `WindowBuffer` variable.
 
 ```cpp
 static WindowBuffer g_window_buffer;
@@ -459,7 +459,7 @@ void cleanup()
 }
 ```
 
-Initialize the WindowBuffer in main.
+Initialize the `WindowBuffer` in main.
 
 ```cpp
 int main(int argc, char* args[])
