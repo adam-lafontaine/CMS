@@ -3,11 +3,11 @@
 
 ### Pointers
 
-Pointers are scary.  Or at least that's what we're told.  I remember in university when we were first taught about pointers.  It almost broke everyone's brain.  Looking back, I can see now that the professor just didn't do a very good job of explaining them.  I don't blame him.  Pointers are hard to explain succinctly.  These days there are plenty of online resources available, but it was only with practical experience that I was able to just get it.  Perhaps I'll do a post dedicated to just explaining pointers, but my advice is and always will be to just get to work.  Programming is not an academic pursuit, it is a skill.  And skills require practice.
+Pointers are scary.  Or at least that's what we're told.  I remember in university when we were first taught about pointers.  It almost broke everyone's brain.  Looking back I can see now that the professor just didn't do a very good job of explaining them.  I don't blame him.  Pointers are hard to explain succinctly.  These days there are plenty of online resources available, but it was only with practical experience that I was able to just get it.  Perhaps I'll do a post dedicated to explaining pointers, but my advice is and always will be to just get to work.  Programming is not an academic pursuit, it is a skill.  And skills require practice.
 
 ### It's about performance
 
-The fear of pointers is quite common and has been used to justify all kinds of language constructs that are supposodly safer but always end up with reduced and non-deterministic performance.  Automatic memory management such as garbage collection and even RAII (constructors/destructors) make frequent calls to `malloc()` and `free()` holding up execution while the operating system deals with the RAM.  Minimizing these calls is not difficult but can be inconvenient if you are used to programming with higher level languages.
+The fear of pointers is quite common and has been used to justify all kinds of language constructs that are supposodly safer but always end up with reduced and non-deterministic performance.  Automatic memory management such as garbage collection and even RAII (constructors/destructors) make frequent calls to `malloc()` and `free()`, holding up execution while the operating system deals with RAM.  Minimizing these calls is not difficult but can be inconvenient if you are used to programming with higher level languages.
 
 ### Example
 
@@ -62,7 +62,7 @@ void buffer_destroy(ByteBuffer& buffer)
 }
 ```
 
-The address in memory that is available for use is the address of `data` offset by the current `size`.  Whenever we want to use memory at the current available address, we need to update the `size` property by the amount of bytes we want.  It's as simple as getting the address, updating the `size`, and then returning the address.
+The address in memory that is available for use is the address of `data` offset by the current `size`.  Whenever we want to use memory at the current available address, we need to update `size` property by the amount of bytes we want.  It's as simple as getting the address, updating the `size`, and then returning the address.
 
 ```cpp
 u8* buffer_push(ByteBuffer& buffer, size_t n_bytes)
@@ -194,4 +194,4 @@ public:
 
 ### Memory safety
 
-Many programming paradigms justify automated memory management by claiming that direct memory access as "unsafe".  I find this claim hard to justify because managing memory is so easy and making sure your code is "safe" only requires a little bit of discipline.  After all, the purpose of a software application is to make the CPU directly access and modify memory.  Why not just do it ourselves and give the users of our software a better experience?
+Many programming paradigms justify automated memory management by claiming that direct memory access is "unsafe".  I find this claim hard to justify because managing memory is so easy and making sure your code is "safe" only requires a little bit of discipline.  After all, the purpose of a software application is to make the CPU directly access and modify memory.  Why not just do it ourselves and give the users of our software a better experience?
