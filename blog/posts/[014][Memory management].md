@@ -1,6 +1,20 @@
 # Memory management
 ## It's not hard
 
+### Pointers
+
+Pointers are scary.  Or at least that's what we're told.  I remember in university when we were first taught about pointers.  It almost broke everyone's brain.  Looking back, I can see now that the professor just didn't do a very good job of explaining them.  I don't blame him.  Pointers are hard to explain succinctly.  These days there are plenty of online resources available, but it was only with practical experience that I was able to just get it.  Perhaps I'll do a post dedicated to just explaining pointers, but my advice is and always will be to just get to work.  Programming is not an academic pursuit, it is a skill.  And skills require practice.
+
+### It's about performance
+
+The fear of pointers is quite common and has been used to justify all kinds of language constructs that are supposodly safer but always end up with reduced and non-deterministic performance.  Automatic memory management such as garbage collection and even RAII (constructors/destructors) make frequent calls to `malloc()` and `free()` holding up execution while the operating system deals with the RAM.  Minimizing these calls is not difficult but can be inconvenient if you are used to programming with higher level languages.
+
+### Example
+
+The demonstration in this post will teach you everything you need to know about memory management.  After reading this, you'll never want a garbage collector again.
+
+We can start with a simple struct that contains the address of the allocated memory (`data`), the amount of memory allocated (`capacity`) and the amount of the memory currently being used (`size`).  These are the only three things that need to be tracked.
+
 ```cpp
 #include <cstdint>
 
@@ -15,18 +29,24 @@ public:
 };
 ```
 
+To initialize the buffer, allocate a given number of bytes and set the memory address and capacity.
+
 ```cpp
+#include <cstdlib>
+
 bool buffer_create(ByteBuffer& buffer, size_t n_bytes)
 {
-    auto data = std::malloc(sizeof(T) * n_elements);
+    auto data = std::malloc(n_bytes);
     assert(data);
 
     buffer.data = (u8*)data;
-    buffer.capacity = n_elements;
+    buffer.capacity = n_bytes;
 
     return data ? true : false;
 }
 ```
+
+When finished, free the memory and set the capacity and size back to zero.
 
 ```cpp
 void buffer_destroy(ByteBuffer& buffer)
@@ -42,17 +62,21 @@ void buffer_destroy(ByteBuffer& buffer)
 }
 ```
 
+The address in memory that is available for use is the address of `data` offset by the current `size`.  Whenever we want to use memory at the current available address, we need to update the `size` property by the amount of bytes we want.  It's as simple as getting the address, updating the `size`, and then returning the address.
+
 ```cpp
 u8* buffer_push(ByteBuffer& buffer, size_t n_bytes)
 {
     auto data = buffer.data + buffer.size;
     assert(data);
 
-    buffer.size += n_elements;
+    buffer.size += n_bytes;
 
     return data;
 }
 ```
+
+It's better practice to first validate the current state of the buffer before returning the available address.
 
 ```cpp
 u8* buffer_push(ByteBuffer& buffer, size_t n_bytes)
@@ -77,11 +101,13 @@ u8* buffer_push(ByteBuffer& buffer, size_t n_bytes)
     auto data = buffer.data + buffer.size;
     assert(data);
 
-    buffer.size += n_elements;
+    buffer.size += n_bytes;
 
     return data;
 }
 ```
+
+We can avoid having to frequently reallocate memory by simply reusing what is currently allocated.  To write at the start of the buffer again, simply set the `size` property to zero.
 
 ```cpp
 void buffer_reset(ByteBuffer& buffer)
@@ -90,9 +116,13 @@ void buffer_reset(ByteBuffer& buffer)
 }
 ```
 
-```cpp
-#include <cstdlib>
+And that's it.  That is everything you need to know about memory management.  This example is the simplest that I could think of and is good enough for most situations.  It will not work in all situations, but if you understand how it works you'll always be able implement whatever is required.
 
+### Class implementation
+
+Having separate functions is good for demonstration purposes but can be cumbersome in practice.  For convenience, here is a templated C++ class that can be used for any type.
+
+```cpp
 template <typename T>
 class MemoryBuffer
 {
@@ -161,3 +191,7 @@ public:
     ~MemoryBuffer() { free(); }
 };
 ```
+
+### Memory safety
+
+Many programming paradigms justify automated memory management by claiming that direct memory access as "unsafe".  I find this claim hard to justify because managing memory is so easy and making sure your code is "safe" only requires a little bit of discipline.  After all, the purpose of a software application is to make the CPU directly access and modify memory.  Why not just do it ourselves and give the users of our software a better experience?
