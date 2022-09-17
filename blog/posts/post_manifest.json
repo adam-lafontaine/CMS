@@ -124,6 +124,14 @@
             "filename": "[013][How to CUDA].md"
         },
         {
+            "number": "[014]",
+            "id": "",
+            "title": "Memory management",
+            "route": "memory-management",
+            "tags": ["C++", "Memory"],
+            "filename": "[014][Memory management].md"
+        },
+        {
             "number": "[]",
             "id": "",
             "title": "",
