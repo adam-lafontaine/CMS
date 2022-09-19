@@ -1,7 +1,7 @@
 # Web sockets
 ## Basic cross platform socket API
 
-Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality and how to hide the differences between system calls.
+Both Windows and Linux provide a C API for communicating with other devices over network.  They are similar but some work needs to be done if you want to provide the same API to the rest of your application.  This post will demonstrate some basic socket functionality and how to hide the differences between operating system calls.
 
 ### Windows
 
@@ -512,7 +512,7 @@ void run_client()
 
 When running these, you may get a message like the following from Windows Firewall.
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p12-sockets/blog/img/%5B012%5D/firewall.bmp)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B012%5D/firewall.bmp)
 
 Give your application(s) access in order to continue.
 
