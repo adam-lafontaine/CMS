@@ -125,7 +125,7 @@
         },
         {
             "number": "[014]",
-            "id": "1663421544231",
+            "id": "1663580200569",
             "title": "Memory management",
             "route": "memory-management",
             "tags": ["C++", "Memory"],

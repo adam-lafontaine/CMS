@@ -167,7 +167,7 @@ free memory
 
 ### Memory management
 
-The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside different hardware.  i.e. device memory on the GPU and host memory in RAM.
+The first step is to allocate memory on the host and the device.  The GPU is referred to as the device and the machine with the CPU is referred to as the host.  Device and host memory are separate as they each reside on different hardware.  i.e. device memory on the GPU and host memory in RAM.
 
 The first part of the program defines a couple of lamdas that allocate and free memory using `FloatBuffer` objects.
 

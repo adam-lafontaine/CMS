@@ -62,7 +62,7 @@ void buffer_destroy(ByteBuffer& buffer)
 }
 ```
 
-The address in memory that is available for use is the address of `data` offset by the current `size`.  Whenever we want to use memory at the current available address, we need to update `size` property by the amount of bytes we want.  It's as simple as getting the address, updating the `size`, and then returning the address.
+The address in memory that is available for use is the address of `data` offset by the current `size`.  Whenever we want to use memory at the current available address, we need to update the `size` property by the amount of bytes we want.  It's as simple as getting the address, updating the `size`, and then returning the address.
 
 ```cpp
 u8* buffer_push(ByteBuffer& buffer, size_t n_bytes)
@@ -116,7 +116,7 @@ void buffer_reset(ByteBuffer& buffer)
 }
 ```
 
-And that's it.  That is everything you need to know about memory management.  This example is the simplest that I could think of and is good enough for most situations.  It will not work in all situations, but if you understand how it works you'll always be able implement whatever is required.
+And that's it.  That is everything you need to know about memory management.  This example is the simplest that I could think of and is often good enough.  It will not work in all situations, but if you understand how it works you'll always be able implement whatever is required.
 
 ### Class implementation
 
