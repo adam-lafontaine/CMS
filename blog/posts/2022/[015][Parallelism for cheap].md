@@ -104,3 +104,99 @@ creating vectors:        1.066500 ms
 process_vector_for(): 2427.183600 ms
 process_vector_stl(): 2418.538700 ms
 ```
+
+
+```cpp
+#include <execution>
+
+
+void process_vector_stl_par(intVec& src, intVec& dst)
+{
+    assert(dst.size() == src.size());
+
+    std::transform(std::execution::par, src.begin(), src.end(), dst.begin(), do_work);
+}
+```
+
+```cpp
+int main()
+{
+    u32 n_elements = 1'000'000;
+
+    Stopwatch sw;
+    double t = 0.0;
+
+    printf("creating vectors:         ");
+    sw.start();
+
+    intVec src(n_elements, 0);
+    intVec dst(n_elements, 0);
+
+    t = sw.get_time_milli();
+    printf("%11f ms\n", t);
+
+    printf("process_vector_for():     ");
+    sw.start();
+
+    process_vector_for(src, dst);
+
+    t = sw.get_time_milli();
+    printf("%11f ms\n", t);
+
+    printf("process_vector_stl():     ");
+    sw.start();
+
+    process_vector_stl(src, dst);
+
+    t = sw.get_time_milli();
+    printf("%11f ms\n", t);
+
+    printf("process_vector_stl_par(): ");
+    sw.start();
+
+    process_vector_stl_par(src, dst);
+
+    t = sw.get_time_milli();
+    printf("%11f ms\n", t);
+}
+```
+
+
+```plaintext
+creating vectors:            1.574800 ms
+process_vector_for():     2404.177500 ms
+process_vector_stl():     2406.099200 ms
+process_vector_stl_par():  479.078000 ms
+```
+
+
+```cpp
+int main()
+{
+    u32 n_elements = 1'000'000;
+
+    Stopwatch sw;
+    auto const print_time = [&sw]() { printf("%10f ms\n", sw.get_time_milli()); };
+
+    printf("creating vectors:         ");
+    sw.start();
+
+    intVec src(n_elements, 0);
+    intVec dst(n_elements, 0);
+
+    print_time();
+
+    printf("process_vector_stl_par(): ");
+    sw.start();
+
+    process_vector_stl_par(src, dst);
+
+    print_time();
+}
+```
+
+
+```plaintext
+creating vectors:           1.291600 ms
+process_vector_stl_par(): 489.985000 ms
+```
