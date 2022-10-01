@@ -100,7 +100,7 @@ int main()
 
 
 ```plaintext
-creating vectors: 2.130200 ms
-process_vector_for(): 2535.883400 ms
-process_vector_stl(): 2544.847300 ms
+creating vectors:        1.066500 ms
+process_vector_for(): 2427.183600 ms
+process_vector_stl(): 2418.538700 ms
 ```
