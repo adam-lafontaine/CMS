@@ -3,72 +3,104 @@
 
 
 ```cpp
-#include <vector>
+#include <random>
 
-
-using r32 = float;
 using u32 = unsigned;
 
-using Vec32 = std::vector<r32>;
+
+constexpr u32 AMOUNT_OF_WORK = 100;
 
 
-void vector_multiply_add(Vec32 const& a, Vec32 const& b, Vec32 const& c, Vec32& result, u32 index)
+int do_work(int n)
 {
-	result[index] = a[index] * b[index] + c[index];
+    std::random_device r;
+    std::default_random_engine eng(r());
+    std::uniform_int_distribution<int> uniform_dist(10, 1000);
+
+    int sum = n;
+
+    for (u32 i = 0; i < AMOUNT_OF_WORK; ++i)
+    {
+        sum += uniform_dist(eng) % 3;
+    }
+
+    return sum;
 }
 ```
 
 ```cpp
 #include <cassert>
 
+using intVec = std::vector<int>;
 
-void vma_for(Vec32 const& a, Vec32 const& b, Vec32 const& c, Vec32& result)
+
+void process_vector_for(intVec& src, intVec& dst)
 {
-	auto n_elements = result.size();
-	assert(a.size() == n_elements);
-	assert(b.size() == n_elements);
-	assert(c.size() == n_elements);
+    auto n_elements = src.size();
+    assert(dst.size() == n_elements);
 
-	for (u32 i = 0; i < n_elements; ++i)
-	{
-		vector_multiply_add(a, b, c, result, i);
-	}
+    for (u32 i = 0; i < n_elements; ++i)
+    {
+        dst[i] = do_work(src[i]);
+    }
 }
 ```
 
+
 ```cpp
-#include <cstdio>
 #include <algorithm>
+
+
+void process_vector_stl(intVec& src, intVec& dst)
+{
+    assert(dst.size() == src.size());
+    
+    std::transform(src.begin(), src.end(), dst.begin(), do_work);
+}
+```
+
+
+```cpp
+#include "stopwatch.hpp"
 
 
 int main()
 {
-    u32 n_elements = 100'000'000;
+    u32 n_elements = 1'000'000;
 
-	// 3 * 4 + 5 = 17
-	printf("create vectors\n");
-	Vec32 vec_3(n_elements, 3.0f);
-	Vec32 vec_4(n_elements, 4.0f);
-	Vec32 vec_5(n_elements, 5.0f);
-	Vec32 vec_17(n_elements, 0.0f);
+    Stopwatch sw;
+    double t = 0.0;
 
-	printf("vma_for(): ");
-	vma_for(vec_3, vec_4, vec_5, vec_17);
-	
-	bool result = std::all_of(vec_17.begin(), vec_17.end(), [](r32 val) { return fabs(val - 17.0f) < 1e-5; });
-	if (result)
-	{
-		printf("PASS\n");
-	}
-	else
-	{
-		printf("FAIL %f, %f, %f, %f\n", vec_3[0], vec_4[0], vec_5[0], vec_17[0]);
-	}
+    printf("creating vectors: ");
+    sw.start();
+
+    intVec src(n_elements, 0);
+    intVec dst(n_elements, 0);
+
+    t = sw.get_time_milli();
+    printf("%f ms\n", t);
+
+    printf("process_vector_for(): ");
+    sw.start();
+
+    process_vector_for(src, dst);
+
+    t = sw.get_time_milli();
+    printf("%f ms\n", t);
+
+    printf("process_vector_stl(): ");
+    sw.start();
+
+    process_vector_stl(src, dst);
+
+    t = sw.get_time_milli();
+    printf("%f ms\n", t);
 }
 ```
 
 
 ```plaintext
-create vectors
-vma_for(): PASS
+creating vectors: 2.130200 ms
+process_vector_for(): 2535.883400 ms
+process_vector_stl(): 2544.847300 ms
 ```
