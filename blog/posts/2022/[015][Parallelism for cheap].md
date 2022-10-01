@@ -369,10 +369,25 @@ int do_work(int n)
 100,000,000 elements
 
 ```plaintext
-creating vectors:            151.018000 ms
-process_vector_stl_par():     52.749700 ms
-process_vector_chunks_4():    47.919300 ms
-process_vector_chunks_8():    53.726300 ms
-process_vector_chunks_16():   52.783300 ms
+creating vectors:          123.803100 ms
+process_vector_for():       63.204300 ms
+process_vector_stl():       68.267900 ms
+process_vector_stl_par():   53.182300 ms
+process_vector_chunks_4():  53.297200 ms
+process_vector_chunks_8():  55.174700 ms
+process_vector_chunks_16(): 55.345700 ms
+Done 0
+```
+
+Without optimizations
+
+```plaintext
+creating vectors:          119.050400 ms
+process_vector_for():       357.404100 ms
+process_vector_stl():       190.443700 ms
+process_vector_stl_par():   56.763100 ms
+process_vector_chunks_4():  130.584700 ms
+process_vector_chunks_8():  108.595600 ms
+process_vector_chunks_16(): 108.132300 ms
 Done 0
 ```
