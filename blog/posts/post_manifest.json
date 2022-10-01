@@ -6,7 +6,15 @@
             "title": "",
             "route": "",
             "tags": [],
-            "filename": "[][].md"
+            "filename": "2022/[][].md"
+        },
+        {
+            "number": "[015]",
+            "id": "",
+            "title": "Parallelism for cheap",
+            "route": "parallelism-for-cheap",
+            "tags": ["C++", "STL", "Algorithms"],
+            "filename": "2022/[015][Parallelism for cheap].md"
         },
         {
             "number": "[014]",
