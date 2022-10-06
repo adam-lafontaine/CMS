@@ -720,25 +720,25 @@ void handle_keyboard_event(SDL_Event const& event)
     {
         printf("A\n");
 
-        render_color(to_pixel(255, 0, 0));
+        draw_color(to_pixel(255, 0, 0));
     } break;
     case SDLK_b:
     {
         printf("B\n");
 
-        render_color(to_pixel(0, 255, 0));
+        draw_color(to_pixel(0, 255, 0));
     } break;
     case SDLK_c:
     {
         printf("C\n");
 
-        render_color(to_pixel(0, 0, 255));
+        draw_color(to_pixel(0, 0, 255));
     } break;
     case SDLK_d:
     {
         printf("D\n");
 
-        render_bgr();
+        draw_bgr();
     } break;
 
     }
