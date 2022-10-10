@@ -10,7 +10,7 @@
         },
         {
             "number": "[015]",
-            "id": "1664640133421",
+            "id": "1665407564795",
             "title": "Parallelism for cheap",
             "route": "parallelism-for-cheap",
             "tags": ["C++", "STL", "Algorithms"],
