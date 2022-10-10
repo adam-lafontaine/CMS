@@ -180,7 +180,7 @@ This program runs each example and outputs their execution times.
 #include "stopwatch.hpp"
 
 
-constexpr unsigned ELEMENT_COUNT = 100000;
+constexpr unsigned ELEMENT_COUNT = 100'000;
 
 
 int main()
