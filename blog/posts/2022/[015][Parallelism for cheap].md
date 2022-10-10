@@ -4,7 +4,7 @@
 
 ### Review
 
-The Standard Template Library contains several algorithms that work out of the box for standard containers and our own containers that we implement the appropriate iterator for.  These algorithms can also execute in parallel as long as the machine running the program supports it.  To start, we'll go through an example of how this works.
+The Standard Template Library contains several algorithms that work out of the box for standard containers, as well as our own that we implement the appropriate iterator for.  These algorithms can also execute in parallel as long as the machine running the program supports it.  To start, we'll go through an example of how this works.
 
 To simulate processing a value, we'll define a function that has no other purpose than to take some time and be sure that the compiler can't optimize it away.
 
