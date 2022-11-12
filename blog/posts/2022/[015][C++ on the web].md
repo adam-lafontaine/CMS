@@ -72,6 +72,7 @@ exe_name := hello_earth
 
 program_exe := $(build)/$(exe_name)
 
+
 main_c       := $(code)/main.cpp
 main_o       := $(build)/main.o
 object_files := $(main_o)
@@ -109,7 +110,7 @@ Create a new folder called 'src' and add a file called main.cpp.
 
 int main()
 {
-    printf("Hello, Earth");
+    printf("Hello, Earth\n");
 }
 ```
 
@@ -139,3 +140,84 @@ $ make run
 ./build/hello_earth
 Hello, Earth
 ```
+
+### Emscripten
+
+Clean the project
+
+```plaintext
+$ make clean
+rm -rfv ./build/*
+removed './build/hello_earth'
+removed './build/main.o'
+```
+
+Modify
+
+```makefile
+# Emscripten compiler
+EPP := em++
+
+build := ./build
+code  := ./src
+
+# 'web' directory for the generated html file
+web := ./web
+
+exe_name := hello_earth
+
+# the html output location
+program_exe := $(web)/$(exe_name).html
+
+
+main_c       := $(code)/main.cpp
+main_o       := $(build)/main.o
+object_files := $(main_o)
+
+
+$(main_o): $(main_c)
+	@echo "\n main"
+	$(EPP) -o $@ -c $<
+
+$(program_exe): $(object_files)
+	@echo "\n $(exe_name)"
+	$(EPP) -o $@ $+
+
+
+build: $(program_exe)
+
+setup:
+	mkdir -p $(build)
+	mkdir -p $(web)
+	@echo "\n"
+
+clean:
+	rm -rfv $(build)/*
+	rm -rfv $(web)/*
+	@echo "\n"
+```
+
+
+
+Setup again
+
+```plaintext
+$ make setup
+mkdir -p ./build
+mkdir -p ./web
+```
+
+
+
+
+Serve the html file
+
+```plaintext
+$ cd {your path}/web/
+$ python3 -m http.server 8080
+Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
+```
+
+In the browser navigate to localhost:8080/hello_earth.html
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/current/blog/img/%5B015%5D/em_html.png)
