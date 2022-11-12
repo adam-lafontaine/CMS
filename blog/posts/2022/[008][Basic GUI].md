@@ -34,7 +34,7 @@ Install SDL2 (64 bit)
 ### Install SDL2 - Ubuntu
 
 ```
-apt-get install libsdl2-dev libsdl2-dbg
+apt-get install libsdl2-dev
 ```
 
 Include the following in your g++ command line arguments when compiling and linking
@@ -720,19 +720,19 @@ void handle_keyboard_event(SDL_Event const& event)
     {
         printf("A\n");
 
-        render_color(to_pixel(255, 0, 0));
+        draw_color(to_pixel(255, 0, 0));
     } break;
     case SDLK_b:
     {
         printf("B\n");
 
-        render_color(to_pixel(0, 255, 0));
+        draw_color(to_pixel(0, 255, 0));
     } break;
     case SDLK_c:
     {
         printf("C\n");
 
-        render_color(to_pixel(0, 0, 255));
+        draw_color(to_pixel(0, 0, 255));
     } break;
     case SDLK_d:
     {

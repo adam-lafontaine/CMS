@@ -207,9 +207,6 @@ mkdir -p ./build
 mkdir -p ./web
 ```
 
-
-
-
 Serve the html file
 
 ```plaintext
@@ -221,3 +218,5 @@ Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 In the browser navigate to localhost:8080/hello_earth.html
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B015%5D/em_html.png)
+
+
