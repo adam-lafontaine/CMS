@@ -232,7 +232,7 @@ Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 
 In the browser navigate to localhost:8080/hello_earth.html
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B015%5D/em_html.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B016%5D/em_html.png)
 
 
 
@@ -592,7 +592,7 @@ int main(int argc, char* args[])
 
 Generated html
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B015%5D/sdl2_html.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B016%5D/sdl2_html.png)
 
 Working program
 
