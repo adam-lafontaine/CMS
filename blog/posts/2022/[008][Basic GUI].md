@@ -738,7 +738,7 @@ void handle_keyboard_event(SDL_Event const& event)
     {
         printf("D\n");
 
-        render_bgr();
+        draw_bgr();
     } break;
 
     }
