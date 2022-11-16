@@ -164,7 +164,7 @@ code  := ./src
 # 'web' directory for the generated html file
 web := ./web
 
-exe_name := hello_earth
+exe_name := sdl2_wasm
 
 # the html output location
 program_exe := $(web)/$(exe_name).html
@@ -175,13 +175,16 @@ main_o       := $(build)/main.o
 object_files := $(main_o)
 
 
+EPP_FLAGS := -s USE_SDL=2
+
+
 $(main_o): $(main_c)
 	@echo "\n main"
-	$(EPP) -o $@ -c $<
+	$(EPP) $(EPP_FLAGS) -o $@ -c $<
 
 $(program_exe): $(object_files)
 	@echo "\n $(exe_name)"
-	$(EPP) -o $@ $+
+	$(EPP) $(EPP_FLAGS) -o $@ $+
 
 
 build: $(program_exe)
@@ -207,6 +210,18 @@ mkdir -p ./build
 mkdir -p ./web
 ```
 
+Build
+
+```plaintext
+$ make build
+
+ main
+em++ -s USE_SDL=2 -o build/main.o -c src/main.cpp
+
+ sdl2_wasm
+em++ -s USE_SDL=2 -o web/sdl2_wasm.html build/main.o
+```
+
 Serve the html file
 
 ```plaintext
@@ -220,6 +235,364 @@ In the browser navigate to localhost:8080/hello_earth.html
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B015%5D/em_html.png)
 
 
+
+### Using SDL2
+
+```cpp
+#include <cstddef>
+
+
+using u8 = uint8_t;
+using u32 = uint32_t;
+using r64 = double;
+
+
+class Pixel
+{
+public:
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha; // padding
+};
+
+
+constexpr Pixel to_pixel(u8 r, u8 g, u8 b)
+{
+    Pixel p{};
+
+    p.red = r;
+    p.green = g;
+    p.blue = b;
+    p.alpha = 255;
+
+    return p;
+}
+
+
+class Image
+{
+public:
+    u32 width;
+    u32 height;
+
+    Pixel* data = nullptr;
+};
+
+
+bool create_image(Image& image, u32 width, u32 height)
+{
+    image.width = width;
+    image.height = height;
+    image.data = (Pixel*)malloc(sizeof(Pixel) * width * height);
+
+    if (!image.data)
+    {
+        image.data = nullptr;
+        return false;
+    }
+
+    return true;
+}
+
+
+void destroy_image(Image& image)
+{
+    if (image.data != nullptr)
+    {
+        free(image.data);
+        image.data = nullptr;
+    }
+}
+```
+
+CanvasBuffer
+
+```cpp
+#include <SDL2/SDL.h>
+
+
+class CanvasBuffer
+{
+public:
+
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Texture* texture = nullptr;
+};
+```
+
+Initialize the SDL2 library
+
+```cpp
+#include <cstdio>
+
+
+bool init_sdl()
+{
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
+        printf("SDL_Init failed\n%s\n", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+```
+
+Free SDL resources
+
+```cpp
+void destroy_canvas_buffer(CanvasBuffer& buffer)
+{
+    if (buffer.texture)
+    {
+        SDL_DestroyTexture(buffer.texture);
+    }
+
+    if (buffer.renderer)
+    {
+        SDL_DestroyRenderer(buffer.renderer);
+    }
+
+    if (buffer.window)
+    {
+        SDL_DestroyWindow(buffer.window);
+    }
+}
+```
+
+Write an image to the canvas
+
+```cpp
+void display_image(Image const& image, CanvasBuffer const& buffer)
+{
+    auto pitch = (int)(image.width * sizeof(Pixel));
+    auto error = SDL_UpdateTexture(buffer.texture, 0, (void*)image.data, pitch);
+    if (error)
+    {
+        printf("SDL_UpdateTexture failed\n%s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_RenderCopy(buffer.renderer, buffer.texture, 0, 0);
+
+    SDL_RenderPresent(buffer.renderer);
+}
+```
+
+Program objects and cleanup
+
+```cpp
+static Image g_image;
+static CanvasBuffer g_canvas;
+static bool g_running = false;
+
+
+void cleanup()
+{
+    destroy_canvas_buffer(g_canvas);
+    SDL_Quit();
+    destroy_image(g_image);
+}
+```
+
+
+Constants
+
+```cpp
+constexpr int WINDOW_WIDTH = 600;
+constexpr int WINDOW_HEIGHT = 600;
+
+constexpr auto RED = to_pixel(255, 0, 0);
+constexpr auto GREEN = to_pixel(0, 255, 0);
+constexpr auto BLUE = to_pixel(0, 0, 255);
+```
+
+Fill the canvas with a single color
+
+```cpp
+void draw_color(Pixel p)
+{
+    for (u32 i = 0; i < g_image.width * g_image.height; ++i)
+    {
+        g_image.data[i] = p;
+    }
+}
+```
+
+Draw 3 vertical sections of blue green and red.
+
+```cpp
+void draw_bgr()
+{
+    auto blue_max = g_image.width / 3;
+    auto green_max = g_image.width * 2 / 3;
+
+    u32 i = 0;
+    for (u32 y = 0; y < g_image.height; ++y)
+    {
+        for (u32 x = 0; x < g_image.width; ++x)
+        {
+            if (x < blue_max)
+            {
+                g_image.data[i] = BLUE;
+            }
+            else if (x < green_max)
+            {
+                g_image.data[i] = GREEN;
+            }
+            else
+            {
+                g_image.data[i] = RED;
+            }
+
+            ++i;
+        }
+    }
+}
+```
+
+
+Keyboard events
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event)
+{
+    if (event.key.repeat || event.key.state != SDL_PRESSED)
+    {
+        return;
+    }
+
+    auto key_code = event.key.keysym.sym;
+    switch (key_code)
+    {
+    case SDLK_a:
+    {
+        printf("A - red\n");
+
+        draw_color(RED);
+    } break;
+    case SDLK_b:
+    {
+        printf("B - green\n");
+
+        draw_color(GREEN);
+    } break;
+    case SDLK_c:
+    {
+        printf("C - blue\n");
+
+        draw_color(BLUE);
+    } break;
+    case SDLK_d:
+    {
+        printf("D - blue green red\n");
+
+        draw_bgr();
+    } break;
+
+    }
+}
+```
+
+Handle the event from the main loop.  First check for shutdown commands before handling other keyboard events.
+
+```cpp
+void handle_sdl_event(SDL_Event const& event)
+{
+    switch (event.type)
+    {
+    case SDL_QUIT:
+    {
+        // window X button pressed
+        printf("SDL_QUIT\n");
+        g_running = false;
+    } break;
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+    {
+        auto key_code = event.key.keysym.sym;
+        auto alt = event.key.keysym.mod & KMOD_ALT;
+        if (key_code == SDLK_F4 && alt)
+        {
+            printf("ALT F4\n");
+            g_running = false;
+        }
+        else if (key_code == SDLK_ESCAPE)
+        {
+            printf("ESC\n");
+            g_running = false;
+        }
+        else
+        {
+            handle_keyboard_event(event);
+        }
+
+    } break;
+
+    }
+}
+```
+
+Main loop
+
+```cpp
+#include <emscripten.h>
+
+
+static void main_loop()
+{
+    SDL_Event event;
+    bool has_event = SDL_PollEvent(&event);
+    if (has_event)
+    {
+        handle_sdl_event(event);
+    }
+
+    display_image(g_image, g_canvas);
+
+    if (!g_running)
+    {
+        emscripten_cancel_main_loop();
+    }
+}
+```
+
+Main function
+
+```cpp
+int main(int argc, char* args[])
+{
+    if (!init_sdl())
+    {
+        return EXIT_FAILURE;
+    }
+
+    if (!init_canvas_buffer(g_canvas, WINDOW_WIDTH, WINDOW_HEIGHT))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    if (!create_image(g_image, WINDOW_WIDTH, WINDOW_HEIGHT))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    g_running = true;
+
+    emscripten_set_main_loop(main_loop, 0, 1);
+
+    cleanup();
+    return EXIT_SUCCESS;
+}
+```
+
+Generated html
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B015%5D/sdl2_html.png)
 
 Working program
 
@@ -305,17 +678,6 @@ public:
 };
 
 
-constexpr int WINDOW_WIDTH = 600;
-constexpr int WINDOW_HEIGHT = 600;
-
-constexpr u32 IMAGE_WIDTH = WINDOW_WIDTH;
-constexpr u32 IMAGE_HEIGHT = WINDOW_HEIGHT;
-
-constexpr auto RED = to_pixel(255, 0, 0);
-constexpr auto GREEN = to_pixel(0, 255, 0);
-constexpr auto BLUE = to_pixel(0, 0, 255);
-
-
 bool init_sdl()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -328,9 +690,9 @@ bool init_sdl()
 }
 
 
-static bool init_canvas_buffer(CanvasBuffer& buffer)
+static bool init_canvas_buffer(CanvasBuffer& buffer, int width, int height)
 {
-    auto error = SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &(buffer.window), &(buffer.renderer));
+    auto error = SDL_CreateWindowAndRenderer(width, height, 0, &(buffer.window), &(buffer.renderer));
     if(error)
     {
         printf("SDL_CreateWindowAndRenderer/n");
@@ -341,8 +703,8 @@ static bool init_canvas_buffer(CanvasBuffer& buffer)
         buffer.renderer,
         SDL_PIXELFORMAT_ABGR8888,
         SDL_TEXTUREACCESS_STREAMING,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT);
+        width,
+        height);
 
     if (!buffer.texture)
     {
@@ -364,6 +726,11 @@ void destroy_canvas_buffer(CanvasBuffer& buffer)
     if (buffer.renderer)
     {
         SDL_DestroyRenderer(buffer.renderer);
+    }
+
+    if (buffer.window)
+    {
+        SDL_DestroyWindow(buffer.window);
     }
 }
 
@@ -395,6 +762,14 @@ void cleanup()
     SDL_Quit();
     destroy_image(g_image);
 }
+
+
+constexpr int WINDOW_WIDTH = 600;
+constexpr int WINDOW_HEIGHT = 600;
+
+constexpr auto RED = to_pixel(255, 0, 0);
+constexpr auto GREEN = to_pixel(0, 255, 0);
+constexpr auto BLUE = to_pixel(0, 0, 255);
 
 
 void draw_color(Pixel p)
@@ -536,13 +911,13 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    if (!init_canvas_buffer(g_canvas))
+    if (!init_canvas_buffer(g_canvas, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
     }
 
-    if (!create_image(g_image, IMAGE_WIDTH, IMAGE_HEIGHT))
+    if (!create_image(g_image, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -555,7 +930,6 @@ int main(int argc, char* args[])
     cleanup();
     return EXIT_SUCCESS;
 }
-
 ```
 
 
