@@ -15,9 +15,7 @@ int main()
 }
 ```
 
-https://almostalwaysauto.com/posts/makefiles
-
-Create a file called Makefile
+Create a file called Makefile containing the following.
 
 ```Makefile
 GPP   := g++
@@ -58,14 +56,16 @@ clean:
 	@echo "\n"
 ```
 
-Create the build directory by running make setup
+Makefiles are covered in more detail here: https://almostalwaysauto.com/posts/makefiles.
+
+Create the build directory by running `make setup`
 
 ```plaintext
 $ make setup
 mkdir -p ./build
 ```
 
-Build the program
+Build the program with `make build`
 
 ```plaintext
 $ make build
@@ -77,7 +77,7 @@ g++ -o build/main.o -c src/main.cpp
 g++ -o build/hello_earth build/main.o
 ```
 
-Run the program
+Run the program with `make run` to get the expected output.
 
 ```plaintext
 $ make run
@@ -98,15 +98,13 @@ removed './build/main.o'
 
 https://emscripten.org/docs/getting_started/downloads.html
 
-Install Git
+The Empscripten library is on Github so in order to get it, you'll need to have Git installed.
 
 ```plaintext
 sudo apt install git
 ```
 
-Run the installation commands.
-
-Chose a location where you want to download emscripten
+The installation commands below are taken directly from the website.  Chose a location where you want to download emscripten and run the following commands.
 
 ```plaintext
 # Get the emsdk repo
@@ -125,18 +123,18 @@ git pull
 ./emsdk activate latest
 
 # Activate PATH and other environment variables in the current terminal
-source ./emsdk_env.sh```
+source ./emsdk_env.sh
+```
 
+The final `source` command will allow you to use emscripten in the current terminal.  The command will need to be run in each new terminal pointing to the correct location of the file.
 
-The source command will work while you are in the current terminal
-
-Install Python if it isn't already
+Emsripten generates an html file.  The easiest way to serve the file is with a Python http server.  Install Python if it isn't already
 
 ```plaintext
 sudo apt install python3
 ```
 
-Modify
+Modify the makefile to use the Empscripten compiler.  There will also be a 'web' folder to store the generated html and supporting files.
 
 ```makefile
 # Emscripten compiler
@@ -184,9 +182,7 @@ clean:
 	@echo "\n"
 ```
 
-
-
-make setup to create the new web directory as well
+Run `make setup` to create the new web directory as well.
 
 ```plaintext
 $ make setup
@@ -194,7 +190,7 @@ mkdir -p ./build
 mkdir -p ./web
 ```
 
-Build
+Now `make build` will compile the program as before and also generate .html, .js, and .wasm files.
 
 ```plaintext
 $ make build
@@ -207,7 +203,7 @@ shared:INFO: (Emscripten: Running sanity checks)
 em++  -o web/hello_earth.html build/main.o
 ```
 
-Serve the html file from another terminal.
+In another terminal, navigate to the /web directory and run the http server.
 
 ```plaintext
 $ cd {your path}/web/
@@ -223,7 +219,9 @@ In the browser navigate to localhost:8080/hello_earth.html
 
 ### Using SDL2
 
-Install SDL2
+Emscripten works with many popular C++ libraries including SDL2.  Rather than image data being written to a window buffer, it will be written an html canvas element.
+
+Install SDL2 if it isn't already.
 
 ```plaintext
 sudo apt install libsdl2-dev -y
@@ -251,13 +249,15 @@ int main()
 }
 ```
 
-Update the makefile compilation flags to use the SDL2 library
+Change name of the 'executable' and update the makefile compilation flags to use the SDL2 library
 
 ```makefile
+exe_name := sdl2_wasm
+
 EPP_FLAGS := -s USE_SDL=2
 ```
 
-Run `make build` and refresh the page in the browser
+Run `make build` and launch the page in the browser.  
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p16-cpp-web/blog/img/%5B016%5D/sdl2_test.png)
 
@@ -335,7 +335,7 @@ void destroy_image(Image& image)
 }
 ```
 
-The image the application writes to will be copied to the canvas element on the html page.  The SDL2 library takes care of this for us.  We'll store the SDL2 references in a single structure and call it a CanvasBuffer.
+The image that the application writes to will be copied to the canvas element on the html page.  The SDL2 library takes care of this for us.  We'll store the SDL2 references in a single structure and call it a CanvasBuffer.
 
 ```cpp
 #include <SDL2/SDL.h>
@@ -391,7 +391,7 @@ void destroy_canvas_buffer(CanvasBuffer& buffer)
 }
 ```
 
-Write our image to the canvas
+Rending our image to the canvas is identical to rendering it in a window.
 
 ```cpp
 void display_image(Image const& image, CanvasBuffer const& buffer)
@@ -418,7 +418,7 @@ static CanvasBuffer g_canvas;
 static bool g_running = false;
 ```
 
-Cleanup all resources at the end of the program.
+Clean up all resources at the end of the program.
 
 ```cpp
 void cleanup()
@@ -564,7 +564,7 @@ void handle_sdl_event(SDL_Event const& event)
 }
 ```
 
-Emscripten handles the framerate of an application so there is no need run an infinite loop in the main function.  We do need to define a function that executes in the loop and means to exit if the application finishes.
+Emscripten handles the framerate of an application so there is no need run an infinite loop in the main function and track the execution time of each frame.  We do need to define a function that executes in the loop and means to exit if the application finishes.
 
 ```cpp
 #include <emscripten.h>
