@@ -128,7 +128,7 @@ source ./emsdk_env.sh
 
 The final `source` command will allow you to use emscripten in the current terminal.  The command will need to be run in each new terminal pointing to the correct location of the file.
 
-Emsripten generates an html file.  The easiest way to serve the file is with a Python http server.  Install Python if it isn't already
+Emsripten generates an html file.  The easiest way to serve the file is with a Python http server.  Install Python if it isn't installed already.
 
 ```plaintext
 sudo apt install python3
@@ -219,7 +219,7 @@ In the browser navigate to localhost:8080/hello_earth.html
 
 ### Using SDL2
 
-Emscripten works with many popular C++ libraries including SDL2.  Rather than image data being written to a window buffer, it will be written an html canvas element.
+Emscripten works with many popular C++ libraries including SDL2.  Rather than image data being written to a window buffer, it will be written to an html canvas element.
 
 Install SDL2 if it isn't already.
 
@@ -257,7 +257,7 @@ exe_name := sdl2_wasm
 EPP_FLAGS := -s USE_SDL=2
 ```
 
-Run `make build` and launch the page in the browser.  
+Run `make build` and launch the new page in the browser.  
 
 ![alt text](https://github.com/adam-lafontaine/CMS/raw/p16-cpp-web/blog/img/%5B016%5D/sdl2_test.png)
 
@@ -391,7 +391,7 @@ void destroy_canvas_buffer(CanvasBuffer& buffer)
 }
 ```
 
-Rending our image to the canvas is identical to rendering it in a window.
+Rendering our image in the canvas is identical to rendering it in a window.
 
 ```cpp
 void display_image(Image const& image, CanvasBuffer const& buffer)
