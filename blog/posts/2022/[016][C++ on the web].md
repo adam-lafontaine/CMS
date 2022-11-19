@@ -1,63 +1,19 @@
 # C++ on the web
-## Running C/C++ application in a browser
+## Porting a C/C++ application to the browser
 
 
-### Installation
+### Basic setup
 
-https://emscripten.org/docs/getting_started/downloads.html
+Create a new folder called 'src' and add a file called main.cpp.
 
-Install SDL2
+```cpp
+#include <cstdio>
 
-```plaintext
-sudo apt-get install libsdl2-dev -y
+int main()
+{
+    printf("Hello, Earth\n");
+}
 ```
-
-Install Python
-
-```plaintext
-sudo apt-get install python3
-```
-
-Install Git
-
-```plaintext
-sudo apt-get install git
-```
-
-Clone the Emscripten SDK repo
-
-```plaintext
-# Get the emsdk repo
-git clone https://github.com/emscripten-core/emsdk.git
-
-```
-
-Run the installation commands
-
-```plaintext
-# Enter that directory
-cd emsdk
-
-# Fetch the latest version of the emsdk (not needed the first time you clone)
-git pull
-
-# Download and install the latest SDK tools.
-./emsdk install latest
-
-# Make the "latest" SDK "active" for the current user. (writes .emscripten file)
-./emsdk activate latest
-
-# Activate PATH and other environment variables in the current terminal
-source ./emsdk_env.sh
-```
-
-From the terminal you will be working in
-
-```plaintext
-source ../../emsdk/emsdk_env.sh
-```
-
-### Makefile setup
 
 https://almostalwaysauto.com/posts/makefiles
 
@@ -102,18 +58,6 @@ clean:
 	@echo "\n"
 ```
 
-
-Create a new folder called 'src' and add a file called main.cpp.
-
-```cpp
-#include <cstdio>
-
-int main()
-{
-    printf("Hello, Earth\n");
-}
-```
-
 Create the build directory by running make setup
 
 ```plaintext
@@ -141,8 +85,6 @@ $ make run
 Hello, Earth
 ```
 
-### Emscripten
-
 Clean the project
 
 ```plaintext
@@ -150,6 +92,50 @@ $ make clean
 rm -rfv ./build/*
 removed './build/hello_earth'
 removed './build/main.o'
+```
+
+### Installing Emscripten
+
+https://emscripten.org/docs/getting_started/downloads.html
+
+Install Git
+
+```plaintext
+sudo apt-get install git
+```
+
+Run the installation commands
+
+```plaintext
+# Get the emsdk repo
+git clone https://github.com/emscripten-core/emsdk.git
+
+# Enter that directory
+cd emsdk
+
+# Fetch the latest version of the emsdk (not needed the first time you clone)
+git pull
+
+# Download and install the latest SDK tools.
+./emsdk install latest
+
+# Make the "latest" SDK "active" for the current user. (writes .emscripten file)
+./emsdk activate latest
+
+# Activate PATH and other environment variables in the current terminal
+source ./emsdk_env.sh
+```
+
+From the terminal you will be working in
+
+```plaintext
+source ../../emsdk/emsdk_env.sh
+```
+
+Install Python
+
+```plaintext
+sudo apt-get install python3
 ```
 
 Modify
@@ -237,6 +223,14 @@ In the browser navigate to localhost:8080/hello_earth.html
 
 
 ### Using SDL2
+
+Install SDL2
+
+```plaintext
+sudo apt-get install libsdl2-dev -y
+```
+
+
 
 ```cpp
 #include <cstddef>
