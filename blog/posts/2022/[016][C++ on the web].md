@@ -101,10 +101,12 @@ https://emscripten.org/docs/getting_started/downloads.html
 Install Git
 
 ```plaintext
-sudo apt-get install git
+sudo apt install git
 ```
 
-Run the installation commands
+Run the installation commands.
+
+Chose a location where you want to download emscripten
 
 ```plaintext
 # Get the emsdk repo
@@ -123,19 +125,15 @@ git pull
 ./emsdk activate latest
 
 # Activate PATH and other environment variables in the current terminal
-source ./emsdk_env.sh
-```
+source ./emsdk_env.sh```
 
-From the terminal you will be working in
 
-```plaintext
-source ../../emsdk/emsdk_env.sh
-```
+The source command will work while you are in the current terminal
 
-Install Python
+Install Python if it isn't already
 
 ```plaintext
-sudo apt-get install python3
+sudo apt install python3
 ```
 
 Modify
@@ -160,8 +158,8 @@ main_c       := $(code)/main.cpp
 main_o       := $(build)/main.o
 object_files := $(main_o)
 
-
-EPP_FLAGS := -s USE_SDL=2
+# compilation flags
+EPP_FLAGS :=
 
 
 $(main_o): $(main_c)
@@ -188,7 +186,7 @@ clean:
 
 
 
-Setup again
+make setup to create the new web directory as well
 
 ```plaintext
 $ make setup
@@ -202,13 +200,14 @@ Build
 $ make build
 
  main
-em++ -s USE_SDL=2 -o build/main.o -c src/main.cpp
+em++  -o build/main.o -c src/main.cpp
+shared:INFO: (Emscripten: Running sanity checks)
 
  sdl2_wasm
-em++ -s USE_SDL=2 -o web/sdl2_wasm.html build/main.o
+em++  -o web/sdl2_wasm.html build/main.o
 ```
 
-Serve the html file
+Serve the html file from another terminal.
 
 ```plaintext
 $ cd {your path}/web/
