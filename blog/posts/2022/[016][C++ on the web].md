@@ -148,7 +148,7 @@ code  := ./src
 # 'web' directory for the generated html file
 web := ./web
 
-exe_name := sdl2_wasm
+exe_name := hello_earth
 
 # the html output location
 program_exe := $(web)/$(exe_name).html
@@ -204,7 +204,7 @@ em++  -o build/main.o -c src/main.cpp
 shared:INFO: (Emscripten: Running sanity checks)
 
  sdl2_wasm
-em++  -o web/sdl2_wasm.html build/main.o
+em++  -o web/hello_earth.html build/main.o
 ```
 
 Serve the html file from another terminal.
@@ -217,7 +217,7 @@ Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 
 In the browser navigate to localhost:8080/hello_earth.html
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B016%5D/em_html.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p16-cpp-web/blog/img/%5B016%5D/em_html.png)
 
 
 
@@ -226,10 +226,43 @@ In the browser navigate to localhost:8080/hello_earth.html
 Install SDL2
 
 ```plaintext
-sudo apt-get install libsdl2-dev -y
+sudo apt install libsdl2-dev -y
 ```
 
+Update main.cpp to test the SDL2 installation.
 
+```cpp
+#include <cstdio>
+#include <SDL2/SDL.h>
+
+int main()
+{
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
+        printf("SDL_Init failed\n%s\n", SDL_GetError());
+        return EXIT_FAILURE;
+    }
+    
+    printf("SDL2 OK!\n");
+
+    SDL_Quit();
+
+    return EXIT_SUCCESS;
+}
+```
+
+Update the makefile compilation flags to use the SDL2 library
+
+```makefile
+EPP_FLAGS := -s USE_SDL=2
+```
+
+Run `make build` and refresh the page in the browser
+
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p16-cpp-web/blog/img/%5B016%5D/sdl2_test.png)
+
+
+### 
 
 ```cpp
 #include <cstddef>
@@ -585,7 +618,7 @@ int main(int argc, char* args[])
 
 Generated html
 
-![alt text](https://github.com/adam-lafontaine/CMS/raw/p15-cpp-web/blog/img/%5B016%5D/sdl2_html.png)
+![alt text](https://github.com/adam-lafontaine/CMS/raw/p16-cpp-web/blog/img/%5B016%5D/em_sdl2_html.png)
 
 Working program
 
