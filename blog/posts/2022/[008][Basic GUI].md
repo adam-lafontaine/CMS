@@ -72,6 +72,16 @@ int main(int argc, char* args[])
 }
 ```
 
+On Linux you can use the following commands.
+
+```plaintext
+# compile
+g++ -o sdl2_app -c main.cpp `sdl2-config --cflags --libs`
+
+# run
+./sdl2_app
+```
+
 ### Application Setup
 
 Before using the libray, SDL needs to be initialized.
@@ -127,30 +137,90 @@ When using a library for the first time, it is a good idea to check for leaks by
 
 ### Application Setup (continued)
 
-Next, we need a function to create our window.
+For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group everything together and call it a `WindowBuffer`.
 
 ```cpp
+class WindowBuffer
+{
+public:
+
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Texture* texture = nullptr;
+};
+
+
 constexpr auto WINDOW_TITLE = "Image Window";
 constexpr int WINDOW_WIDTH = 600;
 constexpr int WINDOW_HEIGHT = 600;
+```
 
+Next, we need a function to create our window, renderer and texture.
 
-SDL_Window* create_window()
+```cpp
+static bool init_window_buffer(WindowBuffer& buffer, int width, int height)
 {
-    auto window = SDL_CreateWindow(
-        WINDOW_TITLE,
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
-        SDL_WINDOW_RESIZABLE);
-
-    if (!window)
+    auto error = SDL_CreateWindowAndRenderer(width, height, 0, &(buffer.window), &(buffer.renderer));
+    if(error)
     {
-        printf("SDL_CreateWindow failed\n%s\n", SDL_GetError());
+        printf("SDL_CreateWindowAndRenderer/n");
+        return false;
     }
 
-    return window;
+    SDL_SetWindowTitle(buffer.window, WINDOW_TITLE);
+
+    buffer.texture = SDL_CreateTexture(
+        buffer.renderer,
+        SDL_PIXELFORMAT_ABGR8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        width,
+        height);
+
+    if (!buffer.texture)
+    {
+        printf("SDL_CreateTexture failed\n%s\n", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+```
+
+The SDL resources will need to be released at the end of the program.
+
+```cpp
+void destroy_window_buffer(WindowBuffer& buffer)
+{
+    if (buffer.texture)
+    {
+        SDL_DestroyTexture(buffer.texture);
+    }
+
+    if (buffer.renderer)
+    {
+        SDL_DestroyRenderer(buffer.renderer);
+    }
+
+    if (buffer.window)
+    {
+        SDL_DestroyWindow(buffer.window);
+    }
+}
+```
+
+Add a global `WindowBuffer` variable.
+
+```cpp
+static WindowBuffer g_window_buffer;
+```
+
+Update the cleanup function.
+
+```cpp
+void cleanup()
+{
+    destroy_window_buffer(g_window_buffer);
+    SDL_Quit();
 }
 ```
 
@@ -164,8 +234,7 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -200,7 +269,7 @@ To keep things simple we'll start keeping global static variables.  This one wil
 static bool g_running = false;
 ```
 
-In the loop we need a function that pauses each frame for just enough time to maintain our 60 FPS.
+In the loop, we need a function that pauses each frame for just enough time to maintain our 60 FPS.
 
 ```cpp
 #include "stopwatch.hpp"
@@ -387,7 +456,7 @@ int main(int argc, char* args[])
 
 ### Enable Rendering
 
-For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group them together and call it a `WindowBuffer`.
+
 
 ```cpp
 class WindowBuffer
@@ -443,21 +512,7 @@ void destroy_window_buffer(WindowBuffer& buffer)
 }
 ```
 
-Add a global `WindowBuffer` variable.
 
-```cpp
-static WindowBuffer g_window_buffer;
-```
-
-Update the cleanup function.
-
-```cpp
-void cleanup()
-{
-    destroy_window_buffer(g_window_buffer);
-    SDL_Quit();
-}
-```
 
 Initialize the `WindowBuffer` in main.
 
@@ -566,7 +621,7 @@ Pixel to_pixel(u8 r, u8 g, u8 b)
 }
 ```
 
-We need a global image and its width and height will match the application widow's.
+We need a global image and its width and height will match that of the application window.
 
 ```cpp
 constexpr u32 IMAGE_WIDTH = WINDOW_WIDTH;
