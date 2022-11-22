@@ -9,7 +9,7 @@ The first thing is to get the SDL2 libraries installed.  On Windows/Visual Studi
 
 https://vcpkg.io/en/getting-started.html
 
-Simply clone/download the repository and follow the instructions in the guide.
+Simply clone/download the vcpkg repository and follow the instructions in the guide.
 
 Run the following commands in **Windows Powershell as administrator**.
 
@@ -72,7 +72,7 @@ int main(int argc, char* args[])
 }
 ```
 
-On Linux you can use the following commands.
+On Linux, you can use the following commands to compile and run the program.
 
 ```plaintext
 # compile
@@ -208,15 +208,12 @@ void destroy_window_buffer(WindowBuffer& buffer)
 }
 ```
 
-Add a global `WindowBuffer` variable.
+Add a global `WindowBuffer` variable and update the cleanup function.
 
 ```cpp
 static WindowBuffer g_window_buffer;
-```
 
-Update the cleanup function.
 
-```cpp
 void cleanup()
 {
     destroy_window_buffer(g_window_buffer);
@@ -263,7 +260,7 @@ constexpr r64 TARGET_FRAMERATE_HZ = 60.0;
 constexpr r64 TARGET_MS_PER_FRAME = 1000.0 / TARGET_FRAMERATE_HZ;
 ```
 
-To keep things simple we'll start keeping global static variables.  This one will be used to signal when the application should be terminated.
+We'll signal when the application should stop running with a global flag.
 
 ```cpp
 static bool g_running = false;
@@ -310,8 +307,7 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -454,109 +450,6 @@ int main(int argc, char* args[])
 }
 ```
 
-### Enable Rendering
-
-
-
-```cpp
-class WindowBuffer
-{
-public:
-
-    SDL_Renderer* renderer;
-    SDL_Texture* texture;
-};
-```
-
-The renderer and texture need to be initialized at startup and destroyed when the program ends.
-
-```cpp
-bool init_window_buffer(WindowBuffer& buffer, SDL_Window* window)
-{
-    buffer.renderer = SDL_CreateRenderer(window, -1, 0);
-
-    if (!buffer.renderer)
-    {
-        printf("SDL_CreateRenderer failed\n%s\n", SDL_GetError());
-        return false;
-    }
-
-    buffer.texture = SDL_CreateTexture(
-        buffer.renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT);
-
-    if (!buffer.texture)
-    {
-        printf("SDL_CreateTexture failed\n%s\n", SDL_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-
-void destroy_window_buffer(WindowBuffer& buffer)
-{
-    if (buffer.texture)
-    {
-        SDL_DestroyTexture(buffer.texture);
-    }
-
-    if (buffer.renderer)
-    {
-        SDL_DestroyRenderer(buffer.renderer);
-    }
-}
-```
-
-
-
-Initialize the `WindowBuffer` in main.
-
-```cpp
-int main(int argc, char* args[])
-{
-    if (!init_sdl())
-    {
-        return EXIT_FAILURE;
-    }
-
-    auto window = create_window();
-    if (!window)
-    {
-        cleanup();
-        return EXIT_FAILURE;
-    }
-
-    if (!init_window_buffer(g_window_buffer, window))
-    {
-        cleanup();
-        return EXIT_FAILURE;
-    }
-
-    g_running = true;
-    Stopwatch sw;
-    sw.start();
-
-    while (g_running)
-    {
-        SDL_Event event;
-        if (SDL_PollEvent(&event))
-        {
-            handle_sdl_event(event);
-        }
-
-        wait_for_framerate(sw);
-    }
-
-    cleanup();
-    return EXIT_SUCCESS;
-}
-```
-
 ### Setup the image data
 
 We need to be able to write generated image data to the SDL texture.  To do that, we'll use image and pixel logic that is similar to previous posts.
@@ -608,7 +501,7 @@ void destroy_image(Image& image)
 }
 
 
-Pixel to_pixel(u8 r, u8 g, u8 b)
+constexpr Pixel to_pixel(u8 r, u8 g, u8 b)
 {
     Pixel p{};
 
@@ -621,18 +514,17 @@ Pixel to_pixel(u8 r, u8 g, u8 b)
 }
 ```
 
-We need a global image and its width and height will match that of the application window.
+Add a global Image object and some constants we'll be using in our example.  Make sure to free the image memory when the application is finished.
 
 ```cpp
-constexpr u32 IMAGE_WIDTH = WINDOW_WIDTH;
-constexpr u32 IMAGE_HEIGHT = WINDOW_HEIGHT;
-
 static Image g_image;
-```
 
-Make sure to free the image memory when the application is finished.
 
-```cpp
+constexpr auto RED = to_pixel(255, 0, 0);
+constexpr auto GREEN = to_pixel(0, 255, 0);
+constexpr auto BLUE = to_pixel(0, 0, 255);
+
+
 void cleanup()
 {
     destroy_window_buffer(g_window_buffer);
@@ -651,19 +543,13 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
-    {
-        return EXIT_FAILURE;
-    }
-
-    if (!init_window_buffer(g_window_buffer, window))
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
     }
 
-    if (!create_image(g_image, IMAGE_WIDTH, IMAGE_HEIGHT))
+    if (!create_image(g_image, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -727,10 +613,6 @@ This will divide the window into blue, green and red vertical sections.
 ```cpp
 void draw_bgr()
 {
-    auto blue = to_pixel(0, 0, 255);
-    auto green = to_pixel(0, 255, 0);
-    auto red = to_pixel(255, 0, 0);
-
     auto blue_max = g_image.width / 3;
     auto green_max = g_image.width * 2 / 3;
 
@@ -741,15 +623,15 @@ void draw_bgr()
         {
             if (x < blue_max)
             {
-                g_image.data[i] = blue;
+                g_image.data[i] = BLUE;
             }
             else if (x < green_max)
             {
-                g_image.data[i] = green;
+                g_image.data[i] = GREEN;
             }
             else
             {
-                g_image.data[i] = red;
+                g_image.data[i] = RED;
             }
 
             ++i;
@@ -773,25 +655,25 @@ void handle_keyboard_event(SDL_Event const& event)
     {
     case SDLK_a:
     {
-        printf("A\n");
+        printf("A - red\n");
 
-        draw_color(to_pixel(255, 0, 0));
+        draw_color(RED);
     } break;
     case SDLK_b:
     {
-        printf("B\n");
+        printf("B - green\n");
 
-        draw_color(to_pixel(0, 255, 0));
+        draw_color(GREEN);
     } break;
     case SDLK_c:
     {
-        printf("C\n");
+        printf("C - blue\n");
 
-        draw_color(to_pixel(0, 0, 255));
+        draw_color(BLUE);
     } break;
     case SDLK_d:
     {
-        printf("D\n");
+        printf("D - blue green red\n");
 
         draw_bgr();
     } break;
