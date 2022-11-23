@@ -9,7 +9,7 @@ The first thing is to get the SDL2 libraries installed.  On Windows/Visual Studi
 
 https://vcpkg.io/en/getting-started.html
 
-Simply clone/download the repository and follow the instructions in the guide.
+Simply clone/download the vcpkg repository and follow the instructions in the guide.
 
 Run the following commands in **Windows Powershell as administrator**.
 
@@ -34,7 +34,7 @@ Install SDL2 (64 bit)
 ### Install SDL2 - Ubuntu
 
 ```
-apt-get install libsdl2-dev libsdl2-dbg
+apt-get install libsdl2-dev
 ```
 
 Include the following in your g++ command line arguments when compiling and linking
@@ -70,6 +70,16 @@ int main(int argc, char* args[])
 {
 
 }
+```
+
+On Linux, you can use the following commands to compile and run the program.
+
+```plaintext
+# compile
+g++ -o sdl2_app -c main.cpp `sdl2-config --cflags --libs`
+
+# run
+./sdl2_app
 ```
 
 ### Application Setup
@@ -127,30 +137,87 @@ When using a library for the first time, it is a good idea to check for leaks by
 
 ### Application Setup (continued)
 
-Next, we need a function to create our window.
+For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group everything together and call it a `WindowBuffer`.
 
 ```cpp
+class WindowBuffer
+{
+public:
+
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Texture* texture = nullptr;
+};
+
+
 constexpr auto WINDOW_TITLE = "Image Window";
 constexpr int WINDOW_WIDTH = 600;
 constexpr int WINDOW_HEIGHT = 600;
+```
 
+Next, we need a function to create our window, renderer and texture.
 
-SDL_Window* create_window()
+```cpp
+static bool init_window_buffer(WindowBuffer& buffer, int width, int height)
 {
-    auto window = SDL_CreateWindow(
-        WINDOW_TITLE,
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
-        SDL_WINDOW_RESIZABLE);
-
-    if (!window)
+    auto error = SDL_CreateWindowAndRenderer(width, height, 0, &(buffer.window), &(buffer.renderer));
+    if(error)
     {
-        printf("SDL_CreateWindow failed\n%s\n", SDL_GetError());
+        printf("SDL_CreateWindowAndRenderer/n");
+        return false;
     }
 
-    return window;
+    SDL_SetWindowTitle(buffer.window, WINDOW_TITLE);
+
+    buffer.texture = SDL_CreateTexture(
+        buffer.renderer,
+        SDL_PIXELFORMAT_ABGR8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        width,
+        height);
+
+    if (!buffer.texture)
+    {
+        printf("SDL_CreateTexture failed\n%s\n", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+```
+
+The SDL resources will need to be released at the end of the program.
+
+```cpp
+void destroy_window_buffer(WindowBuffer& buffer)
+{
+    if (buffer.texture)
+    {
+        SDL_DestroyTexture(buffer.texture);
+    }
+
+    if (buffer.renderer)
+    {
+        SDL_DestroyRenderer(buffer.renderer);
+    }
+
+    if (buffer.window)
+    {
+        SDL_DestroyWindow(buffer.window);
+    }
+}
+```
+
+Add a global `WindowBuffer` variable and update the cleanup function.
+
+```cpp
+static WindowBuffer g_window_buffer;
+
+
+void cleanup()
+{
+    destroy_window_buffer(g_window_buffer);
+    SDL_Quit();
 }
 ```
 
@@ -164,8 +231,7 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -194,13 +260,13 @@ constexpr r64 TARGET_FRAMERATE_HZ = 60.0;
 constexpr r64 TARGET_MS_PER_FRAME = 1000.0 / TARGET_FRAMERATE_HZ;
 ```
 
-To keep things simple we'll start keeping global static variables.  This one will be used to signal when the application should be terminated.
+We'll signal when the application should stop running with a global flag.
 
 ```cpp
 static bool g_running = false;
 ```
 
-In the loop we need a function that pauses each frame for just enough time to maintain our 60 FPS.
+In the loop, we need a function that pauses each frame for just enough time to maintain our 60 FPS.
 
 ```cpp
 #include "stopwatch.hpp"
@@ -241,8 +307,7 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -385,126 +450,9 @@ int main(int argc, char* args[])
 }
 ```
 
-### Enable Rendering
-
-For displaying image data in a window, SDL has a texture and a renderer.  The texture holds a reference to the image data and the renderer renders the texture data to the window.  We'll group them together and call it a `WindowBuffer`.
-
-```cpp
-class WindowBuffer
-{
-public:
-
-    SDL_Renderer* renderer;
-    SDL_Texture* texture;
-};
-```
-
-The renderer and texture need to be initialized at startup and destroyed when the program ends.
-
-```cpp
-bool init_window_buffer(WindowBuffer& buffer, SDL_Window* window)
-{
-    buffer.renderer = SDL_CreateRenderer(window, -1, 0);
-
-    if (!buffer.renderer)
-    {
-        printf("SDL_CreateRenderer failed\n%s\n", SDL_GetError());
-        return false;
-    }
-
-    buffer.texture = SDL_CreateTexture(
-        buffer.renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT);
-
-    if (!buffer.texture)
-    {
-        printf("SDL_CreateTexture failed\n%s\n", SDL_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-
-void destroy_window_buffer(WindowBuffer& buffer)
-{
-    if (buffer.texture)
-    {
-        SDL_DestroyTexture(buffer.texture);
-    }
-
-    if (buffer.renderer)
-    {
-        SDL_DestroyRenderer(buffer.renderer);
-    }
-}
-```
-
-Add a global `WindowBuffer` variable.
-
-```cpp
-static WindowBuffer g_window_buffer;
-```
-
-Update the cleanup function.
-
-```cpp
-void cleanup()
-{
-    destroy_window_buffer(g_window_buffer);
-    SDL_Quit();
-}
-```
-
-Initialize the `WindowBuffer` in main.
-
-```cpp
-int main(int argc, char* args[])
-{
-    if (!init_sdl())
-    {
-        return EXIT_FAILURE;
-    }
-
-    auto window = create_window();
-    if (!window)
-    {
-        cleanup();
-        return EXIT_FAILURE;
-    }
-
-    if (!init_window_buffer(g_window_buffer, window))
-    {
-        cleanup();
-        return EXIT_FAILURE;
-    }
-
-    g_running = true;
-    Stopwatch sw;
-    sw.start();
-
-    while (g_running)
-    {
-        SDL_Event event;
-        if (SDL_PollEvent(&event))
-        {
-            handle_sdl_event(event);
-        }
-
-        wait_for_framerate(sw);
-    }
-
-    cleanup();
-    return EXIT_SUCCESS;
-}
-```
-
 ### Setup the image data
 
-We need to be able to write generated image data to the SDL texture.  To do that, we'll use image and pixel logic that is similar to previous posts.
+We need to be able to write a generated image to the SDL texture.  To do that, we'll use image and pixel logic that is similar to previous posts.
 
 ```cpp
 class Pixel
@@ -553,7 +501,7 @@ void destroy_image(Image& image)
 }
 
 
-Pixel to_pixel(u8 r, u8 g, u8 b)
+constexpr Pixel to_pixel(u8 r, u8 g, u8 b)
 {
     Pixel p{};
 
@@ -566,18 +514,17 @@ Pixel to_pixel(u8 r, u8 g, u8 b)
 }
 ```
 
-We need a global image and its width and height will match the application widow's.
+Add a global Image object and some constants that we'll be using in our example.  Make sure to free the image memory when the application is finished.
 
 ```cpp
-constexpr u32 IMAGE_WIDTH = WINDOW_WIDTH;
-constexpr u32 IMAGE_HEIGHT = WINDOW_HEIGHT;
-
 static Image g_image;
-```
 
-Make sure to free the image memory when the application is finished.
 
-```cpp
+constexpr auto RED = to_pixel(255, 0, 0);
+constexpr auto GREEN = to_pixel(0, 255, 0);
+constexpr auto BLUE = to_pixel(0, 0, 255);
+
+
 void cleanup()
 {
     destroy_window_buffer(g_window_buffer);
@@ -596,19 +543,13 @@ int main(int argc, char* args[])
         return EXIT_FAILURE;
     }
 
-    auto window = create_window();
-    if (!window)
-    {
-        return EXIT_FAILURE;
-    }
-
-    if (!init_window_buffer(g_window_buffer, window))
+    if (!init_window_buffer(g_window_buffer, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
     }
 
-    if (!create_image(g_image, IMAGE_WIDTH, IMAGE_HEIGHT))
+    if (!create_image(g_image, WINDOW_WIDTH, WINDOW_HEIGHT))
     {
         cleanup();
         return EXIT_FAILURE;
@@ -672,10 +613,6 @@ This will divide the window into blue, green and red vertical sections.
 ```cpp
 void draw_bgr()
 {
-    auto blue = to_pixel(0, 0, 255);
-    auto green = to_pixel(0, 255, 0);
-    auto red = to_pixel(255, 0, 0);
-
     auto blue_max = g_image.width / 3;
     auto green_max = g_image.width * 2 / 3;
 
@@ -686,15 +623,15 @@ void draw_bgr()
         {
             if (x < blue_max)
             {
-                g_image.data[i] = blue;
+                g_image.data[i] = BLUE;
             }
             else if (x < green_max)
             {
-                g_image.data[i] = green;
+                g_image.data[i] = GREEN;
             }
             else
             {
-                g_image.data[i] = red;
+                g_image.data[i] = RED;
             }
 
             ++i;
@@ -718,25 +655,25 @@ void handle_keyboard_event(SDL_Event const& event)
     {
     case SDLK_a:
     {
-        printf("A\n");
+        printf("A - red\n");
 
-        draw_color(to_pixel(255, 0, 0));
+        draw_color(RED);
     } break;
     case SDLK_b:
     {
-        printf("B\n");
+        printf("B - green\n");
 
-        draw_color(to_pixel(0, 255, 0));
+        draw_color(GREEN);
     } break;
     case SDLK_c:
     {
-        printf("C\n");
+        printf("C - blue\n");
 
-        draw_color(to_pixel(0, 0, 255));
+        draw_color(BLUE);
     } break;
     case SDLK_d:
     {
-        printf("D\n");
+        printf("D - blue green red\n");
 
         draw_bgr();
     } break;

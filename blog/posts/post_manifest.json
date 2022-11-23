@@ -9,6 +9,14 @@
             "filename": "2022/[][].md"
         },
         {
+            "number": "[016]",
+            "id": "1669194936430",
+            "title": "C++ on the web",
+            "route": "cpp-web",
+            "tags": ["C++", "Web"],
+            "filename": "2022/[016][C++ on the web].md"
+        },
+        {
             "number": "[015]",
             "id": "1665407564795",
             "title": "Parallelism for cheap",
