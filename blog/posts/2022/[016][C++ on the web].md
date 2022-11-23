@@ -3,7 +3,7 @@
 
 ### Emscripten
 
-C and C++ used to be only for computers and embedded devices.  It is now possible to run "native" applications in a webpage.  Emscripten compiles code to Web Assembly (wasm) which runs in modern browsers.  It supports SDL2, so any game or desktop application that uses it can be made to run on the web with very little effort.
+C and C++ used to be only for computers and embedded devices.  Now it's possible to run "native" applications in a webpage.  Emscripten compiles code to Web Assembly (wasm) which runs in modern browsers.  It supports SDL2, so any game or desktop application that uses it can be made to run on the web with very little effort.
 
 In a [previous post](https://almostalwaysauto.com/posts/basic-gui) we covered how to get a basic GUI app up and running with SDL2.  Here we'll walk through getting that app working in the browser.
 
@@ -348,7 +348,7 @@ void destroy_image(Image& image)
 }
 ```
 
-The image that the application writes to will be copied to the canvas element on the html page.  We'll group the SDL2 references that do this in a single structure and call it a CanvasBuffer.
+The image that the application writes to will be copied to the canvas element.  We'll group the SDL2 references that do this in a single structure and call it a CanvasBuffer.
 
 ```cpp
 #include <SDL2/SDL.h>
@@ -493,7 +493,7 @@ void draw_color(Pixel p)
 }
 ```
 
-We'll also have the option to draw 3 vertical sections of blue green and red.
+We'll also have the option to draw 3 vertical sections of blue, green, and red.
 
 ```cpp
 void draw_bgr()
@@ -567,7 +567,7 @@ void handle_keyboard_event(SDL_Event const& event)
 }
 ```
 
-Before checking for our keyboard events, first check for shutdown commands.  These aren't as applicable in the context of running on a web page but they function all the same.
+Before checking for our keyboard events, first check for shutdown commands.  These aren't as applicable in the context of running in a web page but they function all the same.
 
 ```cpp
 void handle_sdl_event(SDL_Event const& event)
