@@ -452,7 +452,7 @@ int main(int argc, char* args[])
 
 ### Setup the image data
 
-We need to be able to write generated image data to the SDL texture.  To do that, we'll use image and pixel logic that is similar to previous posts.
+We need to be able to write a generated image to the SDL texture.  To do that, we'll use image and pixel logic that is similar to previous posts.
 
 ```cpp
 class Pixel
@@ -514,7 +514,7 @@ constexpr Pixel to_pixel(u8 r, u8 g, u8 b)
 }
 ```
 
-Add a global Image object and some constants we'll be using in our example.  Make sure to free the image memory when the application is finished.
+Add a global Image object and some constants that we'll be using in our example.  Make sure to free the image memory when the application is finished.
 
 ```cpp
 static Image g_image;
