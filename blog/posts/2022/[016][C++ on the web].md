@@ -3,7 +3,7 @@
 
 ### Emscripten
 
-C and C++ used to be only for computers and embedded devices.  It is now possible to run "native" applications in a web page.  Emscripten compiles code to Web Assembly (wasm) which will run in modern browsers.  It supports SDL2 so any game or desktop application that uses it can be made to run on the web with very little effort.
+C and C++ used to be only for computers and embedded devices.  It is now possible to run "native" applications in a web page.  Emscripten compiles code to Web Assembly (wasm) which will run in modern browsers.  It supports SDL2, so any game or desktop application that uses it can be made to run on the web with very little effort.
 
 In a [previous post](https://almostalwaysauto.com/posts/basic-gui) we covered how to get a basic GUI app up and running with SDL2.  Here we'll walk through getting that app working in the browser.
 
@@ -54,7 +54,7 @@ clean:
 
 The basics of Makefiles are covered here: https://almostalwaysauto.com/posts/makefiles.
 
-Create a new folder called 'src' and add the file main.cpp.
+Create a new folder called 'src' and add the file 'main.cpp'.
 
 ```cpp
 #include <cstdio>
@@ -190,7 +190,7 @@ clean:
 
 The `run` rule no longer applies because the program automatically runs in the browser when the page is loaded.
 
-Run `make setup` to create the new web directory as well.
+Run `make setup` to create the new 'web' directory as well.
 
 ```plaintext
 $ make setup
@@ -276,6 +276,8 @@ Run `make build` and launch the new page in the browser.
 Now that we have SDL2 installed and file generation working, we can begin porting our desktop application to the web.  The code we'll start with is from this post.
 
 https://almostalwaysauto.com/posts/basic-gui
+
+There is no need to copy the code from the other post.  We'll go over everything step by step here as well.
 
 Define a 4 byte pixel and an image that the application draws to.
 
