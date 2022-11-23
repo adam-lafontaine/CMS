@@ -606,7 +606,7 @@ void handle_sdl_event(SDL_Event const& event)
 }
 ```
 
-Emscripten handles the framerate of an application so there is no need run an infinite loop in the main function and track the execution time of each frame.  We do need to define a function that executes in its loop and a means to exit if the application finishes.
+Emscripten handles the framerate of the application so there is no need run an infinite loop in the main function and track the execution time of each frame.  We do need to define a function that executes in its loop and a means to exit if the application finishes.
 
 ```cpp
 #include <emscripten.h>
