@@ -6,7 +6,15 @@
             "title": "",
             "route": "",
             "tags": [],
-            "filename": "2022/[][].md"
+            "filename": "2023/[][].md"
+        },
+        {
+            "number": "[017]",
+            "id": "1676920367955",
+            "title": "Basic video application",
+            "route": "basic-video",
+            "tags": ["C++", "SDL2", "OpenCV"],
+            "filename": "2023/[017][Basic video].md"
         },
         {
             "number": "[016]",
