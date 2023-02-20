@@ -26,9 +26,6 @@ public:
 };
 
 
-static bool g_running = false;
-
-
 void destroy_window_buffer(WindowBuffer& buffer)
 {
     if (buffer.texture)
@@ -86,9 +83,22 @@ bool init_sdl()
 
     return true;
 }
+```
 
+Create a class to hold the state of the application
 
-void handle_keyboard_event(SDL_Event const& event)
+```cpp
+class AppState
+{
+public:
+    bool is_running = false;
+};
+```
+
+Handle input from keyboard
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event, AppState& state)
 {
     if (event.key.repeat || event.key.state != SDL_PRESSED)
     {
@@ -96,44 +106,50 @@ void handle_keyboard_event(SDL_Event const& event)
     }
 
     auto key_code = event.key.keysym.sym;
+
     switch (key_code)
     {
-    case SDLK_a:
-    {
-        printf("A\n");
-    } break;
 
+    default:
+        printf("any key\n");
     }
 }
 
 
-void handle_sdl_event(SDL_Event const& event)
+void handle_sdl_event(SDL_Event const& event, AppState& state)
 {
     switch (event.type)
     {
     case SDL_QUIT:
     {
         printf("SDL_QUIT\n");
-        g_running = false;
+        state.is_running = false;
     } break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
     {
         auto key_code = event.key.keysym.sym;
         auto alt = event.key.keysym.mod & KMOD_ALT;
-        if (key_code == SDLK_F4 && alt)
+
+        switch (key_code)
         {
-            printf("ALT F4\n");
-            g_running = false;
-        }
-        else if (key_code == SDLK_ESCAPE)
-        {
+        case SDLK_F4:
+            if (alt)
+            {
+                printf("ALT F4\n");
+                state.is_running = false;
+                return;
+            }
+            break;
+
+        case SDLK_ESCAPE:
             printf("ESC\n");
-            g_running = false;
-        }
-        else
-        {
-            handle_keyboard_event(event);
+            state.is_running = false;
+
+            break;
+
+        default:
+            handle_keyboard_event(event, state);
         }
 
     } break;
@@ -142,7 +158,7 @@ void handle_sdl_event(SDL_Event const& event)
 }
 ```
 
-Main
+Main function along with code to throttle the frame rate.
 
 ```cpp
 #include "stopwatch.hpp"
@@ -187,6 +203,7 @@ int main()
     int window_width = 640;
 
     WindowBuffer window_buffer;
+    AppState state;
 
     auto const cleanup = [&]() 
     {
@@ -194,23 +211,23 @@ int main()
         SDL_Quit();
     };
 
-
     if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
     {
         cleanup();
         return EXIT_FAILURE;
     }
 
-    g_running = true;
+    state.is_running = true;
+    
     Stopwatch sw;
     sw.start();
 
-    while (g_running)
+    while (state.is_running)
     {
         SDL_Event event;
         if (SDL_PollEvent(&event))
         {
-            handle_sdl_event(event);
+            handle_sdl_event(event, state);
         }
 
         wait_for_framerate(sw);
@@ -219,5 +236,144 @@ int main()
     cleanup();
     return EXIT_SUCCESS;
 }
+```
 
+SDL2 pixel format
+
+```cpp
+class RGBA
+{
+public:
+    u8 red = 0;
+    u8 green = 0;
+    u8 blue = 0;
+    u8 alpha = 0;
+};;
+
+
+RGBA to_rgba(u8 r, u8 g, u8 b)
+{
+    return { r, g, b, 255 };
+}
+```
+
+Image format
+
+```cpp
+void destroy_image(ImageRGBA& image)
+{
+    if (image.data)
+    {
+        free(image.data);
+    }
+}
+
+
+bool create_image(ImageRGBA& image, u32 width, u32 height)
+{
+    auto data = malloc(sizeof(RGBA) * width * height);
+    if (!data)
+    {
+        return false;
+    }
+
+    image.width = width;
+    image.height = height;
+    image.data = (RGBA*)data;
+
+    return true;
+}
+```
+
+Write image to window
+
+```cpp
+static void render_image(ImageRGBA const& src, WindowBuffer const& dst)
+{
+    int pitch = src.width * sizeof(RGBA);
+    auto error = SDL_UpdateTexture(dst.texture, 0, src.data, pitch);
+    if (error)
+    {
+        printf("SDL_UpdateTexture failed\n");
+    }
+
+    error = SDL_RenderCopy(dst.renderer, dst.texture, 0, 0);
+    if (error)
+    {
+        printf("SDL_RenderCopy failed\n");
+    }
+
+    SDL_RenderPresent(dst.renderer);
+}
+```
+
+Add an image to the state.
+
+```cpp
+class AppState
+{
+public:
+    bool is_running = false;
+
+    ImageRGBA screen_image;
+};
+```
+
+Update main to create the screen image and render it every frame.
+
+```cpp
+int main()
+{
+    if (!init_sdl())
+    {
+        return EXIT_FAILURE;
+    }
+
+    auto app_title = "OpenCV SDL2";
+    int window_height = 480;
+    int window_width = 640;
+
+    WindowBuffer window_buffer;
+    AppState state;
+
+    auto const cleanup = [&]() 
+    {
+        destroy_image(state.screen_image);
+        destroy_window_buffer(window_buffer);
+        SDL_Quit();
+    };
+
+    if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    if (!create_image(state.screen_image, window_width, window_height))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    state.is_running = true;
+    
+    Stopwatch sw;
+    sw.start();
+
+    while (state.is_running)
+    {
+        SDL_Event event;
+        if (SDL_PollEvent(&event))
+        {
+            handle_sdl_event(event, state);
+        }
+
+        render_image(state.screen_image, window_buffer);
+
+        wait_for_framerate(sw);
+    }
+
+    cleanup();
+    return EXIT_SUCCESS;
+}
 ```

@@ -10,7 +10,7 @@
         },
         {
             "number": "[017]",
-            "id": "1669194936431",
+            "id": "1676920367955",
             "title": "Basic video application",
             "route": "basic-video",
             "tags": ["C++", "SDL2", "OpenCV"],
