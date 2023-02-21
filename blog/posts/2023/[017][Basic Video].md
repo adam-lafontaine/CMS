@@ -377,3 +377,418 @@ int main()
     return EXIT_SUCCESS;
 }
 ```
+
+
+
+
+```cpp
+#include <algorithm>
+
+
+void fill_image(ImageRGBA const& image, RGBA color)
+{
+    auto image_begin = image.data;
+    auto image_end = image_begin + image.width * image.height;
+
+    std::fill(image_begin, image_end, color);
+}
+```
+
+Update the keyboard event handling to fill the screen with a given color when a key is pressed.
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event, AppState& state)
+{
+    if (event.key.repeat || event.key.state != SDL_PRESSED)
+    {
+        return;
+    }
+
+    auto key_code = event.key.keysym.sym;
+
+    switch (key_code)
+    {
+    case SDLK_r:
+        fill_image(state.screen_image, to_rgba(255, 0, 0));
+        printf("red\n");
+        break;
+    case SDLK_g:
+        fill_image(state.screen_image, to_rgba(0, 255, 0));
+        printf("green\n");
+        break;
+    case SDLK_b:
+        fill_image(state.screen_image, to_rgba(0, 0, 255));
+        printf("blue\n");
+        break;
+
+    default:
+        printf("any key\n");
+    }
+}
+```
+
+The above will write to the state image only when a key is pressed.  To enable video, we need to update the image every frame.
+
+Add a function object to the state.
+
+```cpp
+#include <functional>
+
+
+class AppState
+{
+public:
+    bool is_running = false;
+
+    ImageRGBA screen_image;
+
+    std::function<void()> update_frame = []() {};
+};
+```
+
+Update the keyboard event handling to change the function when a key pressed.
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event, AppState& state)
+{
+    if (event.key.repeat || event.key.state != SDL_PRESSED)
+    {
+        return;
+    }
+
+    auto key_code = event.key.keysym.sym;
+
+    switch (key_code)
+    {
+    case SDLK_r:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(255, 0, 0)); };
+        printf("red\n");
+        break;
+    case SDLK_g:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 255, 0)); };
+        printf("green\n");
+        break;
+    case SDLK_b:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 0, 255)); };
+        printf("blue\n");
+        break;
+
+    default:
+        printf("any key\n");
+    }
+}
+```
+
+Call the function in each frame in main.
+
+```cpp
+int main()
+{
+    if (!init_sdl())
+    {
+        return EXIT_FAILURE;
+    }
+
+    auto app_title = "OpenCV SDL2";
+    int window_height = 480;
+    int window_width = 640;
+
+    WindowBuffer window_buffer;
+    AppState state;
+
+    auto const cleanup = [&]() 
+    {
+        destroy_image(state.screen_image);
+        destroy_window_buffer(window_buffer);
+        SDL_Quit();
+    };
+
+    if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    if (!create_image(state.screen_image, window_width, window_height))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    state.is_running = true;
+    
+    Stopwatch sw;
+    sw.start();
+
+    while (state.is_running)
+    {
+        SDL_Event event;
+        if (SDL_PollEvent(&event))
+        {
+            handle_sdl_event(event, state);
+        }
+
+        state.update_frame();
+
+        render_image(state.screen_image, window_buffer);
+
+        wait_for_framerate(sw);
+    }
+
+    cleanup();
+    return EXIT_SUCCESS;
+}
+```
+
+### OpenCV
+
+The easy way with OpenCV
+
+```cpp
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
+
+void show_webcam()
+{
+    cv::VideoCapture cap(0);
+
+    cv::Mat frame;
+
+    for(;;)
+    {
+        cap >> frame;
+
+        if (frame.empty())
+        {
+            break;
+        }
+
+        cv::imshow("OpenCV window", frame);
+
+        if (cv::waitKey(15) == 'q')
+        {
+            break;
+        }
+    }
+}
+```
+
+Camera definition.
+
+```cpp
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+
+
+class Camera
+{
+public:
+    cv::VideoCapture capture;
+    cv::Mat frame;
+
+    u32 frame_width = 0;
+    u32 frame_height = 0;
+};
+```
+
+Initialize the camera before using it.
+
+```cpp
+bool open_camera(Camera& camera)
+{
+    auto& cap = camera.capture;
+
+    cap = cv::VideoCapture(0);
+    if (!cap.isOpened())
+    {
+        return false;
+    }
+
+    camera.frame_width = (u32)cap.get(cv::CAP_PROP_FRAME_WIDTH);
+    camera.frame_height = (u32)cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    return true;
+}
+```
+
+Add a Camera to the state class.
+
+```cpp
+class AppState
+{
+public:
+    bool is_running = false;
+
+    ImageRGBA screen_image;
+
+    std::function<void()> update_frame = []() {};
+
+    Camera camera;
+};
+```
+
+Update main to open a Camera and set the window width and height based on its frame dimensions.
+
+```cpp
+int main()
+{
+    if (!init_sdl())
+    {
+        return EXIT_FAILURE;
+    }
+
+    auto app_title = "OpenCV SDL2";    
+
+    WindowBuffer window_buffer;
+    AppState state;
+
+    if (!open_camera(state.camera))
+    {
+        return EXIT_FAILURE;
+    }
+
+    int window_height = (int)state.camera.frame_height;
+    int window_width = (int)state.camera.frame_width;
+
+    auto const cleanup = [&]() 
+    {
+        destroy_image(state.screen_image);
+        destroy_window_buffer(window_buffer);
+        SDL_Quit();
+    };
+
+    if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    if (!create_image(state.screen_image, window_width, window_height))
+    {
+        cleanup();
+        return EXIT_FAILURE;
+    }
+
+    state.is_running = true;
+    
+    Stopwatch sw;
+    sw.start();
+
+    while (state.is_running)
+    {
+        SDL_Event event;
+        if (SDL_PollEvent(&event))
+        {
+            handle_sdl_event(event, state);
+        }
+
+        state.update_frame();
+
+        render_image(state.screen_image, window_buffer);
+
+        wait_for_framerate(sw);
+    }
+
+    cleanup();
+    return EXIT_SUCCESS;
+}
+```
+
+OpenCV frames are in BGR format.  We will need to convert it to RGBA in order to write the webcam image to the screen.
+
+```cpp
+class BGR
+{
+public:
+    u8 blue;
+    u8 green;
+    u8 red;
+};
+
+
+RGBA bgr_to_rgba(BGR bgr)
+{
+    return { bgr.red, bgr.green, bgr.blue, 255 };
+}
+```
+
+Grab a frame
+
+```cpp
+bool grab_frame(Camera& camera)
+{
+    auto& cap = camera.capture;
+
+    if (!cap.grab())
+    {
+        return false;
+    }
+
+    auto& frame = camera.frame;
+
+    if (!cap.retrieve(frame))
+    {
+        return false;
+    }
+
+    return true;
+}
+```
+
+If a frame grab was successful, convert the BGR frame to the RGBA image.
+
+```cpp
+void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
+{
+    if (!grab_frame(camera))
+    {
+        return;
+    }
+
+    auto frame_begin = camera.frame.data;
+    auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
+
+    auto image_begin = image.data;
+
+    std::transform(frame_begin, frame_end, image_begin, bgr_to_rgba);
+}
+```
+
+Update the event handling to display the webcam frame in the window.
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event, AppState& state)
+{
+    if (event.key.repeat || event.key.state != SDL_PRESSED)
+    {
+        return;
+    }
+
+    auto key_code = event.key.keysym.sym;
+
+    switch (key_code)
+    {
+    case SDLK_r:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(255, 0, 0)); };
+        printf("red\n");
+        break;
+    case SDLK_g:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 0, 255)); };
+        printf("green\n");
+        break;
+    case SDLK_b:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 255, 0)); };
+        printf("blue\n");
+        break;
+
+    case SDLK_c:
+        state.update_frame = [&]() { grab_and_convert_frame(state.camera, state.screen_image); };
+        break;
+
+    default:
+        printf("any key\n");
+    }
+}
+```
