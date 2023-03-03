@@ -1,13 +1,46 @@
 # Basic video application
 ## Using SDL2 with OpenCV
 
+
+The easy way with OpenCV
+
+```cpp
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
+
+void show_webcam()
+{
+    cv::VideoCapture cap(0);
+
+    cv::Mat frame;
+
+    for(;;)
+    {
+        cap >> frame;
+
+        if (frame.empty())
+        {
+            break;
+        }
+
+        cv::imshow("OpenCV window", frame);
+
+        if (cv::waitKey(15) == 'q')
+        {
+            break;
+        }
+    }
+}
+```
+
+
 ### SDL2
 
 SDL2 code
 
 ```cpp
-
-
 #include <cstdio>
 
 #if defined(_WIN32)
@@ -542,38 +575,7 @@ int main()
 
 ### OpenCV
 
-The easy way with OpenCV
 
-```cpp
-#include <opencv2/opencv.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
-
-
-void show_webcam()
-{
-    cv::VideoCapture cap(0);
-
-    cv::Mat frame;
-
-    for(;;)
-    {
-        cap >> frame;
-
-        if (frame.empty())
-        {
-            break;
-        }
-
-        cv::imshow("OpenCV window", frame);
-
-        if (cv::waitKey(15) == 'q')
-        {
-            break;
-        }
-    }
-}
-```
 
 Camera definition.
 
