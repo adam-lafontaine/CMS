@@ -1,8 +1,9 @@
-# Basic video application
+# Basic video rendering
 ## Using SDL2 with OpenCV
 
+Here we're going to take what we've learned about SDL2 and use it to render video in a window instead of static images.  The easiest way to get a video stream is from a webcam and the easiest way to use a webcam in code is with OpenCV.  So we will use OpenCV to grab frames from a webcam and render them to the screen with SDL2.
 
-The easy way with OpenCV
+If you are familiar with OpenCV or have seen any of the tutorials, you'll know that OpenCV already has this feature available and it goes something like this.
 
 ```cpp
 #include <opencv2/opencv.hpp>
@@ -35,10 +36,14 @@ void show_webcam()
 }
 ```
 
+If this is what you want to accomplish, then read no furthur.  There is no sense in making life more difficult than necessary.
+
+For everyone else, this post will show how frames from the camera can be continuously rendered in a window of your own application.
 
 ### SDL2
 
-SDL2 code
+We'll use SDL2 to create the window for displaying the video.  The basics of SDL2 was covered here https://almostalwaysauto.com/posts/basic-gui.  You may want to read it first before moving on.
+Here is the code for initializing the library and generating a window.
 
 ```cpp
 #include <cstdio>
@@ -118,7 +123,7 @@ bool init_sdl()
 }
 ```
 
-Create a class to hold the state of the application
+Create a class to hold the state of the application.  We'll add more properties to it as we need them.
 
 ```cpp
 class AppState
@@ -128,7 +133,7 @@ public:
 };
 ```
 
-Handle input from keyboard
+We'll take a reference to the state object when handling input from the keyboard.
 
 ```cpp
 void handle_keyboard_event(SDL_Event const& event, AppState& state)
@@ -191,7 +196,9 @@ void handle_sdl_event(SDL_Event const& event, AppState& state)
 }
 ```
 
-Main function along with code to throttle the frame rate.
+We'll start our application with a main function and code to throttle the frame rate.  It should compile and run with a blank window open.
+
+Check the aforementioned post for the implementation of the Stopwatch class.
 
 ```cpp
 #include "stopwatch.hpp"
@@ -207,7 +214,7 @@ using r32 = float;
 
 void wait_for_framerate(Stopwatch& sw)
 {
-    constexpr auto target_ms_per_frame = 30.0;
+    constexpr auto target_ms_per_frame = 30.0;  // 30 FPS (ish)
 
     auto frame_ms_elapsed = sw.get_time_milli();
     auto sleep_ms = (u32)(target_ms_per_frame - frame_ms_elapsed);
@@ -271,7 +278,10 @@ int main()
 }
 ```
 
-SDL2 pixel format
+
+### Pixel format
+
+We setup our SDL window with the pixel format `SDL_PIXELFORMAT_ABGR8888`.  This means that it expects each pixel to be 4 bytes wide and is in the following format.
 
 ```cpp
 class RGBA
@@ -281,18 +291,22 @@ public:
     u8 green = 0;
     u8 blue = 0;
     u8 alpha = 0;
-};;
-
-
-RGBA to_rgba(u8 r, u8 g, u8 b)
-{
-    return { r, g, b, 255 };
-}
+};
 ```
 
-Image format
+Our image contains a pointer to a buffer of pixels with a width and height;
 
 ```cpp
+class ImageRGBA
+{
+public:
+    u32 width = 0;
+    u32 height = 0;
+
+    RGBA* data = nullptr;
+};
+
+
 void destroy_image(ImageRGBA& image)
 {
     if (image.data)
@@ -318,7 +332,7 @@ bool create_image(ImageRGBA& image, u32 width, u32 height)
 }
 ```
 
-Write image to window
+To render our image to the screen, we get SDL to copy our image to the texture, then copy the texture to the renderer and finally render it in the window.
 
 ```cpp
 static void render_image(ImageRGBA const& src, WindowBuffer const& dst)
@@ -411,6 +425,8 @@ int main()
 }
 ```
 
+### Updating the window.
+
 
 
 
@@ -462,7 +478,7 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
 
 The above will write to the state image only when a key is pressed.  To enable video, we need to update the image every frame.
 
-Add a function object to the state.
+Add a function object to the state.  It will be called every frame to update our screen image.
 
 ```cpp
 #include <functional>
