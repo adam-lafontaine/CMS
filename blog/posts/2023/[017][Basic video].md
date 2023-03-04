@@ -281,7 +281,7 @@ int main()
 
 ### Pixel format
 
-We setup our SDL window with the pixel format `SDL_PIXELFORMAT_ABGR8888`.  This means that it expects each pixel to be 4 bytes wide and is in the following format.
+We setup our SDL window with the pixel format `SDL_PIXELFORMAT_ABGR8888`.  This means that it expects each pixel to be 4 bytes wide and in the following format.
 
 ```cpp
 class RGBA
@@ -292,6 +292,12 @@ public:
     u8 blue = 0;
     u8 alpha = 0;
 };
+
+
+RGBA to_rgba(u8 r, u8 g, u8 b)
+{
+    return { r, g, b, 255 };
+}
 ```
 
 Our image contains a pointer to a buffer of pixels with a width and height;
@@ -427,8 +433,7 @@ int main()
 
 ### Updating the window.
 
-
-
+Now that our window is setup and rendering the contents of our image every frame, we can add functionality that modifies the image.  Before adding the webcam functionality, we'll start with something simple like filling the screen with given color.
 
 ```cpp
 #include <algorithm>
@@ -443,7 +448,7 @@ void fill_image(ImageRGBA const& image, RGBA color)
 }
 ```
 
-Update the keyboard event handling to fill the screen with a given color when a key is pressed.
+Update the event handling to set a different screen color based on what key is pressed.
 
 ```cpp
 void handle_keyboard_event(SDL_Event const& event, AppState& state)
@@ -528,7 +533,7 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
 }
 ```
 
-Call the function in each frame in main.
+Now call the function each frame in main before rendering.
 
 ```cpp
 int main()
@@ -591,9 +596,7 @@ int main()
 
 ### OpenCV
 
-
-
-Camera definition.
+We are now capable of receiving and rendering a new screen image every frame of the application.  Now we can get image data from a `cv::VideoCapture` object.  Define a camera that has a `cv::Mat` to store the most recent webcam image and the image dimensions.
 
 ```cpp
 #include <opencv2/opencv.hpp>
@@ -714,7 +717,9 @@ int main()
 }
 ```
 
-OpenCV frames are in BGR format.  We will need to convert it to RGBA in order to write the webcam image to the screen.
+### Image conversion
+
+A `cv::Mat` object has image data in BGR format.  We will need to convert it to RGBA when writing to screen image.
 
 ```cpp
 class BGR
@@ -732,7 +737,7 @@ RGBA bgr_to_rgba(BGR bgr)
 }
 ```
 
-Grab a frame
+We'll grab an image using the `grab()` and `retrieve()` methods instead of the ``>>` operator so that we can better check for failure.
 
 ```cpp
 bool grab_frame(Camera& camera)
@@ -803,6 +808,7 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
 
     case SDLK_c:
         state.update_frame = [&]() { grab_and_convert_frame(state.camera, state.screen_image); };
+        printf("camera\n");
         break;
 
     default:
@@ -810,3 +816,9 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
     }
 }
 ```
+
+Run the program.  When you press the 'C' key, you'll see your face in the window or whatever your webcam is pointed at.
+
+### That's it
+
+This is video rendering in its most basic form.  You can now use the OpenCV library in your own applications.  I would encourage you to check out the OpenCV tutorials and integrate some of the examples here.
