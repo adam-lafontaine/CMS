@@ -1,7 +1,9 @@
 # Basic video rendering
 ## Using SDL2 with OpenCV
 
-This post will take what we've learned about SDL2 and use it to render video in a window.  The most readily available source of a video stream is a webcam and the easiest way to use a webcam in code is with OpenCV.  We will use OpenCV to grab frames from a webcam and render them to the screen with SDL2.
+This post will take what we've learned about SDL2 and use it to render video in a window.
+
+The most readily available source of a video stream is a webcam and the easiest way to use a webcam in code is with OpenCV.  We will use OpenCV to grab frames from a webcam and render them to the screen with SDL2.
 
 If you are familiar with OpenCV or have seen any of the tutorials, you'll know that OpenCV already has this feature available and it goes something like this.
 
@@ -36,7 +38,7 @@ void show_webcam()
 }
 ```
 
-If this is all that you want to accomplish, then read no furthur.  There is no sense in making life more difficult than necessary.
+If this is all that you want to accomplish, then read no furthur.
 
 For everyone else, this post will show how frames from the camera can be continuously rendered in a window of your own application.
 
