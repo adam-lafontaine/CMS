@@ -1,7 +1,7 @@
 # Basic video rendering
 ## Using SDL2 with OpenCV
 
-Here we're going to take what we've learned about SDL2 and use it to render video in a window instead of static images.  The easiest way to get a video stream is from a webcam and the easiest way to use a webcam in code is with OpenCV.  So we will use OpenCV to grab frames from a webcam and render them to the screen with SDL2.
+This post will take what we've learned about SDL2 and use it to render video in a window.  The most readily available source of a video stream is a webcam and the easiest way to use a webcam in code is with OpenCV.  We will use OpenCV to grab frames from a webcam and render them to the screen with SDL2.
 
 If you are familiar with OpenCV or have seen any of the tutorials, you'll know that OpenCV already has this feature available and it goes something like this.
 
@@ -36,13 +36,13 @@ void show_webcam()
 }
 ```
 
-If this is what you want to accomplish, then read no furthur.  There is no sense in making life more difficult than necessary.
+If this is all that you want to accomplish, then read no furthur.  There is no sense in making life more difficult than necessary.
 
 For everyone else, this post will show how frames from the camera can be continuously rendered in a window of your own application.
 
 ### SDL2
 
-We'll use SDL2 to create the window for displaying the video.  The basics of SDL2 was covered here https://almostalwaysauto.com/posts/basic-gui.  You may want to read it first before moving on.
+We'll use SDL2 for displaying the video.  The basics of SDL2 was covered here https://almostalwaysauto.com/posts/basic-gui.  You may want to read it first before moving on.
 Here is the code for initializing the library and generating a window.
 
 ```cpp
@@ -433,7 +433,7 @@ int main()
 
 ### Updating the window.
 
-Now that our window is setup and rendering the contents of our image every frame, we can add functionality that modifies the image.  Before adding the webcam functionality, we'll start with something simple like filling the screen with given color.
+Now that our window is setup and rendering the contents of our image every frame, we can add functionality that modifies the image.  We'll start with something simple like filling the screen with a given color.
 
 ```cpp
 #include <algorithm>
@@ -500,7 +500,7 @@ public:
 };
 ```
 
-Update the keyboard event handling to change the function when a key pressed.
+Update the keyboard event handling to change the function when a key is pressed.
 
 ```cpp
 void handle_keyboard_event(SDL_Event const& event, AppState& state)
@@ -596,7 +596,7 @@ int main()
 
 ### OpenCV
 
-We are now capable of receiving and rendering a new screen image every frame of the application.  Now we can get image data from a `cv::VideoCapture` object.  Define a camera that has a `cv::Mat` to store the most recent webcam image and the image dimensions.
+We are now capable of rendering a new screen image every frame of the application.  The `cv::VideoCapture` in our camera object will provide this data.  Include a `cv::Mat` to store the most recent webcam image as well as the image dimensions.
 
 ```cpp
 #include <opencv2/opencv.hpp>
@@ -650,7 +650,7 @@ public:
 };
 ```
 
-Update main to open a Camera and set the window width and height based on its frame dimensions.
+Update main to open a `Camera` and set the window width and height based on its frame dimensions.
 
 ```cpp
 int main()
@@ -719,7 +719,7 @@ int main()
 
 ### Image conversion
 
-A `cv::Mat` object has image data in BGR format.  We will need to convert it to RGBA when writing to screen image.
+A `cv::Mat` object has image data in BGR format.  We will need to convert it to RGBA when writing to the screen image.
 
 ```cpp
 class BGR
@@ -737,7 +737,7 @@ RGBA bgr_to_rgba(BGR bgr)
 }
 ```
 
-We'll grab an image using the `grab()` and `retrieve()` methods instead of the ``>>` operator so that we can better check for failure.
+We'll grab an image using the `grab()` and `retrieve()` methods instead of the `>>` operator so that we can better check for failure.
 
 ```cpp
 bool grab_frame(Camera& camera)
@@ -770,7 +770,7 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
         return;
     }
 
-    auto frame_begin = camera.frame.data;
+    auto frame_begin = (BGR*)camera.frame.data;
     auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
 
     auto image_begin = image.data;
@@ -821,4 +821,4 @@ Run the program.  When you press the 'C' key, you'll see your face in the window
 
 ### That's it
 
-This is video rendering in its most basic form.  You can now use the OpenCV library in your own applications.  I would encourage you to check out the OpenCV tutorials and integrate some of the examples here.
+This is video rendering in its most basic form.  You can now use the OpenCV library in your own applications.  I would encourage you to check out the OpenCV tutorials and integrate some of the examples here.  Thanks.
