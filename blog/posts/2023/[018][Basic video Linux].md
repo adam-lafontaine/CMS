@@ -98,9 +98,9 @@ int main()
 }
 ```
 
+When compiling with libuvc, we'll need to include the follow linker flags.
 
 ```plaintext
-g++-11
 `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
 ```
 
@@ -225,7 +225,7 @@ int main()
 
 ### SDL2 Recap
 
-The supporting code for SDL2 is identical to that of the [previous post](https://almostalwaysauto.com/posts/basic-video). We'll start at the point where we can set a callback function that updates the image on screen.
+The supporting code for rendering with SDL2 is identical to that of the [previous post](https://almostalwaysauto.com/posts/basic-video). We'll start at the point where we can set a callback function that updates the image on screen.
 
 Our application state holds the 
 
@@ -335,21 +335,185 @@ int main()
 }
 ```
 
+SDL2 requires the following linker flags for compiling.
 
-### Camera device
-
-```cpp
-
+```plaintext
+`sdl2-config --cflags --libs`
 ```
 
+### Pixel format
+
+Unlike OpenCV, Libuvc does not have a fixed pixel format that it stores frame data in.  Instead it provides the encoding information from the camera and access to the raw data.  It is our responsibility to convert the image data to the format we need.
+
+We won't be covering the various image formats in this post.  To keep things simple, we'll use a Libuvc helper function called `any2bgr()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to BGR.  This is convenient because we're already setup for BGR from the OpenCV example.
+
+If the frame does not have one of the supported image formats, then `any2bgr()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
+
+Define a BGR image to write the frame data to.
+
+
 ```cpp
-class Camera
+#include <cstddef>
+
+using u8 = uint8_t;
+using u32 = uint32_t;
+
+
+class ImageBGR
 {
 public:
+    u32 width = 0;
+    u32 height = 0;
 
+    BGR* data = nullptr;
 };
 
 
+void destroy_image(ImageBGR& image)
+{
+    if (image.data)
+    {
+        free(image.data);
+    }
+}
+
+
+bool create_image(ImageBGR& image, u32 width, u32 height)
+{
+    auto data = malloc(sizeof(BGR) * width * height);
+    if (!data)
+    {
+        return false;
+    }
+
+    image.width = width;
+    image.height = height;
+    image.data = (BGR*)data;
+
+    return true;
+}
 ```
 
+### Camera device
+
+We need to define a `Camera` struct that has a the bgr frame data and the properties required by Libuvc.
+
+```cpp
+#include <cassert>
+
+
+class Camera
+{
+public:
+    device* p_device = nullptr;
+    device_handle* h_device = nullptr;
+    stream_handle* h_stream = nullptr;
+
+    stream_ctrl ctrl;
+
+    int frame_width = -1;
+    int frame_height = -1;
+    int fps = -1;
+
+    ImageBGR bgr_frame;
+
+    bool is_open = false;
+};
+```
+
+Our `DeviceList` from earlier will provide access to a `Camera`.  We first do all of the necessary Libuvc setup.  If it's successful, allocate memory for the image data.
+
+```cpp
+Camera get_default_camera(DeviceList const& list)
+{
+    assert(list.n_devices && list.device_list[0]);
+
+    // select first camera
+    auto device = list.device_list[0];    
+
+    Camera camera{};
+    camera.p_device = device;
+
+    auto res = uvc_open(camera.p_device, &camera.h_device);
+    if (res != UVC_SUCCESS)
+    {
+        // most likely a permissions issue
+        uvc_perror(res, "uvc_open()");
+        print_device_list(list);
+        return camera;
+    }
+
+    const format_desc* format_desc = uvc_get_format_descs(camera.h_device);
+    const frame_desc* frame_desc = format_desc->frame_descs;
+
+    frame_format frame_format;
+    int width = 640;
+    int height = 480;
+    int fps = 30;
+
+    switch (format_desc->bDescriptorSubtype) 
+    {
+    case UVC_VS_FORMAT_MJPEG:
+        frame_format = UVC_FRAME_FORMAT_MJPEG;        
+        break;
+    case UVC_VS_FORMAT_FRAME_BASED:
+        frame_format = UVC_FRAME_FORMAT_H264;
+        break;
+    default:
+        frame_format = UVC_FRAME_FORMAT_YUYV;
+        break;
+    }
+
+    if (frame_desc) 
+    {
+        width = frame_desc->wWidth;
+        height = frame_desc->wHeight;
+        fps = 10000000 / frame_desc->dwDefaultFrameInterval;
+    }    
+
+    res = uvc_get_stream_ctrl_format_size(
+        camera.h_device, &camera.ctrl, /* result stored in ctrl */
+        frame_format,
+        width, height, fps /* width, height, fps */
+    );
+
+    if (res != UVC_SUCCESS)
+    {
+        uvc_perror(res, "uvc_get_stream_ctrl_format_size()");
+        return camera;
+    }
+
+    if (!create_image(camera.bgr_frame, (u32)width, (u32)height))
+    {
+        printf("Error create_image()\n");
+        return camera;
+    }
+
+    camera.frame_width = width;
+    camera.frame_height = height;
+    camera.fps = fps;
+    camera.is_open = true;
+
+    return camera;
+}
+```
+
+Cleanup the camera resources when finished.
+
+```cpp
+void close_camera(Camera const& camera)
+{
+    uvc_close(camera.h_device);
+    camera.h_device = nullptr;
+
+    uvc_unref_device(camera.p_device);
+    camera.p_device = nullptr;
+
+    camera.frame_width = -1;
+    camera.frame_height = -1;
+    camera.fps = -1;
+
+    camera.is_open = false;
+}
+```
 
