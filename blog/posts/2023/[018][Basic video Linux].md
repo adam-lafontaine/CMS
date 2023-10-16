@@ -424,31 +424,33 @@ public:
     u32 height = 0;
 
     RGB* data = nullptr;
+
+    uvc_frame_t* uvc_frame;
 };
-
-
-void destroy_image(ImageRGB& image)
-{
-    if (image.data)
-    {
-        free(image.data);
-    }
-}
 
 
 bool create_image(ImageRGB& image, u32 width, u32 height)
 {
-    auto data = malloc(sizeof(RGB) * width * height);
-    if (!data)
+    image.uvc_frame = uvc_allocate_frame(sizeof(RGB) * width * height);
+    if (!image.uvc_frame)
     {
         return false;
     }
 
     image.width = width;
     image.height = height;
-    image.data = (RGB*)data;
+    image.data = (RGB*)image.uvc_frame->data;
 
     return true;
+}
+
+
+void destroy_image(ImageRGB& image)
+{
+    if (image.uvc_frame)
+    {
+        uvc_free_frame(image.uvc_frame);
+    }
 }
 ```
 
@@ -767,7 +769,7 @@ int main()
 ```cpp
 void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
 {
-    frame* in;
+    uvc_frame_t* in;
 
     auto res = uvc_stream_get_frame(camera.h_stream, &in, 0);
     if (res != UVC_SUCCESS)
@@ -776,16 +778,13 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
         return;
     }
 
-    auto frame_begin = (RGB*)camera.frame.data;
+    auto frame_begin = (RGB*)camera.rgb_frame.data;
     auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
 
-    frame* out;
-    out->data = (void*)frame_begin;
-
-    res = uvc_any2bgr(in, out);
+    res = uvc_any2rgb(in, camera.rgb_frame.uvc_frame);
     if (res != UVC_SUCCESS)
     {
-        uvc_perror(res, "uvc_any2bgr()");
+        uvc_perror(res, "uvc_any2rgb()");
         return;
     }
 
