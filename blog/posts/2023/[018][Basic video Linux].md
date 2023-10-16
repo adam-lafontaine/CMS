@@ -360,12 +360,11 @@ SDL2 requires the following linker flags for compiling.
 
 Unlike OpenCV, Libuvc does not have a fixed pixel format that it stores frame data in.  Instead it provides the encoding information from the camera and access to the raw data.  It is our responsibility to convert the image data to the format we need.
 
-We won't be covering the various image formats in this post.  To keep things simple, we'll use a Libuvc helper function called `any2bgr()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to BGR.  This is convenient because we're already setup for BGR from the OpenCV example.
+We won't be covering the various image formats in this post.  To keep things simple, we'll use a Libuvc helper function called `uvc_any2rgb()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to RGB.
 
-If the frame does not have one of the supported image formats, then `any2bgr()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
+If the frame does not have one of the supported image formats, then `uvc_any2rgb()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
 
-Define a BGR image to write the frame data to.
-
+Define a RGB image to write the frame data to.
 
 ```cpp
 #include <cstddef>
@@ -374,17 +373,26 @@ using u8 = uint8_t;
 using u32 = uint32_t;
 
 
-class ImageBGR
+class RGB
+{
+public:
+    u8 red = 0;
+    u8 green = 0;
+    u8 blue = 0;
+};
+
+
+class ImageRGB
 {
 public:
     u32 width = 0;
     u32 height = 0;
 
-    BGR* data = nullptr;
+    RGB* data = nullptr;
 };
 
 
-void destroy_image(ImageBGR& image)
+void destroy_image(ImageRGB& image)
 {
     if (image.data)
     {
@@ -393,9 +401,9 @@ void destroy_image(ImageBGR& image)
 }
 
 
-bool create_image(ImageBGR& image, u32 width, u32 height)
+bool create_image(ImageRGB& image, u32 width, u32 height)
 {
-    auto data = malloc(sizeof(BGR) * width * height);
+    auto data = malloc(sizeof(RGB) * width * height);
     if (!data)
     {
         return false;
@@ -403,15 +411,24 @@ bool create_image(ImageBGR& image, u32 width, u32 height)
 
     image.width = width;
     image.height = height;
-    image.data = (BGR*)data;
+    image.data = (RGB*)data;
 
     return true;
 }
 ```
 
+The application window image is in RGBA format.  Conversion is very straighforward.
+
+```cpp
+RGBA rgb_to_rgba(RGB rgb)
+{
+    return to_rgba(rgb.red, rgb.green, rgb.blue);
+}
+```
+
 ### Camera setup
 
-We need to define a `Camera` struct that has a the bgr frame data and the properties required by Libuvc.
+We need to define a `Camera` struct that has the frame data in RGB format and the properties required by Libuvc.
 
 ```cpp
 #include <cassert>
@@ -430,7 +447,7 @@ public:
     int frame_height = -1;
     int fps = -1;
 
-    ImageBGR bgr_frame;
+    ImageRGB rgb_frame;
 
     bool has_device = false;
     bool has_frame = false;
@@ -506,10 +523,10 @@ bool get_frame_properties(Camera& camera)
     if (res != UVC_SUCCESS)
     {
         uvc_perror(res, "uvc_get_stream_ctrl_format_size()");
-        return camera;
+        return false;
     }
 
-    if (!create_image(camera.bgr_frame, (u32)width, (u32)height))
+    if (!create_image(camera.rgb_frame, (u32)width, (u32)height))
     {
         printf("Error create_image()\n");
         return false;
@@ -566,7 +583,7 @@ void close_camera(Camera const& camera)
 
     if (camera.has_frame)
     {
-        destroy_image(camera.bgr_frame);
+        destroy_image(camera.rgb_frame);
     }
 
     if (camera.is_open)
@@ -635,7 +652,7 @@ public:
 };
 ```
 
-Update main to find the connected devices and open a `Camera`, set the window width and height based on its frame dimensions.
+Update main to find the connected devices and then open a `Camera`.  Then set the window width and height based on its frame dimensions.
 
 ```cpp
 int main()
@@ -645,7 +662,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    auto app_title = "OpenCV SDL2";    
+    auto app_title = "Libuvc SDL2";
 
     WindowBuffer window_buffer;
     AppState state;
@@ -709,3 +726,79 @@ int main()
     return EXIT_SUCCESS;
 }
 ```
+
+### Grabbing frames
+
+```cpp
+void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
+{
+    frame* in;
+
+    auto res = uvc_stream_get_frame(camera.h_stream, &in);
+    if (res != UVC_SUCCESS)
+    {
+        uvc_perror(res, "uvc_stream_get_frame()");
+        return;
+    }
+
+    auto frame_begin = (RGB*)camera.frame.data;
+    auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
+
+    frame* out;
+    out->data = (void*)frame_begin;
+
+    res = uvc_any2bgr(in, out);
+    if (res != UVC_SUCCESS)
+    {
+        uvc_perror(res, "uvc_any2bgr()");
+        return;
+    }
+
+    auto image_begin = image.data;
+
+    std::transform(frame_begin, frame_end, image_begin, rgb_to_rgba);
+}
+```
+
+Update the event handling to display the webcam frames in the window by pressing the 'C' key;
+
+```cpp
+void handle_keyboard_event(SDL_Event const& event, AppState& state)
+{
+    if (event.key.repeat || event.key.state != SDL_PRESSED)
+    {
+        return;
+    }
+
+    auto key_code = event.key.keysym.sym;
+
+    switch (key_code)
+    {
+    case SDLK_r:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(255, 0, 0)); };
+        printf("red\n");
+        break;
+    case SDLK_g:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 255, 0)); };
+        printf("green\n");
+        break;
+    case SDLK_b:
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 0, 255)); };
+        printf("blue\n");
+        break;
+
+    case SDLK_c:
+        state.update_frame = [&]() { grab_and_convert_frame(state.camera, state.screen_image); };
+        printf("camera\n");
+        break;
+
+    default:
+        printf("any key\n");
+    }
+}
+```
+
+Now when you run the program your webcam video should be displayed in the window.
+
+### Conclusion
+
