@@ -472,11 +472,11 @@ We need to define a `Camera` struct that has the frame data in RGB format and th
 class Camera
 {
 public:
-    device* p_device = nullptr;
-    device_handle* h_device = nullptr;
-    stream_handle* h_stream = nullptr;
+    uvc_device_t* p_device = nullptr;
+    uvc_device_handle_t* h_device = nullptr;
+    uvc_stream_handle_t* h_stream = nullptr;
 
-    stream_ctrl ctrl;
+    uvc_stream_ctrl_t ctrl;
 
     int frame_width = -1;
     int frame_height = -1;
@@ -521,10 +521,10 @@ Query Libuc for the camera information.  If successful, allocate memory for the 
 ```cpp
 bool get_frame_properties(Camera& camera)
 {
-    const format_desc* format_desc = uvc_get_format_descs(camera.h_device);
-    const frame_desc* frame_desc = format_desc->frame_descs;
+    const uvc_format_desc_t* format_desc = uvc_get_format_descs(camera.h_device);
+    const uvc_frame_desc_t* frame_desc = format_desc->frame_descs;
 
-    frame_format format;
+    uvc_frame_format format;
     int width = 640;
     int height = 480;
     int fps = 30;
@@ -549,7 +549,7 @@ bool get_frame_properties(Camera& camera)
         fps = 10000000 / frame_desc->dwDefaultFrameInterval;
     }    
 
-    res = uvc_get_stream_ctrl_format_size(
+    auto res = uvc_get_stream_ctrl_format_size(
         camera.h_device, &camera.ctrl, /* result stored in ctrl */
         format,
         width, height, fps /* width, height, fps */
@@ -592,7 +592,7 @@ bool start_camera(Camera& camera)
     uvc_frame_callback_t* cb = 0;
     auto cb_user_data = (void*)12345;
 
-    res = uvc_stream_start(device.h_stream, cb, cb_user_data, 0);
+    res = uvc_stream_start(camera.h_stream, cb, cb_user_data, 0);
     if (res != UVC_SUCCESS)
     {
         uvc_perror(res, "uvc_stream_start()");
@@ -609,7 +609,7 @@ bool start_camera(Camera& camera)
 Cleanup the camera resources when finished.
 
 ```cpp
-void close_camera(Camera const& camera)
+void close_camera(Camera& camera)
 {
     if (camera.is_streaming)
     {
@@ -621,7 +621,7 @@ void close_camera(Camera const& camera)
         destroy_image(camera.rgb_frame);
     }
 
-    if (camera.is_open)
+    if (camera.has_device)
     {
         uvc_close(camera.h_device);
         uvc_unref_device(camera.p_device);        
@@ -646,7 +646,7 @@ Wrap the device and camera setup logic into one function.
 ```cpp
 bool open_camera(DeviceList& list, Camera& camera)
 {   
-    if (!get_default_device(camera))
+    if (!get_default_device(list, camera))
     {
         close_camera(camera);
         return false;
@@ -718,7 +718,7 @@ int main()
     auto const cleanup = [&]() 
     {
         close_camera(state.camera);
-        close_device_list(list);
+        close_device_list(state.device_list);
 
         destroy_image(state.screen_image);
         destroy_window_buffer(window_buffer);
@@ -769,7 +769,7 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
 {
     frame* in;
 
-    auto res = uvc_stream_get_frame(camera.h_stream, &in);
+    auto res = uvc_stream_get_frame(camera.h_stream, &in, 0);
     if (res != UVC_SUCCESS)
     {
         uvc_perror(res, "uvc_stream_get_frame()");
