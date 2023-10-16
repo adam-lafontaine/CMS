@@ -1,9 +1,9 @@
 # Basic video rendering - Linux edition
 ## Replacing OpenCV with libuvc
 
-The previous post demonstrated how to capture webcam image frames using OpenCV and then render them in a window using SDL2.
+The [previous post](https://almostalwaysauto.com/posts/basic-video) demonstrated how to capture webcam image frames using OpenCV and then render them in a window with SDL2.
 
-If all we are doing is grabbing video frames, then we may not want to have OpenCV as a dependency in our application.  In this post we'll cover using a library called [libuvc](https://github.com/libuvc/libuvc) as an alternative when using Linux.  The example presented in this post was done using g++-11 on Ubuntu 20.04.
+If all we are doing is grabbing video frames, then we may not want to have OpenCV as a dependency in our application.  In this post we'll cover using a library called [libuvc](https://github.com/libuvc/libuvc) as an alternative when programming on Linux.  The example presented here was done using g++-11 on Ubuntu 20.04.
 
 
 ### libuvc installation/setup
@@ -139,7 +139,7 @@ Devices:
 
 ### Set device permissions
 
-Permission needs to be explicitly given for each webcam we want to use.  We do this by creating a file in the `/etc/udev/rules.d` directory.
+Permission needs to be explicitly given for each webcam we want to use.  We do this by creating a file in the `/etc/udev/rules.d/` directory.
 
 ```plaintext
 /etc/udev/rules.d/99-uvc.rules
@@ -286,7 +286,7 @@ SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="046d", ATTRS{id
 SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="64ab", MODE="0666""
 ```
 
-Create the rules file to ensure the app can communicate with the camera.  Remember to restart the computer.
+Create the rules file to ensure the app can communicate with the cameras.  Remember to restart the computer.
 
 
 ### SDL2 Recap
@@ -417,7 +417,7 @@ Unlike OpenCV, libuvc does not provide a fixed pixel format that it stores frame
 
 We won't be covering the various image formats in this post.  To keep things simple, we'll use a libuvc helper function called `uvc_any2rgb()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to RGB.
 
-If the frame does not have one of the supported image formats, then `uvc_any2rgb()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
+If the frame is not one of the supported image formats, then `uvc_any2rgb()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
 
 Define a RGB image to write the frame data to.
 
@@ -490,7 +490,7 @@ RGBA rgb_to_rgba(RGB rgb)
 
 ### Camera setup
 
-We need to define a `Camera` struct that has the frame data in RGB format and the properties required by to communicate with the physical device.
+We need to define a `Camera` struct that has the frame data in RGB format and the properties required by libuvc to communicate with the physical device.
 
 ```cpp
 class Camera
@@ -714,7 +714,7 @@ public:
 };
 ```
 
-Update main to find the connected devices and then open a `Camera`.  Set the window width and height based on the camera frame dimensions.
+Update main to find the connected devices and then open a `Camera`.  Set the window width and height based on the camera's frame dimensions.
 
 ```cpp
 int main()
@@ -791,7 +791,7 @@ int main()
 
 ### Grabbing frames
 
-When the library is up and running, we can request frames from the camera.  Here we gea frame, convert it to RGB, and then convert it to RGBA when writing to the application window.
+When the library is up and running, we can request frames from the camera.  Here we get a frame, convert it to RGB, and then convert it to RGBA when writing to the application window.
 
 ```cpp
 #include <algorithm>
@@ -823,6 +823,8 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
     std::transform(frame_begin, frame_end, image_begin, rgb_to_rgba);
 }
 ```
+
+It would be more efficient to convert the frame directly to RGBA instead of having the intermediate step of converting it to RGB first.  However in this simplified example, we do not know what format the source data will be in.  In order to elimnate the the RGB step, we would need to know what image format the camera provides and have a means of converting it to RGBA.  Otherwise we would need to create our own `any2rgba()` helper function.
 
 Update the event handling to display the webcam frames in the window by pressing the 'C' key;
 
