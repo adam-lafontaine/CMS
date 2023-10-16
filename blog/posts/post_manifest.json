@@ -9,11 +9,19 @@
             "filename": "2023/[][].md"
         },
         {
+            "number": "[018]",
+            "id": "1697463127665",
+            "title": "Basic video rendering - Linux edition",
+            "route": "basic-video-linux",
+            "tags": ["C++", "SDL2", "Libuvc", "USB"],
+            "filename": "2023/[018][Basic video Linux].md"
+        },
+        {
             "number": "[017]",
             "id": "1678100029576",
             "title": "Basic video rendering",
             "route": "basic-video",
-            "tags": ["C++", "SDL2", "OpenCV"],
+            "tags": ["C++", "SDL2", "OpenCV", "USB"],
             "filename": "2023/[017][Basic video].md"
         },
         {
@@ -21,7 +29,7 @@
             "id": "1669194936430",
             "title": "C++ on the web",
             "route": "cpp-web",
-            "tags": ["C++", "Web"],
+            "tags": ["C++", "Web", "wasm"],
             "filename": "2022/[016][C++ on the web].md"
         },
         {
