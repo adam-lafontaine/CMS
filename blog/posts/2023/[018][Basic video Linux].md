@@ -1,27 +1,38 @@
 # Basic video rendering - Linux edition
-## Replacing OpenCV with Libuvc
+## Replacing OpenCV with libuvc
 
 The previous post demonstrated how to capture webcam image frames using OpenCV and then render them in a window using SDL2.
 
-If all we are doing is grabbing video frames, then we may not want to have OpenCV as a dependency in our application.  In this post we'll cover using a library called [Libuvc](https://github.com/libuvc/libuvc) as an alternative.
-
-Note: I have not been able to get this to work on Windows.  This example was run on Linux Ubuntu 20.04.
+If all we are doing is grabbing video frames, then we may not want to have OpenCV as a dependency in our application.  In this post we'll cover using a library called [libuvc](https://github.com/libuvc/libuvc) as an alternative when using Linux.  The example presented in this post was done using g++-11 on Ubuntu 20.04.
 
 
-### Libuvc installation/setup
+### libuvc installation/setup
 
-Install libusb
+To start, libuvc requires libusb and libjpeg installed.
 
 ```plaintext
-sudo apt-get install - y libusb-1.0-0-dev libjpeg-dev
+sudo apt install -y libusb-1.0-0-dev libjpeg-dev
 ```
 
-Libuvc single header [Libuvc single header](https://github.com/adam-lafontaine/Cpp_Utilities/blob/master/libuvc/libuvc.h)
+The libuvc readme provides pretty simple installation instructions using CMake.  If you do not have CMake installed or simply do not want to use it, I have created a single header file with all of the library code in it.
 
+[libuvc single header](https://github.com/adam-lafontaine/Cpp_Utilities/blob/master/libuvc/libuvc.h)
+
+Be advised that the single header file does not work on Windows.  Also, be sure to define `LIBUVC_IMPLEMENTATION` before including it.
+
+```cpp
+#define LIBUVC_IMPLEMENTATION
+#include "libuvc.h"
+```
 
 ### List devices
 
+First we'll list all of the connected webcams to the console to make sure that everything is installed properly and we're communicating with the cameras.
+
+Create a `DeviceList` struct to keep our references to the libuvc library.
+
 ```cpp
+#define LIBUVC_IMPLEMENTATION
 #include "libuvc.h"
 
 #include <cstdio>
@@ -35,8 +46,11 @@ public:
 
     int n_devices = 0;
 };
+```
 
+In `main()`, initialize the library, get a reference to a list of the connected devices and then print some information about them to the console.
 
+```cpp
 int main()
 {
     DeviceList list{};
@@ -57,7 +71,7 @@ int main()
         return 1;
     }
 
-    if (!list.device_list[0])
+    if (!list.device_list || !list.device_list[0])
     {
         printf("No devices found\n");
         uvc_exit(list.context);
@@ -71,7 +85,7 @@ int main()
     {
         list.n_devices++;
 
-        device_descriptor* desc;
+        uvc_device_descriptor_t* desc;
 
         res = uvc_get_device_descriptor(list.device_list[i], &desc);
         if (res != UVC_SUCCESS)
@@ -103,13 +117,13 @@ When compiling with libuvc, we'll need to include the follow linker flags.
 `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
 ```
 
-Sample command line
+Here is a sample command line instruction to compile the program.
 
 ```plaintext
 g++-11 main.cpp -o camera_app `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
 ```
 
-Output
+The output should display the vendor ids and and product ids in hexadecimal form.  These will be required in the next step.  My machine currently has 3 webcams connected.
 
 ```plaintext
 Devices:
@@ -125,20 +139,20 @@ Devices:
 
 ### Set device permissions
 
-Create a file
+Permission needs to be explicitly given for each webcam we want to use.  We do this by creating a file in the `/etc/udev/rules.d` directory.
 
 ```plaintext
 /etc/udev/rules.d/99-uvc.rules
 ```
 
-For each webcam add the following line
+Create the file called `99-uvc.rules` and for each webcam add the following line.
 
 ```plaintext
 SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", MODE="0666"
 ```
-Replace XXXX and YYYY for the 4 hexadecimal characters corresponding to the vendor and product ID of your webcams.  Restart the computer for the changes to take effect.
+Replace XXXX and YYYY with the 4 hexadecimal characters corresponding to the vendor and product ID of your webcams.  **Restart the computer** for the changes to take effect.
 
-We can rewrite the code to just print the information to the console in case we need it.
+We can rewrite the code to just print the information we need to the console.
 
 ```cpp
 #include <vector>
@@ -162,7 +176,7 @@ bool find_devices(DeviceList& list)
         return false;
     }
 
-    if (!list.device_list[0])
+    if (!list.device_list || !list.device_list[0])
     {
         printf("No devices found\n");
         uvc_exit(list.context);
@@ -252,7 +266,7 @@ int main()
 }
 ```
 
-Output
+Here is my updated output for the 3 cameras.
 
 ```plaintext
 Devices:
@@ -272,12 +286,12 @@ SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="046d", ATTRS{id
 SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="64ab", MODE="0666""
 ```
 
-Create the rules file to ensure the app can communicate with the camera.
+Create the rules file to ensure the app can communicate with the camera.  Remember to restart the computer.
 
 
 ### SDL2 Recap
 
-The supporting code for rendering with SDL2 is identical to that of the [previous post](https://almostalwaysauto.com/posts/basic-video). We'll start at the point where we can set a callback function that updates the image on screen.
+The supporting code for rendering with SDL2 is identical to that of the [previous post](https://almostalwaysauto.com/posts/basic-video). We'll start at the point where we can set a callback function that updates the image in the window.
 
 ```cpp
 #include <functional>
@@ -324,7 +338,7 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
 }
 ```
 
-And our main function is setup to display a 640 x 480 window to start.
+Our main function is setup to display a 640 x 480 window to start.
 
 ```cpp
 int main()
@@ -334,7 +348,7 @@ int main()
         return 1;
     }
 
-    auto app_title = "Libuvc SDL2";
+    auto app_title = "libuvc SDL2";
     int window_height = 480;
     int window_width = 640;
 
@@ -391,11 +405,17 @@ SDL2 requires the following linker flags for compiling.
 `sdl2-config --cflags --libs`
 ```
 
+Here is an updated sample command.
+
+```plaintext
+g++-11 main.cpp -o camera_app `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread `sdl2-config --cflags --libs
+```
+
 ### Pixel format
 
-Unlike OpenCV, Libuvc does not have a fixed pixel format that it stores frame data in.  Instead it provides the encoding information from the camera and access to the raw data.  It is our responsibility to convert the image data to the format we need.
+Unlike OpenCV, libuvc does not provide a fixed pixel format that it stores frame data in.  Instead it provides the encoding information from the camera and access to the raw data.  It is our responsibility to convert the image data to the format we need.
 
-We won't be covering the various image formats in this post.  To keep things simple, we'll use a Libuvc helper function called `uvc_any2rgb()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to RGB.
+We won't be covering the various image formats in this post.  To keep things simple, we'll use a libuvc helper function called `uvc_any2rgb()`.  The function checks the frame for one of the common webcam formats.  If it finds a match, it does the appropriate conversion to RGB.
 
 If the frame does not have one of the supported image formats, then `uvc_any2rgb()` will fail.  Dealing with this case is outside of the scope of this post but it'll work for most webcams on the market.
 
@@ -427,8 +447,13 @@ public:
 
     uvc_frame_t* uvc_frame;
 };
+```
 
+Note that the image struct contains a pointer to a `uvc_frame_t`.  This is because `uvc_any2rgb` writes the converted image data to another frame instead of simply a supplied buffer.
 
+To get around this, we point our RGB data to that of the frame.
+
+```cpp
 bool create_image(ImageRGB& image, u32 width, u32 height)
 {
     image.uvc_frame = uvc_allocate_frame(sizeof(RGB) * width * height);
@@ -465,12 +490,9 @@ RGBA rgb_to_rgba(RGB rgb)
 
 ### Camera setup
 
-We need to define a `Camera` struct that has the frame data in RGB format and the properties required by Libuvc.
+We need to define a `Camera` struct that has the frame data in RGB format and the properties required by to communicate with the physical device.
 
 ```cpp
-#include <cassert>
-
-
 class Camera
 {
 public:
@@ -492,9 +514,12 @@ public:
 };
 ```
 
-Our `DeviceList` from earlier will provide access to a `Camera`.  We first do all of the necessary Libuvc setup.  
+Our `DeviceList` from earlier will provide access to a `Camera`.  We first do all of the necessary libuvc setup.  
 
 ```cpp
+#include <cassert>
+
+
 bool get_default_device(DeviceList const& list, Camera& camera)
 {
     assert(list.n_devices && list.device_list[0]);
@@ -518,7 +543,7 @@ bool get_default_device(DeviceList const& list, Camera& camera)
 }
 ```
 
-Query Libuc for the camera information.  If successful, allocate memory for the image data.
+Query libuvc for the camera information.  If successful, allocate memory for the image data.
 
 ```cpp
 bool get_frame_properties(Camera& camera)
@@ -554,7 +579,7 @@ bool get_frame_properties(Camera& camera)
     auto res = uvc_get_stream_ctrl_format_size(
         camera.h_device, &camera.ctrl, /* result stored in ctrl */
         format,
-        width, height, fps /* width, height, fps */
+        width, height, fps
     );
 
     if (res != UVC_SUCCESS)
@@ -689,7 +714,7 @@ public:
 };
 ```
 
-Update main to find the connected devices and then open a `Camera`.  Then set the window width and height based on its frame dimensions.
+Update main to find the connected devices and then open a `Camera`.  Set the window width and height based on the camera frame dimensions.
 
 ```cpp
 int main()
@@ -699,7 +724,7 @@ int main()
         return 1;
     }
 
-    auto app_title = "Libuvc SDL2";
+    auto app_title = "libuvc SDL2";
 
     WindowBuffer window_buffer;
     AppState state;
@@ -766,7 +791,12 @@ int main()
 
 ### Grabbing frames
 
+When the library is up and running, we can request frames from the camera.  Here we gea frame, convert it to RGB, and then convert it to RGBA when writing to the application window.
+
 ```cpp
+#include <algorithm>
+
+
 void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
 {
     uvc_frame_t* in;
@@ -778,15 +808,15 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
         return;
     }
 
-    auto frame_begin = (RGB*)camera.rgb_frame.data;
-    auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
-
     res = uvc_any2rgb(in, camera.rgb_frame.uvc_frame);
     if (res != UVC_SUCCESS)
     {
         uvc_perror(res, "uvc_any2rgb()");
         return;
     }
+
+    auto frame_begin = (RGB*)camera.rgb_frame.data;
+    auto frame_end = frame_begin + camera.frame_width * camera.frame_height;
 
     auto image_begin = image.data;
 
@@ -832,7 +862,9 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
 }
 ```
 
-Now when you run the program your webcam video should be displayed in the window.
+Now run the program and your webcam video should be displayed in the window.
 
-### Conclusion
 
+### Finished
+
+We had to do a little more work this time but we basically made our own version of `cv::VideoCapture`.   Sometimes it's nice to be able to do things yourself.
