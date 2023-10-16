@@ -272,19 +272,12 @@ SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="046d", ATTRS{id
 SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="64ab", MODE="0666""
 ```
 
-Create permissions file
+Create the rules file to ensure the app can communicate with the camera.
 
-Output
-
-```plaintext
-
-```
 
 ### SDL2 Recap
 
 The supporting code for rendering with SDL2 is identical to that of the [previous post](https://almostalwaysauto.com/posts/basic-video). We'll start at the point where we can set a callback function that updates the image on screen.
-
-Our application state holds the 
 
 ```cpp
 #include <functional>
