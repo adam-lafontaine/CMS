@@ -13,7 +13,7 @@ Note: I have not been able to get this to work on Windows.  This example was run
 Install libusb
 
 ```plaintext
-sudo apt-get install libusb-1.0-0-dev
+sudo apt-get install - y libusb-1.0-0-dev libjpeg-dev
 ```
 
 Libuvc single header [Libuvc single header](https://github.com/adam-lafontaine/Cpp_Utilities/blob/master/libuvc/libuvc.h)
@@ -22,7 +22,7 @@ Libuvc single header [Libuvc single header](https://github.com/adam-lafontaine/C
 ### List devices
 
 ```cpp
-#include "libuvc.h";
+#include "libuvc.h"
 
 #include <cstdio>
 
@@ -30,8 +30,8 @@ Libuvc single header [Libuvc single header](https://github.com/adam-lafontaine/C
 class DeviceList
 {
 public:
-    context* context = nullptr;
-    device** device_list = nullptr;
+    uvc_context_t* context = nullptr;
+    uvc_device_t** device_list = nullptr;
 
     int n_devices = 0;
 };
@@ -46,7 +46,7 @@ int main()
     {
         uvc_perror(res, "uvc_init()");
         uvc_exit(list.context);
-        return EXIT_FAILURE;
+        return 1;
     }
 
     res = uvc_get_device_list(list.context, &list.device_list);
@@ -54,14 +54,14 @@ int main()
     {
         uvc_perror(res, "uvc_get_device_list()");
         uvc_exit(list.context);
-        return EXIT_FAILURE;
+        return 1;
     }
 
     if (!list.device_list[0])
     {
         printf("No devices found\n");
         uvc_exit(list.context);
-        return EXIT_FAILURE;
+        return 1;
     }
 
     list.n_devices = 0;    
@@ -83,11 +83,8 @@ int main()
         auto vendor_id = (int)desc->idVendor;
         auto product_id = (int)desc->idProduct;        
 
-        printf("    Vendor ID: 0x%04x\n", vendor_id);
-        printf("   Product ID: 0x%04x\n", product_id);
-        printf(" Manufacturer: %s\n", desc->manufacturer);
-        printf("      Product: %s\n", desc->product);
-        printf("Serial Number: %s\n", desc->serialNumber);
+        printf("  Vendor ID: 0x%04x\n", vendor_id);
+        printf(" Product ID: 0x%04x\n", product_id);
         printf("\n");
 
         uvc_free_device_descriptor(desc);
@@ -96,7 +93,7 @@ int main()
     uvc_free_device_list(list.device_list, 0);
     
     uvc_exit(list.context);
-    return EXIT_SUCCESS;
+    return 0;
 }
 ```
 
@@ -104,6 +101,26 @@ When compiling with libuvc, we'll need to include the follow linker flags.
 
 ```plaintext
 `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
+```
+
+Sample command line
+
+```plaintext
+g++-11 main.cpp -o camera_app `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
+```
+
+Output
+
+```plaintext
+Devices:
+  Vendor ID: 0x5986
+ Product ID: 0x211b
+
+  Vendor ID: 0x046d
+ Product ID: 0x082b
+
+  Vendor ID: 0x0c45
+ Product ID: 0x64ab
 ```
 
 ### Set device permissions
@@ -185,9 +202,10 @@ void print_device_list(DeviceList const& list)
     std::vector<VP> vp;
     vp.reserve(list.n_devices);    
 
+    printf("Devices:\n");
     for (int i = 0; i < list.n_devices; i++)
     {
-        device_descriptor* desc;
+        uvc_device_descriptor_t* desc;
 
         auto res = uvc_get_device_descriptor(list.device_list[i], &desc);
         if (res != UVC_SUCCESS)
@@ -200,11 +218,8 @@ void print_device_list(DeviceList const& list)
         auto product_id = (int)desc->idProduct;
         vp.push_back({ vendor_id, product_id });
 
-        printf("    Vendor ID: 0x%04x\n", vendor_id);
-        printf("   Product ID: 0x%04x\n", product_id);
-        printf(" Manufacturer: %s\n", desc->manufacturer);
-        printf("      Product: %s\n", desc->product);
-        printf("Serial Number: %s\n", desc->serialNumber);
+        printf("  Vendor ID: 0x%04x\n", vendor_id);
+        printf(" Product ID: 0x%04x\n", product_id);
         printf("\n");
 
         uvc_free_device_descriptor(desc);
@@ -226,7 +241,7 @@ int main()
 
     if (!find_devices(list))
     {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     print_device_list(list);
@@ -237,6 +252,33 @@ int main()
 }
 ```
 
+Output
+
+```plaintext
+Devices:
+  Vendor ID: 0x5986
+ Product ID: 0x211b
+
+  Vendor ID: 0x046d
+ Product ID: 0x082b
+
+  Vendor ID: 0x0c45
+ Product ID: 0x64ab
+
+Permissions file: /etc/udev/rules.d/99-uvc.rules
+
+SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="5986", ATTRS{idProduct}=="211b", MODE="0666"
+SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="082b", MODE="0666"
+SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="64ab", MODE="0666""
+```
+
+Create permissions file
+
+Output
+
+```plaintext
+
+```
 
 ### SDL2 Recap
 
@@ -296,7 +338,7 @@ int main()
 {
     if (!init_sdl())
     {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     auto app_title = "Libuvc SDL2";
@@ -316,13 +358,13 @@ int main()
     if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
     {
         cleanup();
-        return EXIT_FAILURE;
+        return 1;
     }
 
     if (!create_image(state.screen_image, window_width, window_height))
     {
         cleanup();
-        return EXIT_FAILURE;
+        return 1;
     }
 
     state.is_running = true;
@@ -346,7 +388,7 @@ int main()
     }
 
     cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }
 ```
 
@@ -659,7 +701,7 @@ int main()
 {
     if (!init_sdl())
     {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     auto app_title = "Libuvc SDL2";
@@ -669,12 +711,12 @@ int main()
 
     if (!find_devices(state.device_list))
     {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     if (!open_camera(state.device_list, state.camera))
     {
-        return EXIT_FAILURE;
+        return 1;
     }
 
     int window_height = (int)state.camera.frame_height;
@@ -693,13 +735,13 @@ int main()
     if (!init_window_buffer(window_buffer, window_width, window_height, app_title))
     {
         cleanup();
-        return EXIT_FAILURE;
+        return 1;
     }
 
     if (!create_image(state.screen_image, window_width, window_height))
     {
         cleanup();
-        return EXIT_FAILURE;
+        return 1;
     }
 
     state.is_running = true;
@@ -723,7 +765,7 @@ int main()
     }
 
     cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }
 ```
 
