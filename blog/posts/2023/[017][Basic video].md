@@ -735,7 +735,7 @@ public:
 
 RGBA bgr_to_rgba(BGR bgr)
 {
-    return { bgr.red, bgr.green, bgr.blue, 255 };
+    return to_rgba(bgr.red, bgr.green, bgr.blue);
 }
 ```
 
@@ -781,7 +781,7 @@ void grab_and_convert_frame(Camera& camera, ImageRGBA const& image)
 }
 ```
 
-Update the event handling to display the webcam frame in the window.
+Update the event handling to display the webcam frames in the window.
 
 ```cpp
 void handle_keyboard_event(SDL_Event const& event, AppState& state)
@@ -800,11 +800,11 @@ void handle_keyboard_event(SDL_Event const& event, AppState& state)
         printf("red\n");
         break;
     case SDLK_g:
-        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 0, 255)); };
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 255, 0)); };
         printf("green\n");
         break;
     case SDLK_b:
-        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 255, 0)); };
+        state.update_frame = [&]() { fill_image(state.screen_image, to_rgba(0, 0, 255)); };
         printf("blue\n");
         break;
 
