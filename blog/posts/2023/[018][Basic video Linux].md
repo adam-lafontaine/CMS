@@ -3,7 +3,7 @@
 
 The [previous post](https://almostalwaysauto.com/posts/basic-video) demonstrated how to capture webcam image frames using OpenCV and then render them in a window with SDL2.
 
-If all we are doing is grabbing video frames, then we may not want to have OpenCV as a dependency in our application.  In this post we'll cover using a library called [libuvc](https://github.com/libuvc/libuvc) as an alternative when programming on Linux.  The example presented here was done using g++-11 on Ubuntu 20.04.
+We may not want to have OpenCV as a dependency if all we are doing is grabbing video frames.  In this post we'll use a library called [libuvc](https://github.com/libuvc/libuvc) as an alternative when programming on Linux.  The example presented here was done using g++-11 on Ubuntu 20.04.
 
 
 ### libuvc installation/setup
@@ -111,7 +111,7 @@ int main()
 }
 ```
 
-When compiling with libuvc, we'll need to include the follow linker flags.
+When compiling libuvc, we need to include the follow linker flags.
 
 ```plaintext
 `pkg-config --libs --cflags libusb-1.0` -ljpeg -pthread
@@ -139,7 +139,7 @@ Devices:
 
 ### Set device permissions
 
-Permission needs to be explicitly given for each webcam we want to use.  We do this by creating a file in the `/etc/udev/rules.d/` directory.
+Permission needs to be given explicitly for each webcam we want to use.  We do this by creating a file in the `/etc/udev/rules.d/` directory.
 
 ```plaintext
 /etc/udev/rules.d/99-uvc.rules
@@ -791,7 +791,7 @@ int main()
 
 ### Grabbing frames
 
-When the library is up and running, we can request frames from the camera.  Here we get a frame, convert it to RGB, and then convert it to RGBA when writing to the application window.
+When the library is up and running, we can request frames from the camera.  Here we get a frame, convert it to RGB, and then convert it to RGBA as we write to the application window.
 
 ```cpp
 #include <algorithm>
