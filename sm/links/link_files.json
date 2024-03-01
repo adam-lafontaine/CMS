@@ -1,0 +1,22 @@
+{
+    "link_files": [
+        {
+            "id": "",
+            "name": "",
+            "type": "",
+            "filename_json": ""
+        },
+        {
+            "id": "1709147209495",
+            "name": "youtube",
+            "type": "video",
+            "filename_json": "youtube_links.json"
+        },
+        {
+            "id": "1709147220281",
+            "name": "rumble",
+            "type": "video",
+            "filename_json": "rumble_links.json"
+        }
+    ]
+}
