@@ -3,8 +3,14 @@
         {
             "id": "",
             "name": "",
-            "type": "video",
+            "type": "web",
             "filename_json": ""
+        },
+        {
+            "id": "1709323420940",
+            "name": "",
+            "type": "web",
+            "filename_json": "business_links.json"
         },
         {
             "id": "1709147209495",
