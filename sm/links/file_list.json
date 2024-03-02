@@ -3,14 +3,15 @@
         {
             "id": "",
             "name": "",
-            "type": "",
+            "type": "web",
             "filename_json": ""
         },
         {
-            "id": "",
-            "name": "website",
-            "type": "website",
-            "filename_json": "website_links.json"
+            "id": "1709323420940",
+            "name": "",
+            "type": "web",
+            "filename_json": "business_links.json"
+
         },
         {
             "id": "1709147209495",
