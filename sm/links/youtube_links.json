@@ -7,6 +7,8 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
+            "youtube_url": "",
+            "rumble_url": "",
             "video_url": "",
             "tags": []
         },
@@ -17,6 +19,8 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
+            "youtube_url": "",
+            "rumble_url": "",
             "video_url": "https://youtube.com/embed/9y6L5sSDscM?rel=0",
             "tags": ["adam", "dance", "julia"]
         }

@@ -7,18 +7,10 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
+            "youtube_url": "",
+            "rumble_url": "",
             "video_url": "",
             "tags": []
-        },
-        {
-            "id": "",
-            "name": "",
-            "website_url": "",
-            "facebook_url": "",
-            "instagram_url": "",
-            "twitterx_url": "",
-            "video_url": "https://www.youtube.com/shorts/50K8Q9mK-IQ",
-            "tags": ["art"]
         },
         {
             "id": "1709327639567",
@@ -27,6 +19,8 @@
             "facebook_url": "",
             "instagram_url": "https://www.instagram.com/thegarageartstudio/",
             "twitterx_url": "",
+            "youtube_url": "https://www.youtube.com/shorts/50K8Q9mK-IQ",
+            "rumble_url": "",
             "video_url": "",
             "tags": ["art", "cars"]
         }
