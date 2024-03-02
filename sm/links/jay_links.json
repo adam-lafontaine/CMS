@@ -7,6 +7,8 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
+            "youtube_url": "",
+            "rumble_url": "",
             "video_url": "",
             "tags": []
         },
@@ -17,8 +19,10 @@
             "facebook_url": "",
             "instagram_url": "https://www.instagram.com/thegarageartstudio/",
             "twitterx_url": "",
+            "youtube_url": "https://www.youtube.com/channel/UCa879l4Dk0saJN6U1LmgIyg",
+            "rumble_url": "",
             "video_url": "",
-            "tags": ["jay", "art", "cars"]
+            "tags": ["art", "cars"]
         }
     ]
 }
