@@ -11,6 +11,16 @@
             "tags": []
         },
         {
+            "id": "1709415993341",
+            "name": "",
+            "website_url": "",
+            "facebook_url": "",
+            "instagram_url": "",
+            "twitterx_url": "",
+            "video_url": "https://www.youtube.com/shorts/50K8Q9mK-IQ",
+            "tags": ["art"]
+        },
+        {
             "id": "1709327639567",
             "name": "The Garage Art Studio",
             "website_url": "https://www.thegaragestthomas.com/",
@@ -18,7 +28,7 @@
             "instagram_url": "https://www.instagram.com/thegarageartstudio/",
             "twitterx_url": "",
             "video_url": "",
-            "tags": ["jay", "art", "cars"]
+            "tags": ["art", "cars"]
         }
     ]
 }
