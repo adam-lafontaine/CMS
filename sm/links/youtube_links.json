@@ -13,26 +13,38 @@
             "tags": []
         },
         {
+            "id": "1709669774139",
+            "name": "The hip twist",
+            "video_url": "https://youtube.com/embed/W7GhqKJck3w",
+            "tags": []
+        },
+        {
+            "id": "1709669892209",
+            "name": "Let's leave it at that...",
+            "video_url": "https://youtube.com/embed/Q3ux8Hyg8zw",
+            "tags": []
+        },
+        {
+            "id": "1709669955465",
+            "name": "Alignment",
+            "video_url": "https://youtube.com/embed/Rzz7V1IFWmE",
+            "tags": []
+        },
+        {
+            "id": "",
+            "name": "Open right lesson",
+            "video_url": "https://youtube.com/embed/CQFn3sw-n4E",
+            "tags": []
+        },
+        {
             "id": "1709579673177",
             "name": "My first video game",
-            "website_url": "",
-            "facebook_url": "",
-            "instagram_url": "",
-            "twitterx_url": "",
-            "youtube_url": "",
-            "rumble_url": "",
             "video_url": "https://youtube.com/embed/9vmKpIwunKw",
             "tags": ["adam", "code", "art"]
         },
         {
             "id": "1709146122227",
             "name": "Rumba warm up",
-            "website_url": "",
-            "facebook_url": "",
-            "instagram_url": "",
-            "twitterx_url": "",
-            "youtube_url": "",
-            "rumble_url": "",
             "video_url": "https://youtube.com/embed/9y6L5sSDscM?rel=0",
             "tags": ["adam", "dance", "julia"]
         }
