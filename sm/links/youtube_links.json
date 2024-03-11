@@ -13,6 +13,13 @@
             "tags": []
         },
         {
+            "id": "1710178251677",
+            "name": "Game demo",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/1rvyyv7ohBQ",
+            "tags": ["adam", "code"]
+        },
+        {
             "id": "1709863995561",
             "name": "Side and slightly back",
             "youtube_url": "https://www.youtube.com/@almostalwaysadam",
@@ -73,7 +80,7 @@
             "name": "My first video game",
             "youtube_url": "https://www.youtube.com/@almostalwaysadam",
             "video_url": "https://youtube.com/embed/9vmKpIwunKw",
-            "tags": ["adam", "code", "art"]
+            "tags": ["adam", "code"]
         },
         {
             "id": "1709146122227",
