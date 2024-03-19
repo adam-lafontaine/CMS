@@ -7,20 +7,134 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
-            "youtube_url": "",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
             "rumble_url": "",
-            "video_url": "",
+            "video_url": "https://youtube.com/embed/",
             "tags": []
+        },
+        {
+            "id": "1710853522299",
+            "name": "No wind up",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/FyR2m3UBqX8",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710848886656",
+            "name": "Right side forward",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/rOC9PZdE9Jk",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710845248779",
+            "name": "Find your center!",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/6fFDZd8R51s",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710284254450",
+            "name": "Tricky",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/j3MM4Y4z5HI",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710284060481",
+            "name": "Passing twinkle drama",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/nVxl34uCBc0",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710265568992",
+            "name": "So many words",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/SxVioHImpH4",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710180685434",
+            "name": "Game engine demo",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/EDO7zJweeis",
+            "tags": ["adam", "code"]
+        },
+        {
+            "id": "1710178251677",
+            "name": "Game demo",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/1rvyyv7ohBQ",
+            "tags": ["adam", "code"]
+        },
+        {
+            "id": "1709863995561",
+            "name": "Side and slightly back",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/_FAUaNct0MI",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709862426374",
+            "name": "Left and right pass",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/4fnTCt4N6iU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709862402433",
+            "name": "Merciless",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/FTSWQaTBxWo",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709862383942",
+            "name": "Eight count",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/ZFcJJrxh9rU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709669774139",
+            "name": "The hip twist",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/W7GhqKJck3w",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709669892209",
+            "name": "Let's leave it at that...",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/Q3ux8Hyg8zw",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709669955465",
+            "name": "Alignment",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/Rzz7V1IFWmE",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709671705486",
+            "name": "Open right lesson",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/CQFn3sw-n4E",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1709579673177",
+            "name": "My first video game",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/9vmKpIwunKw",
+            "tags": ["adam", "code"]
         },
         {
             "id": "1709146122227",
             "name": "Rumba warm up",
-            "website_url": "",
-            "facebook_url": "",
-            "instagram_url": "",
-            "twitterx_url": "",
-            "youtube_url": "",
-            "rumble_url": "",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
             "video_url": "https://youtube.com/embed/9y6L5sSDscM?rel=0",
             "tags": ["adam", "dance", "julia"]
         }
