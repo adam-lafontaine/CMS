@@ -7,10 +7,31 @@
             "facebook_url": "",
             "instagram_url": "",
             "twitterx_url": "",
-            "youtube_url": "",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
             "rumble_url": "",
-            "video_url": "",
+            "video_url": "https://youtube.com/embed/",
             "tags": []
+        },
+        {
+            "id": "",
+            "name": "No wind up",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/FyR2m3UBqX8",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710848886656",
+            "name": "Right side forward",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/rOC9PZdE9Jk",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1710845248779",
+            "name": "Find your center!",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/6fFDZd8R51s",
+            "tags": ["adam", "dance", "julia"]
         },
         {
             "id": "1710284254450",
