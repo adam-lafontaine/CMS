@@ -10,6 +10,15 @@
             }
         },
         {
+            "id": "1713474362747",
+            "name": "arcade",
+
+            "meta": {
+                "route_ep": "/arcade",
+                "filename_md": ""
+            }
+        },
+        {
             "id": "1708217781247",
             "name": "home",
 
