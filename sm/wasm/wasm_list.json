@@ -1,0 +1,14 @@
+{
+    "apps": [
+        {
+            "id": "",
+            "name": "",
+            "filename_wasm": ""
+        },
+        {
+            "id": "1713540630991",
+            "name": "Asteroids",
+            "filename_wasm": "asteroids.wasm"
+        }
+    ]
+}
