@@ -3,11 +3,13 @@
         {
             "id": "",
             "name": "",
+            "description": "",
             "filename_wasm": ""
         },
         {
             "id": "1713540630991",
             "name": "Asteroids",
+            "description": "Latest Asteroids clone beta",
             "filename_wasm": "asteroids.wasm"
         }
     ]
