@@ -10,7 +10,7 @@
             "id": "1713795839387",
             "name": "Mandelbrot",
             "description": "Interactive Mandelbrot renderer",
-            "filename_wasm": "mandelbort_wasm.wasm"
+            "filename_wasm": "mandelbrot_wasm.wasm"
         },
         {
             "id": "1713540630991",
