@@ -7,6 +7,12 @@
             "filename_wasm": ""
         },
         {
+            "id": "1713795839387",
+            "name": "Mandelbrot",
+            "description": "Interactive Mandelbrot renderer",
+            "filename_wasm": "mandelbort_wasm.wasm"
+        },
+        {
             "id": "1713540630991",
             "name": "Asteroids",
             "description": "Latest Asteroids clone beta",
