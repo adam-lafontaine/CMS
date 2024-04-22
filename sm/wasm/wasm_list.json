@@ -8,7 +8,7 @@
             "module_js": ""
         },
         {
-            "id": "",
+            "id": "1713807060949",
             "name": "Mandelbrot",
             "description": "Interactive Mandelbrot renderer",
             "filename_wasm": "mandelbrot.wasm",
