@@ -4,19 +4,23 @@
             "id": "",
             "name": "",
             "description": "",
-            "filename_wasm": ""
+            "filename_wasm": "",
+            "module_js": ""
         },
         {
-            "id": "",
+            "id": "1713807060949",
             "name": "Mandelbrot",
             "description": "Interactive Mandelbrot renderer",
-            "filename_wasm": "mandelbrot_wasm.wasm"
+            "filename_wasm": "mandelbrot.wasm",
+            "module_js": "mandelbrot.js"
+            
         },
         {
             "id": "1713540630991",
             "name": "Asteroids",
-            "description": "Latest Asteroids clone beta",
-            "filename_wasm": "asteroids.wasm"
+            "description": "Asteroids clone (WIP)",
+            "filename_wasm": "asteroids.wasm",
+            "module_js": "asteroids.js"
         }
     ]
 }
