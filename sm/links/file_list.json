@@ -15,9 +15,15 @@
         },
         {
             "id": "1709147209495",
-            "name": "youtube",
+            "name": "dance",
             "type": "video",
-            "filename_json": "youtube_links.json"
+            "filename_json": "dance_youtube_links.json"
+        },
+        {
+            "id": "1709147209495",
+            "name": "gamedev",
+            "type": "video",
+            "filename_json": "gamedev_youtube_links.json"
         },
         {
             "id": "",
