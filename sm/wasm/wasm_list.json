@@ -5,14 +5,20 @@
             "name": "",
             "description": "",
             "filename_wasm": "",
-            "module_js": ""
+            "module_js": "",
+            "itchio_src": "",
+            "itchio_href": "",
+            "itchio_description": ""
         },
         {
             "id": "1713807060949",
             "name": "Mandelbrot",
             "description": "Interactive Mandelbrot renderer",
             "filename_wasm": "mandelbrot.wasm",
-            "module_js": "mandelbrot.js"
+            "module_js": "mandelbrot.js",
+            "itchio_src": "https://itch.io/embed/1603304",
+            "itchio_href": "https://almostalwaysadam.itch.io/the-mandelbrot-experience",
+            "itchio_description": "The Mandelbrot Experience by almostalwaysadam<"
             
         },
         {
@@ -20,7 +26,10 @@
             "name": "Asteroids",
             "description": "Asteroids clone (WIP)",
             "filename_wasm": "asteroids.wasm",
-            "module_js": "asteroids.js"
+            "module_js": "asteroids.js",
+            "itchio_src": "https://itch.io/embed/2834707",
+            "itchio_href": "https://almostalwaysadam.itch.io/asteroids",
+            "itchio_description": "Asteroids++ by almostalwaysadam"
         }
     ]
 }
