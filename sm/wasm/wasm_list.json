@@ -8,7 +8,7 @@
             "module_js": "",
             "itchio_src": "",
             "itchio_href": "",
-            "itchio_description": ""
+            "itchio_label": ""
         },
         {
             "id": "1713807060949",
@@ -18,7 +18,7 @@
             "module_js": "mandelbrot.js",
             "itchio_src": "https://itch.io/embed/1603304",
             "itchio_href": "https://almostalwaysadam.itch.io/the-mandelbrot-experience",
-            "itchio_description": "The Mandelbrot Experience by almostalwaysadam<"
+            "itchio_label": "The Mandelbrot Experience by almostalwaysadam<"
             
         },
         {
@@ -29,7 +29,7 @@
             "module_js": "asteroids.js",
             "itchio_src": "https://itch.io/embed/2834707",
             "itchio_href": "https://almostalwaysadam.itch.io/asteroids",
-            "itchio_description": "Asteroids++ by almostalwaysadam"
+            "itchio_label": "Asteroids++ by almostalwaysadam"
         }
     ]
 }
