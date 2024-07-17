@@ -16,7 +16,7 @@
             "description": "Interactive Mandelbrot renderer",
             "filename_wasm": "mandelbrot.wasm",
             "module_js": "mandelbrot.js",
-            "itchio_src": "https://itch.io/embed/1603304?dark=true&amp;linkback=true",
+            "itchio_src": "https://itch.io/embed/1603304?dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/the-mandelbrot-experience",
             "itchio_label": "The Mandelbrot Experience by almostalwaysadam<"
             
@@ -27,7 +27,7 @@
             "description": "Asteroids clone (WIP)",
             "filename_wasm": "asteroids.wasm",
             "module_js": "asteroids.js",
-            "itchio_src": "https://itch.io/embed/2834707?linkback=true&amp;dark=true",
+            "itchio_src": "https://itch.io/embed/2834707?dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/asteroids",
             "itchio_label": "Asteroids++ by almostalwaysadam"
         }
