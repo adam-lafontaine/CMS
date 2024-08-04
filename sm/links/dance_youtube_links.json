@@ -19,6 +19,14 @@
             "video_url": "https://youtube.com/embed/",
             "tags": ["adam", "dance", "julia"]
         },
+
+        {
+            "id": "1722707820732",
+            "name": "Just like Foxtrot",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/DVipS2bBvHA",
+            "tags": ["adam", "dance", "julia"]
+        },
         {
             "id": "1722601312376",
             "name": "The ladies never listen",
