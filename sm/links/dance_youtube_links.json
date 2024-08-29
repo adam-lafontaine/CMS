@@ -12,7 +12,6 @@
             "video_url": "https://youtube.com/embed/",
             "tags": []
         },
-
         {
             "id": "",
             "name": "",
@@ -20,8 +19,13 @@
             "video_url": "https://youtube.com/embed/",
             "tags": ["adam", "dance", "julia"]
         },
-
-
+        {
+            "id": "1724939755564",
+            "name": "More of a sense of...",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/ovK4iyMNR1A",
+            "tags": ["adam", "dance", "julia"]
+        },
         {
             "id": "1724710663231",
             "name": "Push the sponge",
