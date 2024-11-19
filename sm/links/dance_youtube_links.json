@@ -20,6 +20,20 @@
             "tags": ["adam", "dance", "julia"]
         },
         {
+            "id": "1732280400000",
+            "name": "Learn to dance",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/3D5FcOPVfkU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1732194000000",
+            "name": "Suit yourself",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/XYx23wzUZMU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
             "id": "1732107600000",
             "name": "That's dangerous",
             "youtube_url": "https://www.youtube.com/@almostalwaysadam",
