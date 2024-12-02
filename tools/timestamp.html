@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="">
 <style>
     #btn_timestamp {
-        width: 80px;
+        width: 120px;
         height: 30px;
     }
 
@@ -25,18 +25,37 @@
     <button
         id="btn_timestamp"
         type="button"
-        onclick="setTimestamp()"
-    >Timestamp</button>
+        onclick="setTimestampNow()"
+    >Timestamp Now</button>
     <input 
         type="text" 
-        id="txt_timestamp"
+        id="txt_timestamp_now"
+    ></input>
+
+    <br>
+
+    <input 
+        type="datetime-local" 
+        id="dt_timestamp"
+        onchange="setTimestampDatetime()"
+        >
+    <input 
+        type="text" 
+        id="txt_timestamp_datetime"
     ></input>
     
 <script>
-    function setTimestamp()
+    function setTimestampNow()
     {
         //alert("hello");
-        document.getElementById("txt_timestamp").value = `${Date.now()}`;
+        document.getElementById("txt_timestamp_now").value = `${Date.now()}`;
+    }
+
+
+    function setTimestampDatetime()
+    {
+        let dt = document.getElementById("dt_timestamp");
+        document.getElementById("txt_timestamp_datetime").value = `${Date.parse(dt.value)}`;
     }
 </script>
 </body>
