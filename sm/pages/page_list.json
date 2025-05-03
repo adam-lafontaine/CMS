@@ -17,6 +17,15 @@
                 "route_ep": "/",
                 "filename_md": "home.md"
             }
+        },
+        {
+            "id": "1746304833085",
+            "name": "Hello",
+
+            "meta": {
+                "route_ep": "/hello",
+                "filename_md": "hello.md"
+            }
         }
     ]
 }
