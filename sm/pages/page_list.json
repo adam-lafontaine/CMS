@@ -11,10 +11,10 @@
         },
         {
             "id": "1708217781247",
-            "name": "home",
+            "name": "Home",
 
             "meta": {
-                "route_ep": "/",
+                "route_ep": "",
                 "filename_md": "home.md"
             }
         },
@@ -23,7 +23,7 @@
             "name": "Hello",
 
             "meta": {
-                "route_ep": "/hello",
+                "route_ep": "hello",
                 "filename_md": "hello.md"
             }
         }
