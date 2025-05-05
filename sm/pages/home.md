@@ -5,4 +5,5 @@
     "subtitle": "A website mostly about Adam"
 }
 ```
-#### Welcome to almostalwaysadam.com
+
+Welcome to almostalwaysadam.com
