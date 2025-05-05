@@ -13,10 +13,276 @@
             "tags": []
         },
         {
+            "id": "1744908796770",
+            "name": "It was just a lucky one",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/OTcoxcrrLFU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
             "id": "",
             "name": "",
             "youtube_url": "https://www.youtube.com/@almostalwaysadam",
             "video_url": "https://youtube.com/embed/",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1744637368817",
+            "name": "Tango Promenade Twist Turn",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/7LlYfRuQXSs",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1744292101612",
+            "name": "Two shirts",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/PvsI_qIGsrE",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1743595200000",
+            "name": "Hesitation",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/tv2YSnj8Sh4",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1743515954891",
+            "name": "No more panic",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/8FHXYLCz2lg",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1743177600000",
+            "name": "Cha cha panic",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/J2zAWknbvQU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1743078451871",
+            "name": "Quick under arm turn",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/gQsjf36J7oY",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1742924657154",
+            "name": "Open break problems",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/shD7ku8Uans",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1742572800000",
+            "name": "Mixed messages Part 2",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/-AiSrYyZ_9M",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1742558400000",
+            "name": "Mixed messages",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/h7q7wKXSLpk",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1742472000000",
+            "name": "I'm in charge",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/LYbvBzN2uwM",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1742299200000",
+            "name": "Shall we Bolero?",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/q7SqTkqSNSQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1741953600000",
+            "name": "Champion of pivots",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/a6eQxYGuWKE",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1741895222508",
+            "name": "Full of tricks",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/AvMu05MM4as",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1741266000000",
+            "name": "The part I forgot",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/ehnNq7IlJwU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1741186699920",
+            "name": "Have faith",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/FvFwD7wjfZQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1741094753066",
+            "name": "So close",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/dxIBfXEEgX0",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1740419444421",
+            "name": "So Unhappy",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/HXBidHdSS28",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1740165391794",
+            "name": "Not in a good mood",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/7ghwGtTEUiI",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1739451600000",
+            "name": "Bolero",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/0kr0MOJjW3o",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1739294503443",
+            "name": "American Waltz Sequence",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/AVJefstMfHg",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1738847491552",
+            "name": "Cha cha Fan",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/CNl2sgqYI_E",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1738760400000",
+            "name": "New Waltz Sequence",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/b28KQApMTfQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1738677132666",
+            "name": "Head over your spine",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/YXUg44ZJzlE",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1737723600000",
+            "name": "Tango Promenade kick",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/LVv69QZkba4",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1737550800000",
+            "name": "Off time",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/103iERdFNPU",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1737480576936",
+            "name": "Dance politics",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/jFlzXdu-ki0",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1736514000000",
+            "name": "Connection",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/Ekkou-3ecAQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1736341739920",
+            "name": "They're not lying",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/fQSukaTcoeA",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1736265592084",
+            "name": "Two, three, four, one",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/rQSDKkZD0zY",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734699600000",
+            "name": "Welcome to dancing",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/tDiPVifdkzQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734621026655",
+            "name": "Not OK",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/reDedFASv68",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734440400000",
+            "name": "Happy dances",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/aTa33G0pjAQ",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734354000000",
+            "name": "So attractive",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/y-baNJZs4bg",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734181200000",
+            "name": "All part of leading",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/Tg55RCLB1p8",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734094800000",
+            "name": "Keep your balance",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/VykiIvhy-k8",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1734008400000",
+            "name": "Increase the pressure",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/4kt0I7v_rbc",
+            "tags": ["adam", "dance", "julia"]
+        },
+        {
+            "id": "1733836692631",
+            "name": "Hop, skip, or jump",
+            "youtube_url": "https://www.youtube.com/@almostalwaysadam",
+            "video_url": "https://youtube.com/embed/tH239anaBCw",
             "tags": ["adam", "dance", "julia"]
         },
         {
