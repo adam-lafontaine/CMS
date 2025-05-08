@@ -6,7 +6,7 @@
 }
 ```
 
-<h5><span> B.A.Sc. Chemical Engineering</span><span style="float: right">1997 – 2002</span></h5>
+<div class="text-h6"><span> B.A.Sc. Chemical Engineering</span><span style="float: right">1997 – 2002</span></div>
 **University of Ottawa, Ottawa ON, Canada**
 
 * Graduated with distinction magna cum laude
