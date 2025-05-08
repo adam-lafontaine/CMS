@@ -173,7 +173,7 @@
                     },
                     {
                         "description": "3D coordinate extraction for robotic pick and place",
-                        "detais":[
+                        "details":[
                             "Structured lighting application",
                             "Halcon, .NET/WPF"
                         ]

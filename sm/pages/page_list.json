@@ -15,7 +15,7 @@
             "name": "Education",
 
             "meta": {
-                "route_ep": "education",
+                "route_ep": "cv-education",
                 "filename_md": "",
                 "filename_json": "education.json"
             }
@@ -25,7 +25,7 @@
             "name": "Experience",
 
             "meta": {
-                "route_ep": "experience",
+                "route_ep": "cv-experience",
                 "filename_md": "",
                 "filename_json": "experience.json"
             }
