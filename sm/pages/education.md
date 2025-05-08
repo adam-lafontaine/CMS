@@ -7,9 +7,10 @@
 ```
 
 <div class="text-h6"><span> B.A.Sc. Chemical Engineering</span><span style="float: right">1997 – 2002</span></div>
-**University of Ottawa, Ottawa ON, Canada**
-
-* Graduated with distinction magna cum laude
+<div class="text-weight-bold">University of Ottawa, Ottawa ON, Canada</div>
+<ul>
+<li>Graduated with distinction magna cum laude</li>
+</ul>
 
 
 ### Computer Programmer Analyst | 2015 – 2017
