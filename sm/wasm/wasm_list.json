@@ -24,7 +24,7 @@
         {
             "id": "1713540630991",
             "name": "Asteroids",
-            "description": "Asteroids clone (WIP)",
+            "description": "Asteroids clone",
             "filename_wasm": "asteroids.wasm",
             "module_js": "asteroids.js",
             "itchio_src": "https://itch.io/embed/2834707?dark=true",

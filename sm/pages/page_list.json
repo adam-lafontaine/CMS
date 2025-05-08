@@ -8,6 +8,24 @@
                 "route_ep": "",
                 "filename_md": ""
             }
+        }, 
+        {
+            "id": "1746662799376",
+            "name": "Education",
+
+            "meta": {
+                "route_ep": "education",
+                "filename_md": "education.md"
+            }
+        }, 
+        {
+            "id": "1746662773729",
+            "name": "Experience",
+
+            "meta": {
+                "route_ep": "experience",
+                "filename_md": "experience.md"
+            }
         },
         {
             "id": "1708217781247",
