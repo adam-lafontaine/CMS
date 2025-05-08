@@ -2,7 +2,7 @@
 { 
     "doc_title": "",
     "title": "Education",
-    "subtitle": " "
+    "subtitle": ""
 }
 ```
 
