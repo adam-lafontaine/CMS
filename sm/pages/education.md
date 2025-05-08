@@ -2,11 +2,11 @@
 { 
     "doc_title": "",
     "title": "Education",
-    "subtitle": ""
+    "subtitle": " "
 }
 ```
 
-#### B.A.Sc. Chemical Engineering | 1997 – 2002
+<h6><div align="left"> B.A.Sc. Chemical Engineering</div><div align="right">1997 – 2002</div></h6>
 **University of Ottawa, Ottawa ON, Canada**
 
 * Graduated with distinction magna cum laude
