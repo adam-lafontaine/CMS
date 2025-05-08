@@ -19,20 +19,146 @@
                 ]
             },
             {
-                "id": "8",
-                "name": "Research Chemist (co-op)",
-                "date": "Feb 2000 – Apr 2001",
-                "organization": "Shipley Company LLC (DOW Chemical)",
-                "location": "Marlborough MA, USA",
+                "id": "9",
+                "name": "Independent Video Game Developer",
+                "date": "July 2022 - Present",
+                "organization": "",
+                "location": "",
                 "notes": [
                     {
-                        "description": "Created and tested semiconductor photoresists as part of a research and development team",
-                        "details": ["University of Ottawa co-op placement"]
+                        "description": "Asteroids++",
+                        "details": [
+                            "A survivors-like homage to the arcade classic Asteroids",
+                            "https://almostalwaysadam.itch.io/asteroids"
+                        ]
+                    },
+                    {
+                        "description": "The Mandelbrot Experience",
+                        "details": [
+                            "Render the Mandelbrot set allowing the user to move around and zoom in and out of any particular part",
+                            "https://almostalwaysadam.itch.io/the-mandelbrot-experience"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "8",
+                "name": "Vision Systems Programmer",
+                "date": "Jan 2021 – June 2023",
+                "organization": "BOS Innovations",
+                "location": "London ON, Canada",
+                "notes": [
+                    {
+                        "description": "Multi-camera deep learning vision inspection system",
+                        "details": [
+                            "Configurable real-time application with 20+ cameras for an engine assembly line",
+                            "Cognex Deep Learning, Basler, .NET/WPF"
+                        ]
+                    },
+                    {
+                        "description": "PLC telemetry server",
+                        "details": [
+                            "Remote monitoring and recording of tag values for diagnostics and proving cycle time",
+                            "C++, libplctag, DearImGui, SQLite"
+                        ]
+                    },
+                    {
+                        "description": "3D coordinate extraction for robotic pick and place",
+                        "details":[
+                            "Structured lighting application",
+                            "Halcon, .NET/WPF"
+                        ]
                     }
                 ]
             },
             {
                 "id": "7",
+                "name": "Software Developer",
+                "date": "Jan 2018 – Dec 2020",
+                "organization": "BOS Innovations",
+                "location": "Dorchester ON, Canada",
+                "notes": [
+                    {
+                        "description": "Custom ERP development and integration",
+                        "details": [
+                            "Custom desktop and web applications",
+                            "CRM, project budget tracking, Resource Planning, Time Entry",
+                            "Integration with existing company software for reporting and analysis",
+                            ".NET, WPF, Vue.js, Typescript"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "6",
+                "name": "Contract Professor",
+                "date": "Aug 2019",
+                "organization": "Fanshawe College Corporate Training Services",
+                "location": "London ON, Canada",
+                "notes": [
+                    {
+                        "description": "Prepared and taught a SQL and database design course for a corporate client",
+                        "details": []
+                    }
+                ]
+            },
+            {
+                "id": "5",
+                "name": "Software Developer (co-op)",
+                "date": "Apr 2017 – Aug 2017",
+                "organization": "BOS Innovations",
+                "location": "Dorchester ON, Canada",
+                "notes": [
+                    {
+                        "description": "Custom ERP software development",
+                        "details": ["Fanshawe College co-op placement"]
+                    }
+                ]
+            },
+            {
+                "id": "4",
+                "name": "Software Developer (co-op)",
+                "date": "Sep 2016 – Dec 2016",
+                "organization": "Cineplex Digital Media",
+                "location": "London ON, Canada",
+                "notes": [
+                    {
+                        "description": "Smart TV application development for restaurant menu boards",
+                        "details": ["Fanshawe College co-op placement"]
+                    }
+                ]
+            },
+            {
+                "id": "3",
+                "name": "Software Developer (co-op)",
+                "date": "Jan 2016 – Apr 2016",
+                "organization": "Info-Tech Research Group",
+                "location": "London ON, Canada",
+                "notes": [
+                    {
+                        "description": "Ruby on Rails web development",
+                        "details": ["Fanshawe College co-op placement"]
+                    }
+                ]
+            },
+            {
+                "id": "2",
+                "name": "University English Professor",
+                "date": "Aug 2013 – Jun 2014",
+                "organization": "North China Institute of Science and Technology",
+                "location": "Yanjiao, China",
+                "notes": [
+                    {
+                        "description": "English courses for Chinese university students",
+                        "details": [
+                            "Created course curriculum, materials and examinations",
+                            "Taught and managed 9 classes of 35 students each"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "1",
                 "name": "General Manager",
                 "date": "Mar 2006 – Dec 2012",
                 "organization": "Bourdeau Enterprise",
@@ -65,118 +191,15 @@
                 ]
             },
             {
-                "id": "6",
-                "name": "University English Professor",
-                "date": "Aug 2013 – Jun 2014",
-                "organization": "North China Institute of Science and Technology",
-                "location": "Yanjiao, China",
-                "notes": [
-                    {
-                        "description": "English courses for Chinese university students",
-                        "details": [
-                            "Created course curriculum, materials and examinations",
-                            "Taught and managed 9 classes of 35 students each"
-                        ]
-                    }
-                ]
-            },
-            {
-                "id": "5",
-                "name": "Software Developer (co-op)",
-                "date": "Jan 2016 – Apr 2016",
-                "organization": "Info-Tech Research Group",
-                "location": "London ON, Canada",
-                "notes": [
-                    {
-                        "description": "Ruby on Rails web development",
-                        "details": ["Fanshawe College co-op placement"]
-                    }
-                ]
-            },
-            {
-                "id": "4",
-                "name": "Software Developer (co-op)",
-                "date": "Sep 2016 – Dec 2016",
-                "organization": "Cineplex Digital Media",
-                "location": "London ON, Canada",
-                "notes": [
-                    {
-                        "description": "Smart TV application development for restaurant menu boards",
-                        "details": ["Fanshawe College co-op placement"]
-                    }
-                ]
-            },
-            {
-                "id": "3",
-                "name": "Software Developer (co-op)",
-                "date": "Apr 2017 – Aug 2017",
-                "organization": "BOS Innovations",
-                "location": "Dorchester ON, Canada",
-                "notes": [
-                    {
-                        "description": "Custom ERP software development",
-                        "details": ["Fanshawe College co-op placement"]
-                    }
-                ]
-            },            
-            {
-                "id": "2",
-                "name": "Contract Professor",
-                "date": "Aug 2019",
-                "organization": "Fanshawe College Corporate Training Services",
-                "location": "London ON, Canada",
-                "notes": [
-                    {
-                        "description": "Prepared and taught a SQL and database design course for a corporate client",
-                        "details": []
-                    }
-                ]
-            },
-            {
-                "id": "1",
-                "name": "Software Developer",
-                "date": "Jan 2018 – Dec 2020",
-                "organization": "BOS Innovations",
-                "location": "Dorchester ON, Canada",
-                "notes": [
-                    {
-                        "description": "Custom ERP development and integration",
-                        "details": [
-                            "Custom desktop and web applications",
-                            "CRM, project budget tracking, Resource Planning, Time Entry",
-                            "Integration with existing company software for reporting and analysis",
-                            ".NET, WPF, Vue.js, Typescript"
-                        ]
-                    }
-                ]
-            },
-            {
                 "id": "0",
-                "name": "Vision Systems Programmer",
-                "date": "Jan 2021 – June 2023",
-                "organization": "BOS Innovations",
-                "location": "London ON, Canada",
+                "name": "Research Chemist (co-op)",
+                "date": "Feb 2000 – Apr 2001",
+                "organization": "Shipley Company LLC (DOW Chemical)",
+                "location": "Marlborough MA, USA",
                 "notes": [
                     {
-                        "description": "Multi-camera deep learning vision inspection system",
-                        "details": [
-                            "Configurable real-time application with 20+ cameras for an engine assembly line",
-                            "Cognex Deep Learning, Basler, .NET/WPF"
-                        ]
-                    },
-                    {
-                        "description": "PLC telemetry server",
-                        "details": [
-                            "Remote monitoring and recording of tag values for diagnostics and proving cycle time",
-                            "C++, libplctag, DearImGui, SQLite"
-                        ]
-                    },
-                    {
-                        "description": "3D coordinate extraction for robotic pick and place",
-                        "details":[
-                            "Structured lighting application",
-                            "Halcon, .NET/WPF"
-                        ]
+                        "description": "Created and tested semiconductor photoresists as part of a research and development team",
+                        "details": ["University of Ottawa co-op placement"]
                     }
                 ]
             }
