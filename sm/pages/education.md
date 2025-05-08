@@ -6,8 +6,8 @@
 }
 ```
 
-### B.A.Sc. Chemical Engineering | 1997 – 2002
-#### University of Ottawa, Ottawa ON, Canada
+#### B.A.Sc. Chemical Engineering | 1997 – 2002
+**University of Ottawa, Ottawa ON, Canada**
 
 * Graduated with distinction magna cum laude
 
