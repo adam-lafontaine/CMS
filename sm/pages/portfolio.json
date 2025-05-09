@@ -21,7 +21,57 @@
                 ]
             },
             {
-                "id": "",
+                "id": "8",
+                "name": "VideoDoctor",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Video processing API with motion capture",
+                        "details": [
+                            "https://github.com/adam-lafontaine/VideoDoctor",
+                            "C++, ffmpeg, Dear ImGui"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "7",
+                "name": "CameraCapture",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "USB camera API for Windows and Linux",
+                        "details": [
+                            "https://github.com/adam-lafontaine/CameraCapture",
+                            "C++, libuvc, Windows Media Foundation"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "6",
+                "name": "LibplctagLite",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Read real-time tag data from a Allen-Bradley PLC",
+                        "details": [
+                            "A minimal C++ wrapper for libplctag",
+                            "https://github.com/adam-lafontaine/LibplctagLite",
+                            "libplctag (https://github.com/libplctag/libplctag)",
+                            "C++"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "5",
                 "name": "NNDashboard",
                 "date": "",
                 "organization": "",
@@ -37,7 +87,23 @@
                 ]
             },
             {
-                "id": "",
+                "id": "4",
+                "name": "AugmentedAI",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "A customizable clustering machine learning program",
+                        "details": [
+                            "https://github.com/adam-lafontaine/AugmentedAI",
+                            "C++"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "3",
                 "name": "SDL3Game, SDL2Demo",
                 "date": "",
                 "organization": "",
@@ -54,7 +120,23 @@
                 ]
             },
             {
-                "id": "",
+                "id": "2",
+                "name": "GPUGame",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Mini game using CUDA for GPU processing",
+                        "details": [
+                            "https://github.com/adam-lafontaine/GPUGame",
+                            "C++, CUDA"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "1",
                 "name": "ZeldaMap",
                 "date": "",
                 "organization": "",
