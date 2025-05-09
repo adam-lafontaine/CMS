@@ -15,9 +15,9 @@
             "name": "Portfolio",
 
             "meta": {
-                "route_ep": "portfolio",
-                "filename_md": "portfolio.md",
-                "filename_json": ""
+                "route_ep": "cv-portfolio",
+                "filename_md": "",
+                "filename_json": "portfolio.json"
             }
         }, 
         {

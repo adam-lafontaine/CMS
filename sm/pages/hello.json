@@ -1,0 +1,23 @@
+{
+    "page_data": {
+        "doc_title": "",
+        "title": "Hello",
+        "subtitle": "json starting file",
+
+        "items": [
+            {
+                "id": "",
+                "name": "",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "",
+                        "details": []
+                    }
+                ]
+            }
+        ]
+    }
+}
