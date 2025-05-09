@@ -6,4 +6,14 @@
 }
 ```
 
-Welcome to almostalwaysadam.com
+### Welcome to almostalwaysadam.com
+
+<div style="text-align: center;">
+  <img 
+    src="https://github.com/adam-lafontaine/CMS/raw/sm-current/sm/img/under_construction.png" 
+    alt="Under construction"
+    style="width: 300px;"
+    >
+</div>
+
+This website is a work in progress.  Feel free to look around.
