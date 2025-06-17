@@ -110,11 +110,11 @@
                 "location": "",
                 "notes": [
                     {
-                        "description": "Sample desktop applications using SDL2.  (TODO: SDL3)",
+                        "description": "Sample desktop applications using SDL3 (and SDL2)",
                         "details": [
                             "https://github.com/adam-lafontaine/SDL3Game",
                             "https://github.com/adam-lafontaine/SDL2Demo",
-                            "C++, SDL2"
+                            "C++, SDL3, SDL2"
                         ]
                     }
                 ]
