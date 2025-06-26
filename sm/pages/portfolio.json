@@ -1,0 +1,175 @@
+{
+    "page_data": {
+        "doc_title": "",
+        "title": "Portfolio",
+        "subtitle": "Technical side projects",
+
+        "items": [
+            {
+                "id": "",
+                "name": "",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "",
+                        "details": [
+                            ""
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "8",
+                "name": "VideoDoctor",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Video processing API with motion capture",
+                        "details": [
+                            "https://github.com/adam-lafontaine/VideoDoctor",
+                            "C++, ffmpeg, Dear ImGui"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "7",
+                "name": "CameraCapture",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "USB camera API for Windows and Linux",
+                        "details": [
+                            "Windows - Windows Media Foundation",
+                            "Linux - My own hacked/modified version of libuvc",
+                            "SDL3 - Cross platform replacement when more available",
+                            "https://github.com/adam-lafontaine/CameraCapture"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "6",
+                "name": "LibplctagLite",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Read real-time tag data from a Allen-Bradley PLC",
+                        "details": [
+                            "A minimal C++ wrapper for libplctag",
+                            "https://github.com/adam-lafontaine/LibplctagLite",
+                            "libplctag (https://github.com/libplctag/libplctag)",
+                            "C++"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "5",
+                "name": "NNDashboard",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "User interface for customizing a Convolutional Neural Network",
+                        "details": [
+                            "https://github.com/adam-lafontaine/NNDashboard",
+                            "C++, Dear ImGui"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "4",
+                "name": "AugmentedAI",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "A customizable clustering machine learning program",
+                        "details": [
+                            "https://github.com/adam-lafontaine/AugmentedAI",
+                            "C++"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "3",
+                "name": "SDL3Game, SDL2Demo",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Sample desktop applications using SDL3 (and SDL2)",
+                        "details": [
+                            "https://github.com/adam-lafontaine/SDL3Game",
+                            "https://github.com/adam-lafontaine/SDL2Demo",
+                            "C++, SDL3, SDL2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "2",
+                "name": "GPUGame",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Mini game using CUDA for GPU processing",
+                        "details": [
+                            "https://github.com/adam-lafontaine/GPUGame",
+                            "C++, CUDA"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "1",
+                "name": "ZeldaMap",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Generates an overworld map for the Legend of Zelda",
+                        "details": [
+                            "Scans a save directory for new screenshots to build the map",
+                            "https://github.com/adam-lafontaine/ZeldaMap",
+                            "C++"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0",
+                "name": "This website - almostalwaysadam.com",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "A custom single page application hosting publicly available markdown and json on Github",
+                        "details": [
+                            "Pinia (https://pinia.vuejs.org)",
+                            "Quasar (https://quasar.dev)"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -6,7 +6,38 @@
 
             "meta": {
                 "route_ep": "",
-                "filename_md": ""
+                "filename_md": "",
+                "filename_json": ""
+            }
+        }, 
+        {
+            "id": "1746813517460",
+            "name": "Portfolio",
+
+            "meta": {
+                "route_ep": "cv-portfolio",
+                "filename_md": "",
+                "filename_json": "portfolio.json"
+            }
+        }, 
+        {
+            "id": "1746662799376",
+            "name": "Education",
+
+            "meta": {
+                "route_ep": "cv-education",
+                "filename_md": "",
+                "filename_json": "education.json"
+            }
+        }, 
+        {
+            "id": "1746662773729",
+            "name": "Experience",
+
+            "meta": {
+                "route_ep": "cv-experience",
+                "filename_md": "",
+                "filename_json": "experience.json"
             }
         },
         {
@@ -15,7 +46,8 @@
 
             "meta": {
                 "route_ep": "",
-                "filename_md": "home.md"
+                "filename_md": "home.md",
+                "filename_json": ""
             }
         },
         {
@@ -24,7 +56,8 @@
 
             "meta": {
                 "route_ep": "hello",
-                "filename_md": "hello.md"
+                "filename_md": "hello.md",
+                "filename_json": ""
             }
         }
     ]

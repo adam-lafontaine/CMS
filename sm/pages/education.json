@@ -1,0 +1,43 @@
+{
+    "page_data": {
+        "doc_title": "",
+        "title": "Education",
+        "subtitle": "",
+
+        "items": [
+            {
+                "id": "",
+                "name": "",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    ""
+                ]
+            },
+            {
+                "id": "0",
+                "name": "Computer Programmer Analyst",
+                "date": "2015 – 2017",
+                "organization": "Fanshawe College",
+                "location": "London ON, Canada",
+                "notes": [
+                    "Dean's Honor Roll every semester",
+                    "President's Honor Roll upon graduation",
+                    "Info-Tech Award for Academic Excellence",
+                    "Start.ca Award for Software Project Management"
+                ]
+            },
+            {
+                "id": "1",
+                "name": "B.A.Sc. Chemical Engineering",
+                "date": "1997 – 2002",
+                "organization": "University of Ottawa",
+                "location": "Ottawa ON, Canada",
+                "notes": [
+                    "Graduated with distinction magna cum laude"
+                ]
+            }
+        ]
+    }
+}
