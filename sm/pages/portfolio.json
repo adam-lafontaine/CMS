@@ -46,8 +46,10 @@
                     {
                         "description": "USB camera API for Windows and Linux",
                         "details": [
-                            "https://github.com/adam-lafontaine/CameraCapture",
-                            "C++, libuvc, Windows Media Foundation"
+                            "Windows - Windows Media Foundation",
+                            "Linux - My own hacked/modified version of libuvc",
+                            "SDL3 - Cross platform replacement when more available",
+                            "https://github.com/adam-lafontaine/CameraCapture"
                         ]
                     }
                 ]
