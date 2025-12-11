@@ -30,6 +30,16 @@
             "itchio_src": "https://itch.io/embed/2834707?dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/asteroids",
             "itchio_label": "Asteroids++ by almostalwaysadam"
+        },
+        {
+            "id": "1765392859363",
+            "name": "Punk Run",
+            "description": "Work in progress",
+            "filename_wasm": "punk_run.wasm",
+            "module_js": "punk_run.js",
+            "itchio_src": "https://itch.io/embed/4111253?dark=true",
+            "itchio_href": "https://almostalwaysadam.itch.io/punk-run",
+            "itchio_label": "Punk Run by almostalwaysadam"
         }
     ]
 }
