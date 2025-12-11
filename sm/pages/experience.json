@@ -20,7 +20,7 @@
             },
             {
                 "id": "9",
-                "name": "Independent Video Game Developer",
+                "name": "Video Game Development",
                 "date": "July 2022 - Present",
                 "organization": "",
                 "location": "",
@@ -37,6 +37,13 @@
                         "details": [
                             "Render the Mandelbrot set allowing the user to move around and zoom in and out of any particular part",
                             "https://almostalwaysadam.itch.io/the-mandelbrot-experience"
+                        ]
+                    },
+                    {
+                        "description": "Punk Run",
+                        "details": [
+                            "2D pixel-art game",
+                            "https://almostalwaysadam.itch.io/punk-run"
                         ]
                     }
                 ]
