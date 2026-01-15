@@ -34,7 +34,7 @@
         {
             "id": "1765392859363",
             "name": "Punk Run",
-            "description": "Work in progress",
+            "description": "In progress",
             "filename_wasm": "punk_run.wasm",
             "module_js": "punk_run.js",
             "itchio_src": "https://itch.io/embed/4111253?dark=true",
