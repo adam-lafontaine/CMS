@@ -2,6 +2,7 @@
     "apps": [
         {
             "id": "",
+            "route_ep": "",
             "name": "",
             "description": "",
             "filename_wasm": "",
@@ -11,7 +12,19 @@
             "itchio_label": ""
         },
         {
+            "id": "1771631257768",
+            "route_ep": "game",
+            "name": "Game Console",
+            "description": "Simulated game console",
+            "filename_wasm": "punk_run_console.wasm",
+            "module_js": "punk_run_console.js",
+            "itchio_src": "",
+            "itchio_href": "",
+            "itchio_label": ""
+        },
+        {
             "id": "1713807060949",
+            "route_ep": "mandelbrot",
             "name": "Mandelbrot",
             "description": "Interactive Mandelbrot renderer",
             "filename_wasm": "mandelbrot.wasm",
@@ -23,6 +36,7 @@
         },
         {
             "id": "1713540630991",
+            "route_ep": "asteroids",
             "name": "Asteroids",
             "description": "Asteroids clone",
             "filename_wasm": "asteroids.wasm",
@@ -33,6 +47,7 @@
         },
         {
             "id": "1765392859363",
+            "route_ep": "punk-run",
             "name": "Punk Run",
             "description": "In progress",
             "filename_wasm": "punk_run.wasm",
