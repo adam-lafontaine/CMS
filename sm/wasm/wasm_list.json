@@ -10,18 +10,7 @@
             "itchio_src": "",
             "itchio_href": "",
             "itchio_label": ""
-        },
-        {
-            "id": "1771631257768",
-            "route_ep": "game",
-            "name": "Game Console",
-            "description": "Simulated game console",
-            "filename_wasm": "punk_run_console.wasm",
-            "module_js": "punk_run_console.js",
-            "itchio_src": "",
-            "itchio_href": "",
-            "itchio_label": ""
-        },
+        },        
         {
             "id": "1713807060949",
             "route_ep": "mandelbrot",
@@ -31,7 +20,7 @@
             "module_js": "mandelbrot.js",
             "itchio_src": "https://itch.io/embed/1603304?dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/the-mandelbrot-experience",
-            "itchio_label": "The Mandelbrot Experience by almostalwaysadam<"
+            "itchio_label": "The Mandelbrot Experience by almostalwaysadam"
             
         },
         {
@@ -52,6 +41,21 @@
             "description": "In progress",
             "filename_wasm": "punk_run.wasm",
             "module_js": "punk_run.js",
+            "itchio_src": "https://itch.io/embed/4111253?dark=true",
+            "itchio_href": "https://almostalwaysadam.itch.io/punk-run",
+            "itchio_label": "Punk Run by almostalwaysadam"
+        }
+    ],
+
+    "console_apps": [
+
+        {
+            "id": "1771631257768",
+            "route_ep": "game",
+            "name": "Game Console",
+            "description": "Simulated game console",
+            "filename_wasm": "punk_run_console.wasm",
+            "module_js": "punk_run_console.js",
             "itchio_src": "https://itch.io/embed/4111253?dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/punk-run",
             "itchio_label": "Punk Run by almostalwaysadam"
