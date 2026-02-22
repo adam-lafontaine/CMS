@@ -9339,8 +9339,8 @@ var ASM_CONSTS = {
  342437: () => { if (typeof(Module['SDL3']) !== 'undefined') { var SDL3 = Module['SDL3']; SDL3.themeChangedMatchMedia.removeEventListener('change', SDL3.eventHandlerThemeChanged); SDL3.themeChangedMatchMedia = undefined; SDL3.eventHandlerThemeChanged = undefined; } },  
  342690: () => { return window.innerWidth; },  
  342720: () => { return window.innerHeight; },  
- 342751: ($0) => { /*Module['requestFullscreen'] = function(lockPointer, resizeCanvas) { _requestFullscreenThroughSDL($0); };*/ },  
- 342860: () => { /*Module['requestFullscreen'] = function(lockPointer, resizeCanvas) {};*/ },  
+ 342751: ($0) => { /*Module['requestFullscreen'] = function(lockPointer, resizeCanvas) { _requestFullscreenThroughSDL($0); };*/ console.log("NO FULLSCREEN", $0) },  
+ 342860: () => { /*Module['requestFullscreen'] = function(lockPointer, resizeCanvas) {};*/ console.log("NO FULLSCREEN"); },  
  342934: () => { if (window.matchMedia) { if (typeof(Module['SDL3']) === 'undefined') { Module['SDL3'] = {}; } var SDL3 = Module['SDL3']; SDL3.eventHandlerThemeChanged = function(event) { _Emscripten_SendSystemThemeChangedEvent(); }; SDL3.themeChangedMatchMedia = window.matchMedia('(prefers-color-scheme: dark)'); SDL3.themeChangedMatchMedia.addEventListener('change', SDL3.eventHandlerThemeChanged); } }
 };
 
