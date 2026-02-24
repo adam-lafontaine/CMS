@@ -50,7 +50,7 @@
     "console_apps": [
 
         {
-            "id": "1771631257768",
+            "id": "",
             "route_ep": "game",
             "name": "Game Console",
             "description": "Simulated game console",
