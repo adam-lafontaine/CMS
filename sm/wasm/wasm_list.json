@@ -18,7 +18,7 @@
             "description": "Interactive Mandelbrot renderer",
             "filename_wasm": "mandelbrot.wasm",
             "module_js": "mandelbrot.js",
-            "itchio_src": "https://itch.io/embed/1603304?dark=true",
+            "itchio_src": "https://itch.io/embed/1603304?linkback=true&amp;dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/the-mandelbrot-experience",
             "itchio_label": "The Mandelbrot Experience by almostalwaysadam"
             
@@ -30,7 +30,7 @@
             "description": "Asteroids clone",
             "filename_wasm": "asteroids.wasm",
             "module_js": "asteroids.js",
-            "itchio_src": "https://itch.io/embed/2834707?dark=true",
+            "itchio_src": "https://itch.io/embed/2834707?linkback=true&amp;dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/asteroids",
             "itchio_label": "Asteroids++ by almostalwaysadam"
         },
@@ -38,10 +38,10 @@
             "id": "1765392859363",
             "route_ep": "punk-run",
             "name": "Punk Run",
-            "description": "Procedurally generated running platformer",
+            "description": "Procedurally generated running platformer (tech demo)",
             "filename_wasm": "punk_run.wasm",
             "module_js": "punk_run.js",
-            "itchio_src": "https://itch.io/embed/4111253?dark=true",
+            "itchio_src": "https://itch.io/embed/4111253?linkback=true&amp;dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/punk-run",
             "itchio_label": "Punk Run by almostalwaysadam"
         }
@@ -56,7 +56,7 @@
             "description": "Simulated game console",
             "filename_wasm": "punk_run_console.wasm",
             "module_js": "punk_run_console.js",
-            "itchio_src": "https://itch.io/embed/4111253?dark=true",
+            "itchio_src": "https://itch.io/embed/4111253?linkback=true&amp;dark=true",
             "itchio_href": "https://almostalwaysadam.itch.io/punk-run",
             "itchio_label": "Punk Run by almostalwaysadam"
         }
