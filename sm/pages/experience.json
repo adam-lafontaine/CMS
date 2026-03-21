@@ -26,6 +26,14 @@
                 "location": "",
                 "notes": [
                     {
+                        "description": "Punk Run",
+                        "details": [
+                            "A procedurally generated running platformer",
+                            "In progress",
+                            "https://almostalwaysadam.itch.io/punk-run"
+                        ]
+                    },
+                    {
                         "description": "Asteroids++",
                         "details": [
                             "A survivors-like homage to the arcade classic Asteroids",
@@ -35,18 +43,11 @@
                     {
                         "description": "The Mandelbrot Experience",
                         "details": [
-                            "Render the Mandelbrot set allowing the user to move around and zoom in and out of any particular part",
+                            "Real-time rendering of the Mandelbrot set",
                             "https://almostalwaysadam.itch.io/the-mandelbrot-experience"
                         ]
-                    },
-                    {
-                        "description": "Punk Run",
-                        "details": [
-                            "A procedurally generated running platformer",
-                            "In progress",
-                            "https://almostalwaysadam.itch.io/punk-run"
-                        ]
                     }
+                    
                 ]
             },
             {
