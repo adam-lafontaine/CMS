@@ -5,7 +5,7 @@ Punk Run is a cyberpunk themed game made with pixel-art assets from <https://itc
 ### Why the name 'Punk Run'?
 The game is named after the animation spritesheet for the main character (Punk_run.png).
 
-![Punk_run.png](dev/img/Punk_run.png)
+![Punk_run.png](https://github.com/adam-lafontaine/CMS/raw/sm-current/site-punk-run/img/Punk_run.png)
 
 ### Why use free pixel-art?
 Because I am a programmer.  Making art is well outside of my wheelhouse.  Also, 'free' is within budget.
