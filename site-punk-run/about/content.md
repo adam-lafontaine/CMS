@@ -13,7 +13,10 @@ The development team consists of only 1 programmer.  There is no artistic talent
 So far just running, jumping and spawing random sprites on screen.  The rule for development is that only art from the above asset packs can be used for the game.  Anything else is on the table
 
 ### What's next?
-TBD.  Something new is added with each update.
+TBD.  Something new is added with each update.  As the project matures, there will be a section on this site for planned features and their progress.
 
 ### What game engine is used?
-None.  Just old fashioned C++ with SDL2(3).  The game will be heavy on procedural generation so, full control of the game logic is needed.  SDL allows the game the be run on multiple systems.
+None.  Just old fashioned C++ with SDL3.  The game will be heavy on procedural generation so, full control of the game logic is needed.
+
+### On what platforms will the the game be available?
+Basically any.  The code 'targets' [SDL3](https://wiki.libsdl.org/SDL3/FrontPage).  SDL supports several platforms.  Currently there are [releases](https://almostalwaysadam.itch.io/punk-run) available for Windows, Linux, and WASM (browser).
