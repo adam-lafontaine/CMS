@@ -3,31 +3,31 @@
 <table>
     <thead>
         <tr>
-            <th style="border: 1px solid">Gameplay Controls</th>
-            <th style="border: 1px solid">Gamepad</th>
-            <th style="border: 1px solid">Keyboard</th>
+            <th>Gameplay Controls</th>
+            <th>Gamepad</th>
+            <th>Keyboard</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td style="border: 1px solid">Run / Stop</td>
-            <td style="border: 1px solid">A</td>
-            <td style="border: 1px solid">A / Enter</td>
+            <td>Run / Stop</td>
+            <td>A</td>
+            <td>A / Enter</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Jump</td>
-            <td style="border: 1px solid">Y</td>
-            <td style="border: 1px solid">Y / Space</td>
+            <td>Jump</td>
+            <td>Y</td>
+            <td>Y / Space</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Bat Sprite</td>
-            <td style="border: 1px solid">X</td>
-            <td style="border: 1px solid">X</td>
+            <td>Bat Sprite</td>
+            <td>X</td>
+            <td>X</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Cycle Theme</td>
-            <td style="border: 1px solid">B</td>
-            <td style="border: 1px solid">B</td>
+            <td>Cycle Theme</td>
+            <td>B</td>
+            <td>B</td>
         </tr>
     </tbody>
 </table>
@@ -35,31 +35,31 @@
 <table>
     <thead>
         <tr>
-            <th style="border: 1px solid">Camera Controls</th>
-            <th style="border: 1px solid">Gamepad</th>
-            <th style="border: 1px solid">Keyboard</th>
+            <th>Camera Controls</th>
+            <th>Gamepad</th>
+            <th>Keyboard</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td style="border: 1px solid">Move Right</td>
-            <td style="border: 1px solid">Right</td>
-            <td style="border: 1px solid">Right Arrow</td>
+            <td>Move Right</td>
+            <td>Right</td>
+            <td>Right Arrow</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Move Left</td>
-            <td style="border: 1px solid">Left</td>
-            <td style="border: 1px solid">Left Arrow</td>
+            <td>Move Left</td>
+            <td>Left</td>
+            <td>Left Arrow</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Move Up</td>
-            <td style="border: 1px solid">Up</td>
-            <td style="border: 1px solid">Up Arrow</td>
+            <td>Move Up</td>
+            <td>Up</td>
+            <td>Up Arrow</td>
         </tr>
         <tr>
-            <td style="border: 1px solid">Move Down</td>
-            <td style="border: 1px solid">Down</td>
-            <td style="border: 1px solid">Down Arrow</td>
+            <td>Move Down</td>
+            <td>Down</td>
+            <td>Down Arrow</td>
         </tr>
     </tbody>
 </table>
