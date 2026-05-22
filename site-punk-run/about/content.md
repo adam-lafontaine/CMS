@@ -22,4 +22,4 @@ Basically any.  The code 'targets' [SDL3](https://wiki.libsdl.org/SDL3/FrontPage
 No.  I don't want to delete my account.
 
 ### What's next?
-TBD.  Something new is added with each update.  As the project matures, this site will have a section for planned features and thier progress.
+TBD.  Something new is added with each update.  As the project matures, this site will evolve with and include a section for planned features and thier progress.
