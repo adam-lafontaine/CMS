@@ -2,7 +2,6 @@
 
 <div class="fit-center">
 
-<p>
 <table>
     <thead>
         <tr>
@@ -34,8 +33,7 @@
         </tr>
     </tbody>
 </table>
-</p>
-<p>
+
 <table>
     <thead>
         <tr>
@@ -67,5 +65,5 @@
         </tr>
     </tbody>
 </table>
-</p>
+
 </div>
