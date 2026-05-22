@@ -1,5 +1,7 @@
 ## Controls
 
+<div class="fit-center">
+
 <table>
     <thead>
         <tr>
@@ -63,3 +65,5 @@
         </tr>
     </tbody>
 </table>
+
+</div>
