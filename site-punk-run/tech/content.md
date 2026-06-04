@@ -1,5 +1,12 @@
 ## Change Log
 
+### v0.13 [ 2026-05-25 - 2026-06-04 ]: Numerical units
+* Fixed point tile coordinates and physics
+* Smooth camera motion
+* Allow the game to set its fixed frame rate
+* No release
+
+
 ### v0.12 [ 2026-05-16 - 2026-05-21 ]: Sprite and camera movement
 * Add more sprites
 * Camera automatically moves back to origin
