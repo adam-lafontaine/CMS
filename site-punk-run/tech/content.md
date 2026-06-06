@@ -1,10 +1,10 @@
 ## Change Log
 
-### v0.13 [ 2026-05-25 - 2026-06-04 ]: Numerical units
+### v0.13 [ 2026-05-25 - 2026-06-06 ]: Upgrade visuals
 * Fixed point tile coordinates and physics
 * Smooth camera motion
-* Allow the game to set its fixed frame rate
-* No release
+* Enable in-game framerate adjustement
+* Fix window texture scaling mode (sharper resolution)
 
 
 ### v0.12 [ 2026-05-16 - 2026-05-21 ]: Sprite and camera movement
