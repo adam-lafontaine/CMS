@@ -6,6 +6,7 @@
 * Enable in-game framerate adjustement
 * Fix window texture scaling mode (sharper resolution)
 * Upgrade engine image texture inspection
+* New title screen and icon
 
 
 ### v0.12 [ 2026-05-16 - 2026-05-21 ]: Sprite and camera movement
