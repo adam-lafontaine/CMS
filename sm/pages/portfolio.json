@@ -21,7 +21,7 @@
                 ]
             },
             {
-                "id": "8",
+                "id": "9",
                 "name": "VideoDoctor",
                 "date": "",
                 "organization": "",
@@ -37,7 +37,7 @@
                 ]
             },
             {
-                "id": "7",
+                "id": "8",
                 "name": "CameraCapture",
                 "date": "",
                 "organization": "",
@@ -50,6 +50,22 @@
                             "Linux - My own hacked/modified version of libuvc",
                             "SDL3 - Cross platform replacement when more available",
                             "https://github.com/adam-lafontaine/CameraCapture"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "7",
+                "name": "SimpleImage",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "A simple image processing library for educational purposes",
+                        "details": [
+                            "https://github.com/adam-lafontaine/SimpleImage",
+                            "C++, CUDA"
                         ]
                     }
                 ]
