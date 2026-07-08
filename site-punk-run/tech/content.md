@@ -1,10 +1,11 @@
 ## Change Log
 
-### v0.14 [ 2026-06-17 - 2026-07-03 ]: Asset app tool
+### v0.14 [ 2026-06-17 - 2026-07-08 ]: Asset app tool
 * Made a new app for converting raw assets to a binaray file
 * Accidentally delete hard drive and reinstall everything
 * Compile time references for loading assets
 * Reorganize assets used in game
+* Track night and day with game tick
 
 
 ### v0.13 [ 2026-05-25 - 2026-06-06 ]: Upgrade visuals
