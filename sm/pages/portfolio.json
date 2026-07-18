@@ -21,6 +21,23 @@
                 ]
             },
             {
+                "id": "1784376560221",
+                "name": "OdinGame",
+                "date": "",
+                "organization": "",
+                "location": "",
+                "notes": [
+                    {
+                        "description": "Application made with Odin and Raylib backend",
+                        "details": [
+                            "https://github.com/adam-lafontaine/OdinGame",
+                            "Odin, Raylib",
+                            "based on https://github.com/adam-lafontaine/SDL3Game"
+                        ]
+                    }
+                ]
+            },
+            {
                 "id": "1783627579909",
                 "name": "VideoDoctor",
                 "date": "",
@@ -128,12 +145,10 @@
                 "location": "",
                 "notes": [
                     {
-                        "description": "Sample game applications",
+                        "description": "Game applications made with SDL3 and SDL2 backends",
                         "details": [
                             "https://github.com/adam-lafontaine/SDL3Game",
-                            "C++, SDL3, SDL2",
-                            "https://github.com/adam-lafontaine/SDL3Game/tree/odin-master",
-                            "Odin, Raylib"
+                            "C++, SDL3, SDL2"
                         ]
                     }
                 ]
